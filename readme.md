@@ -39,6 +39,8 @@ El código principal de la aplicación está en el directorio pialara.
 
 En el directorio blueprints se van a agrupar las funcionalidades para tenerlo todo separado. Por ejemplo, auth tendrá su blueprint, syllabus (frases) tendrá su blueprint, etc.
 
+Cuando se crea un blueprint, es necesario agregarlo en ```__init__.py``` para que la aplicación lo cargue.
+
 ### Vistas
 
 Cada blueprint va a tener asociado un directorio con su mismo nombre dentro del directorio templates que contendrá sus vistas
