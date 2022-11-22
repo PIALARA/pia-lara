@@ -22,7 +22,7 @@ Y activar el entorno virtual (aquí ya cada uno según windows, linux o Mac tend
 
 Instalamos los requerimientos
 ```
-pip3 install -r requeriments.txt
+pip3 install -r requirements.txt
 ```
 
 Ejecutamos
