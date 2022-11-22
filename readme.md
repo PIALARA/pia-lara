@@ -83,13 +83,7 @@ Los métodos de MongoModel no son más que wrappers de los ofrecidos por la libr
 - insert_one(self, values)
 - insert_many(self, values)
 
-
-### Conexión a la base de datos
-TBD descripción
-TBD conectar con mongo
-TBD ejemplo
-
-#### Ejemplos
+#### Ejemplos de uso de los modelos
 
 **Ejemplo para insertar un documento**
 
