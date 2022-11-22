@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title">Listado de usuarios</h1>
+
+{% with messages = get_flashed_messages(category_filter=["info"]) %}
+{% if messages %}
+    <div class="notification is-info">
+    {{ messages[0] }}
+    </div>
+{% endif %}
+{% endwith %}
+
+{% with messages = get_flashed_messages(category_filter=["error"]) %}
+{% if messages %}
+    <div class="notification is-error">
+    {{ messages[0] }}. Vuelve a intentarlo
+    </div>
+{% endif %}
+{% endwith %}
+
+<div class="content">
+  <table class="table is-hoverable is-fullwidth">
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Nombre</th>
+        <th>Rol</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.get('email') }}</td>
+        <td>{{ user.get('nombre') }}</td>
+        <td>{{ user.get('rol') }}</td>
+        <td>
+{#            <a href="{{ url_for('main.user_view', id=user['_id']) }}"><span class="icon"><i class="fas fa-eye"></i></span></a>#}
+{#            <a href="{{ url_for('main.user_edit', id=user['_id']) }}"><span class="icon"><i class="fas fa-edit"></i></span></a>#}
+{#            <a href="{{ url_for('main.user_remove', id=user['_id']) }}"><span class="icon"><i class="fas fa-trash"></i></span></a>#}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

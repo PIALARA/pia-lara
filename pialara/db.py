@@ -1,10 +1,11 @@
-from pymongo import MongoClient
-from pymongo.errors import DuplicateKeyError, OperationFailure
 from bson.objectid import ObjectId
-from pymongo import DESCENDING, ASCENDING
-
 from flask import current_app, g
+from pymongo import ASCENDING
+from pymongo import MongoClient
 from werkzeug.local import LocalProxy
+
+from pialara.models.User import User
+
 
 # from project.models import User
 

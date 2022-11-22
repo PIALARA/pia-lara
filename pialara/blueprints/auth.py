@@ -3,6 +3,7 @@ from flask import (
 )
 from flask_login import login_required, login_user, current_user, logout_user
 from werkzeug.security import check_password_hash
+from pialara import db
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -28,12 +29,17 @@ def login_post():
 
     # marcamos al usuario como autenticado en flask_login
     login_user(user, remember=remember)
-    return redirect(url_for('main.profile', nombre=current_user.nombre))
+    return redirect(url_for('auth.profile', nombre=current_user.nombre))
 
 
-# @bp.route('/logout')
-# @login_required
-# def logout():
-#     logout_user()
-#     flash('Sesión cerrada con éxito')
-#     return redirect(url_for('auth.login'))
+@bp.route('/profile')
+def profile():
+    return render_template('auth/profile.html')
+
+
+@bp.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Sesión cerrada con éxito')
+    return redirect(url_for('auth.login'))

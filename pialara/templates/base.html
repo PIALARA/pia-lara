@@ -5,120 +5,121 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PIA Lara - Captura</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
 </head>
 <body>
-    <section class="hero is-white is-fullheight">
-        <nav class="navbar is-transparent">
-            <div class="navbar-brand">
-              <a class="navbar-item" href="https://piafplara.es">
-                <img src="{{ url_for('static', filename='pialara.png') }}" alt="PIA Lara: un proyecto que habla por ti" width="112" height="28">
-              </a>
-              <div class="navbar-burger burger" data-target="navbarPIALara">
+<section class="hero is-white is-fullheight">
+    <nav class="navbar is-transparent">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://piafplara.es">
+                <img src="{{ url_for('static', filename='pialara.png') }}" alt="PIA Lara: un proyecto que habla por ti"
+                     width="112" height="28">
+            </a>
+            <div class="navbar-burger burger" data-target="navbarPIALara">
                 <span></span>
                 <span></span>
                 <span></span>
-              </div>
             </div>
+        </div>
 
-            <div id="navbarPIALara" class="navbar-menu">
-              <div class="navbar-start">
+        <div id="navbarPIALara" class="navbar-menu">
+            <div class="navbar-start">
                 <a href="{{ url_for('main.index') }}" class="navbar-item">
                     Inicio
                 </a>
                 {% if not current_user.is_authenticated %}
-                  <a href="{{ url_for('auth.login') }}" class="navbar-item">
-                      Login
-                  </a>
+                    <a href="{{ url_for('auth.login') }}" class="navbar-item">
+                        Login
+                    </a>
                 {% endif %}
                 {% if current_user.is_authenticated %}
-                  <a href="{{ url_for('main.profile') }}" class="navbar-item">
-                      Perfil
-                  </a>
-                  {% if current_user.rol == "Administrador" %}
-                  <div class="navbar-item has-dropdown is-hoverable">
-                    <a class="navbar-link" href="#">
-                      Usuarios
+                    <a href="{{ url_for('auth.profile') }}" class="navbar-item">
+                        Perfil
                     </a>
-                    <div class="navbar-dropdown is-hidden-mobile is-boxed">
-                        <a class="navbar-item" href="{{ url_for('main.user_create') }}">
-                        Alta
-                      </a>
-                      <a class="navbar-item" href="{{ url_for('main.user_list') }}">
-                        Listado
-                      </a>
-                    </div>
-                  </div>
-                  {% endif %}
-                  {% if current_user.rol == "Técnico" %}
-                  <div class="navbar-item has-dropdown is-hoverable">
-                    <a class="navbar-link" href="#">
-                      Clientes
-                    </a>
-                    <div class="navbar-dropdown is-hidden-mobile is-boxed">
-                        <a class="navbar-item" href="{{ url_for('main.client_create') }}">
-                        Alta
-                      </a>
-                      <a class="navbar-item" href="{{ url_for('main.client_list') }}">
-                        Listado
-                      </a>
-                    </div>
-                  </div>
-                  {% endif %}
+                    {% if current_user.rol == "Administrador" %}
+                        <div class="navbar-item has-dropdown is-hoverable">
+                            <a class="navbar-link" href="#">
+                                Usuarios
+                            </a>
+                            <div class="navbar-dropdown is-hidden-mobile is-boxed">
+                                <a class="navbar-item" href="{{ url_for('users.index') }}">
+                                    Alta
+                                </a>
+                                <a class="navbar-item" href="{{ url_for('users.index') }}">
+                                    Listado
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if current_user.rol == "Técnico" %}
+                        <div class="navbar-item has-dropdown is-hoverable">
+                            <a class="navbar-link" href="#">
+                                Clientes
+                            </a>
+                            <div class="navbar-dropdown is-hidden-mobile is-boxed">
+                                <a class="navbar-item" href="{{ url_for('users.index') }}">
+                                    Alta
+                                </a>
+                                <a class="navbar-item" href="{{ url_for('users.index') }}">
+                                    Listado
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
                 {% endif %}
             </div>
 
             {% if current_user.is_authenticated %}
-            <div class="navbar-end">
-                <div class="navbar-item">
-                    <div class="field is-grouped">
-                      <div class="field has-addons">
+                <div class="navbar-end">
+                    <div class="navbar-item">
+                        <div class="field is-grouped">
+                            <div class="field has-addons">
 
-                            <p class="control">
+                                <p class="control">
                               <span class="button">
-                              {% if current_user.rol == "Cliente": %}
-                                <a class="navbar-item" href="{{ url_for('main.client_edit', id=current_user.id)  }}">
-                              {% else: %}
-                                <a class="navbar-item" href="{{ url_for('main.user_edit', id=current_user.id)  }}">
-                              {% endif %}
+{#                              {% if current_user.rol == "Cliente": %}#}
+                                  <a class="navbar-item" href="{{ url_for('users.index', id=current_user.id) }}">
+{#                              {% else: %}#}
+{#                                  <a class="navbar-item" href="{{ url_for('users.index', id=current_user.id) }}">#}
+{#                              {% endif %}#}
                                   <span class="icon is-small">
                                   <i class="fas fa-user"> </i>
                                 </span>
                                 <span>{{ current_user.nombre }}</span>
                                   </a>
                               </span>
-                            </p>
-                            <p class="control">
-                              <button class="button is-static">
+                                </p>
+                                <p class="control">
+                                    <button class="button is-static">
                                 <span class="icon is-small">
                                   <i class="fas fa-layer-group"></i>
                                 </span>
-                                <span>{{ current_user.rol }}
-                              </button>
-                            </p>
-                            <p class="control">
-                                <a class="button is-info" href="{{ url_for('auth.logout') }}">
+                                        <span>{{ current_user.rol }}
+                                    </button>
+                                </p>
+                                <p class="control">
+                                    <a class="button is-info" href="{{ url_for('auth.logout') }}">
                                     <span class="icon">
                                         <i class="fas fa-right-from-bracket"></i>
                                     </span>
-                                    <span>Salir</span>
-                                </a>
-                            </p>
+                                        <span>Salir</span>
+                                    </a>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
             {% endif %}
-        </nav>
+    </nav>
 
-        <div class="hero-body">
-            <div class="container has-text-centered">
-               {% block content %}
-               {% endblock %}
-            </div>
+    <div class="hero-body">
+        <div class="container has-text-centered">
+            {% block content %}
+            {% endblock %}
         </div>
-    </section>
+    </div>
+</section>
 </body>
 <script type="text/javascript" src="{{ url_for('static', filename='pialara.js') }}"></script>
 </html>
