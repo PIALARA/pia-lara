@@ -43,18 +43,53 @@ Cuando se crea un blueprint, es necesario agregarlo en ```__init__.py``` para qu
 
 ### Vistas
 
-Cada blueprint va a tener asociado un directorio con su mismo nombre dentro del directorio templates que contendrá sus vistas
+Cada Blueprint va a tener asociado un directorio con su mismo nombre dentro del directorio templates que contendrá sus vistas.
+
+Por ejemplo, el Blueprint auth va a tener el directorio templates/auth para guardar sus vistas.
 
 ### Modelos
 
-TDB
+Se van a usar modelos para acceder a la base de datos. Cada modelo representa a una colección y tiene que extender de la clase base que se ha creado  ```MongoModel```. Un ejemplo de implementación para crear un modelo que va a acceder a las colecciones de Usuario sería:
+
+```python
+from pialara.models.MongoModel import MongoModel
+
+
+class Usuario(MongoModel):
+    collection_name = 'users'
+
+```
+
+Es necesario hacer override de la propiedad collection_name y asignarle una cadena con el nombre de la colección.
+
+Una vez tenemos el modelo creado, lo podemos instanciar de la siguiente manera:
+
+```python
+u = Usuario()
+```
+
+Con esto, tendríamos todos los métodos que se han heredado de MongoModel a nuestra disposición sin tener que haberlos implementado. Por ejemplo, podríamos recuperar todos los usuarios con:
+```python
+db.users.find()
+```
+
+#### Métodos de MongoModel
+
+Los métodos de MongoModel no son más que wrappers de los ofrecidos por la librería PyMongo. Es decir, el método ```user.find(...parametros...)``` sería lo mismo que hacer ```db.users.find(...parametros...)```
+
+- find(self, params=None)
+- update_one(self, mongo_filter, new_values, upsert=False)
+- update_many(self, mongo_filter, new_values, upsert=False)
+- insert_one(self, values)
+- insert_many(self, values)
+
 
 ### Conexión a la base de datos
 TBD descripción
 TBD conectar con mongo
 TBD ejemplo
 
-### Ejemplos
+#### Ejemplos
 
 **Ejemplo para insertar un documento**
 
@@ -87,4 +122,3 @@ u.update_many({"nombre": "Test"}, { "$set": {"email":"asddasd@asdads.com"}})
 ```python
 u.update_many({"nombre": "Test"}, { "$set": {"email":"asddasd@asdads.com"}}, upsert=True)
 ```
-Prueba
