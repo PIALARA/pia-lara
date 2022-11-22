@@ -7,3 +7,4 @@ PIALARA_DB_NAME = pialara
 SECRET_KEY = eac5e91171438960ddec0c9c469a4c3dd42e96aea462afc5ab830f78527ad80e
 PIALARA_DB_URI = localhost
 PIALARA_DB_NAME = pialara
+
