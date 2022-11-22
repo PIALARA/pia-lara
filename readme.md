@@ -87,4 +87,4 @@ u.update_many({"nombre": "Test"}, { "$set": {"email":"asddasd@asdads.com"}})
 ```python
 u.update_many({"nombre": "Test"}, { "$set": {"email":"asddasd@asdads.com"}}, upsert=True)
 ```
-
+Prueba
