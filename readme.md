@@ -53,3 +53,38 @@ TDB
 TBD descripción
 TBD conectar con mongo
 TBD ejemplo
+
+### Ejemplos
+
+**Ejemplo para insertar un documento**
+
+```python
+u.insert_one({ "nombre": "Test", "email": "test@test.com" })
+```
+
+**Ejemplo para insertar multiples documentos**
+
+```python
+u.insert_many([{ "nombre": "Test", "email": "test2@test2.com" },{ "nombre": "Test", "email": "test3@test3.com" }])
+```
+
+**Ejemplo para actualizar un documento**
+```python
+u.update_one({"email":"test3@test3.com"}, { "$set": {"nombre": "Test33"}})
+```
+
+**Ejemplo para actualizar un documento y si no existe lo crea**
+```python
+u.update_one({"email":"test3@test3.com"}, { "$set": {"nombre": "Test33"}}, upsert=True)
+```
+
+**Ejemplo para actualizar multiples documentos**
+```python
+u.update_many({"nombre": "Test"}, { "$set": {"email":"asddasd@asdads.com"}})
+```
+
+**Ejemplo para actualizar multiples documentos y si no existen los crea**
+```python
+u.update_many({"nombre": "Test"}, { "$set": {"email":"asddasd@asdads.com"}}, upsert=True)
+```
+
