@@ -9,6 +9,7 @@ from pialara.db import get_db
 def index():
     return render_template('syllabus/index.html')
 
+"""
 @bp.route('/create/:id')
 def create():
     return render_template('syllabus/create.html')
@@ -35,3 +36,4 @@ def delete():
 @bp.route('/view/:id')
 def view():
     return render_template('syllabus/index.html')
+"""
