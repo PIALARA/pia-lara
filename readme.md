@@ -2,6 +2,10 @@
 
 ## Instalación
 
+
+
+
+
 **Consideraciones**: Uso los comandos ```python3``` y ```pip3```por que es como lo tengo configurado en mi sistema. Cada uno tendrá que saber cuál utilizar (python vs. python3 / pip vs. pip3) según el entorno de cada uno.
 
 Clonar el repositorio 
