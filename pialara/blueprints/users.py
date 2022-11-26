@@ -19,3 +19,9 @@ def index():
 
 
     return render_template('users/index.html', users=u.find())
+
+
+@bp.route('/list')
+@login_required
+def list():
+    return render_template('users/list.html')
