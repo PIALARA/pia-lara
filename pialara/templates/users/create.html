@@ -1,0 +1,153 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+  <h1 class="text-center p-3">Crear usuario</h1>
+
+  <nav class="nav nav-tabs justify-content-center" id="nav-tab" role="tablist">
+    <button class="nav-link active" id="nav-administrador-tab" data-bs-toggle="tab" data-bs-target="#nav-administrador"
+      type="button" role="tab" aria-controls="nav-administrador" aria-selected="true">
+      <i class="bi bi-gear me-2"></i>Administrador
+    </button>
+
+    <button class="nav-link" id="nav-tecnico-tab" data-bs-toggle="tab" data-bs-target="#nav-tecnico" type="button"
+      role="tab" aria-controls="nav-tecnico" aria-selected="false">
+      <i class="bi bi-journals me-2"></i>Técnico
+    </button>
+
+    <button class="nav-link" id="nav-cliente-tab" data-bs-toggle="tab" data-bs-target="#nav-cliente" type="button"
+      role="tab" aria-controls="nav-cliente" aria-selected="false">
+      <i class="bi bi-person me-2"></i>Cliente
+    </button>
+  </nav>
+
+  <div class="tab-content py-4" id="nav-tabContent">
+    <section class="tab-pane fade show active" id="nav-administrador" role="tabpanel"
+      aria-labelledby="nav-administrador-tab" tabindex="0">
+      <form class="container" style="max-width: 20rem">
+        <div class="mb-3">
+          <label for="nombre" class="form-label">Nombre</label>
+          <input type="text" class="form-control" id="nombre" required />
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" required />
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Contraseña</label>
+          <input type="password" class="form-control" id="password" required />
+        </div>
+        <div class="mb-3">
+          <label for="password-repeat" class="form-label">Repetir contraseña</label>
+          <input type="password" class="form-control" id="password-repeat" required />
+        </div>
+        <div class="mb-3">
+          <button class="btn btn-primary w-100 shadow" type="submit">
+            <i class="bi bi-plus-square me-2"></i>Crear administrador
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="tab-pane fade" id="nav-tecnico" role="tabpanel" aria-labelledby="nav-tecnico-tab" tabindex="0">
+      <form class="container" style="max-width: 20rem">
+        <div class="mb-3">
+          <label for="nombre" class="form-label">Nombre</label>
+          <input type="text" class="form-control" id="nombre" required />
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" required />
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Contraseña</label>
+          <input type="password" class="form-control" id="password" required />
+        </div>
+        <div class="mb-3">
+          <label for="password-repeat" class="form-label">Repetir contraseña</label>
+          <input type="password" class="form-control" id="password-repeat" required />
+        </div>
+        <div class="mb-3">
+          <button class="btn btn-primary w-100 shadow" type="submit">
+            <i class="bi bi-plus-square me-2"></i>Crear técnico
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="tab-pane fade" id="nav-cliente" role="tabpanel" aria-labelledby="nav-cliente-tab" tabindex="0">
+      <form class="container" style="max-width: 20rem">
+        <div class="mb-3">
+          <label for="nombre" class="form-label">Nombre</label>
+          <input type="text" class="form-control" id="nombre" required />
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" required />
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Contraseña</label>
+          <input type="password" class="form-control" id="password" required />
+        </div>
+        <div class="mb-3">
+          <label for="password-repeat" class="form-label">Repetir contraseña</label>
+          <input type="password" class="form-control" id="password-repeat" required />
+        </div>
+        <div class="mb-3">
+          <label for="fecha_nacimiento" class="form-label">Fecha de nacimiento</label>
+          <input type="date" class="form-control" id="fecha_nacimiento" required />
+        </div>
+        <div class="mb-3">
+          <label for="sexo" class="form-label">Sexo</label>
+          <select class="form-select" id="sexo" required>
+            <option value="H">Hombre</option>
+            <option value="M">Mujer</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="provincia" class="form-label">Provincia</label>
+          <select class="form-select" id="provincia" required>
+            <option value="Alicante">Alicante</option>
+            <option value="Valencia">Valencia</option>
+            <option value="Castellón">Castellón</option>
+            <option value="Murcia">Murcia</option>
+          </select>
+        </div>
+        <fieldset class="mb-3">
+          <legend class="fs-6">Enfermedades</legend>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="enfermedades" value="enfermedad-1" id="enfermedad-1" />
+            <label class="form-check-label" for="enfermedad-1">Enfermedad 1</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="enfermedades" value="enfermedad-2" id="enfermedad-2" />
+            <label class="form-check-label" for="enfermedad-2">Enfermedad 2</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="enfermedades" value="enfermedad-3" id="enfermedad-3" />
+            <label class="form-check-label" for="enfermedad-3">Enfermedad 3</label>
+          </div>
+        </fieldset>
+        <fieldset class="mb-3">
+          <legend class="fs-6">Dis</legend>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="dis" value="dis-1" id="dis-1" />
+            <label class="form-check-label" for="dis-1">Dis 1</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="dis" value="dis-2" id="dis-2" />
+            <label class="form-check-label" for="dis-2">Dis 2</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="dis" value="dis-3" id="dis-3" />
+            <label class="form-check-label" for="dis-3">Dis 3</label>
+          </div>
+        </fieldset>
+        <div class="mb-3">
+          <button class="btn btn-primary w-100 shadow" type="submit">
+            <i class="bi bi-plus-square me-2"></i>Crear cliente
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+{% endblock %}

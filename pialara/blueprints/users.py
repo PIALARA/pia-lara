@@ -18,3 +18,9 @@ def index():
         raise Exception("Operación no permitida para el rol", logged_rol)
 
     return render_template('users/index.html', users=u.find())
+
+
+@bp.route('/create')
+@login_required
+def create():
+    return render_template('users/create.html')
