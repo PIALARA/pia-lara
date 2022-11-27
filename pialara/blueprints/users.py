@@ -11,11 +11,11 @@ bp = Blueprint('users', __name__, url_prefix='/users')
 def index():
     u = Usuario()
 
-    logged_rol = current_user.rol
-    if logged_rol == "Administrador":
-        users = db.users.find()
-    else:
-        raise Exception("Operación no permitida para el rol", logged_rol)
+    # logged_rol = current_user.rol
+    # if logged_rol == "Administrador":
+    #     users = db.users.find()
+    # else:
+    #     raise Exception("Operación no permitida para el rol", logged_rol)
 
     return render_template('users/index.html', users=u.find())
 
