@@ -7,7 +7,7 @@
 Clonar el repositorio 
 
 ```
-git clone git@github.com:yepes/pia-lara.git
+git clone git@github.com:PIalara/pia-lara.git
 ```
 
 Dentro del directorio del repositorio, crear el entorno virtual:
