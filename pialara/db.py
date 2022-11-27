@@ -47,10 +47,13 @@ def get_user_by_id(id):
     Devuelve un objeto User a partir de su id
     """
     try:
-        usuario = db.users.find_one({"_id": ObjectId(id)})
+        usuario = db.usuarios.find_one({"_id": ObjectId(id)})
+        print("buscando usuario")
+        print(id)
+        print(usuario)
 
         usuario_obj = User(id=usuario["_id"],
-                           email=usuario.get("email"),
+                           mail=usuario.get("mail"),
                            nombre=usuario.get("nombre"),
                            password=usuario.get("password"),
                            rol=usuario.get("rol"),
