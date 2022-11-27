@@ -1,48 +1,60 @@
-{% extends "base.html" %}
+{% extends 'layout.html' %}
 
 {% block content %}
-<h1 class="title">Listado de usuarios</h1>
+  <h1 class="text-center p-3">Lista de usuarios</h1>
 
-{% with messages = get_flashed_messages(category_filter=["info"]) %}
-{% if messages %}
-    <div class="notification is-info">
-    {{ messages[0] }}
+  <form class="container pb-4" style="max-width: 25rem">
+    <div class="input-group">
+      <input type="search" class="form-control" placeholder="Buscar usuarios..." aria-label="Buscar usuarios..."
+        aria-describedby="button-search" />
+      <button class="btn btn-primary" type="submit" id="button-search"><i class="bi bi-search me-2"></i>Buscar</button>
     </div>
-{% endif %}
-{% endwith %}
+  </form>
 
-{% with messages = get_flashed_messages(category_filter=["error"]) %}
-{% if messages %}
-    <div class="notification is-error">
-    {{ messages[0] }}. Vuelve a intentarlo
-    </div>
-{% endif %}
-{% endwith %}
+  <section class="container d-flex flex-wrap justify-content-center gap-3">
+    <article class="card shadow-sm" style="width: 20rem">
+      <header class="card-header"><i class="bi bi-gear me-2"></i>Administrador</header>
+      <section class="card-body">
+        <h5 class="card-title">Nombre del administrador</h5>
+        <p class="card-text"><i class="bi bi-envelope-at me-2"></i>admin@email.com</p>
+        <a href="#" class="btn btn-primary"><i class="bi bi-pencil me-2"></i>Editar</a>
+      </section>
+    </article>
 
-<div class="content">
-  <table class="table is-hoverable is-fullwidth">
-    <thead>
-      <tr>
-        <th>Email</th>
-        <th>Nombre</th>
-        <th>Rol</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for user in users %}
-      <tr>
-        <td>{{ user.get('email') }}</td>
-        <td>{{ user.get('nombre') }}</td>
-        <td>{{ user.get('rol') }}</td>
-        <td>
-{#            <a href="{{ url_for('main.user_view', id=user['_id']) }}"><span class="icon"><i class="fas fa-eye"></i></span></a>#}
-{#            <a href="{{ url_for('main.user_edit', id=user['_id']) }}"><span class="icon"><i class="fas fa-edit"></i></span></a>#}
-{#            <a href="{{ url_for('main.user_remove', id=user['_id']) }}"><span class="icon"><i class="fas fa-trash"></i></span></a>#}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+    <article class="card shadow-sm" style="width: 20rem">
+      <header class="card-header"><i class="bi bi-journals me-2"></i>Técnico</header>
+      <section class="card-body">
+        <h5 class="card-title">Nombre del técnico</h5>
+        <p class="card-text"><i class="bi bi-envelope-at me-2"></i>tecnico@email.com</p>
+        <a href="#" class="btn btn-primary"><i class="bi bi-pencil me-2"></i>Editar</a>
+      </section>
+    </article>
+
+    <article class="card shadow-sm" style="width: 20rem">
+      <header class="card-header"><i class="bi bi-person me-2"></i>Cliente</header>
+      <section class="card-body">
+        <h5 class="card-title">Nombre del cliente</h5>
+        <p class="card-text"><i class="bi bi-envelope-at me-2"></i>cliente@email.com</p>
+        <a href="#" class="btn btn-primary"><i class="bi bi-pencil me-2"></i>Editar</a>
+      </section>
+    </article>
+
+    <article class="card shadow-sm" style="width: 20rem">
+      <header class="card-header"><i class="bi bi-gear me-2"></i>Administrador</header>
+      <section class="card-body">
+        <h5 class="card-title">Nombre del administrador</h5>
+        <p class="card-text"><i class="bi bi-envelope-at me-2"></i>admin@email.com</p>
+        <a href="#" class="btn btn-primary"><i class="bi bi-pencil me-2"></i>Editar</a>
+      </section>
+    </article>
+
+    <article class="card shadow-sm" style="width: 20rem">
+      <header class="card-header"><i class="bi bi-journals me-2"></i>Técnico</header>
+      <section class="card-body">
+        <h5 class="card-title">Nombre del técnico</h5>
+        <p class="card-text"><i class="bi bi-envelope-at me-2"></i>tecnico@email.com</p>
+        <a href="#" class="btn btn-primary"><i class="bi bi-pencil me-2"></i>Editar</a>
+      </section>
+    </article>
+  </section>
 {% endblock %}

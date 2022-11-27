@@ -17,11 +17,4 @@ def index():
     else:
         raise Exception("Operación no permitida para el rol", logged_rol)
 
-
     return render_template('users/index.html', users=u.find())
-
-
-@bp.route('/list')
-@login_required
-def list():
-    return render_template('users/list.html')
