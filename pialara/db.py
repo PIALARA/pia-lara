@@ -87,10 +87,10 @@ def get_user(email):
     Método a emplear en el login
     """
     try:
-        usuario = db.users.find_one({"email": email})
+        usuario = db.usuarios.find_one({"mail": email})
 
         usuario_obj = User(id=usuario["_id"],
-                           email=usuario.get("email"),
+                           mail=usuario.get("mail"),
                            nombre=usuario.get("nombre"),
                            password=usuario.get("password"),
                            rol=usuario.get("rol"),

@@ -57,8 +57,7 @@ usuarios = [{
         "nombre": "Pedro",
         "sexo": "H",
         "provincia": "Alicante",
-        "ultima_conexion": datetime.today()
-        ,
+        "ultima_conexion": datetime.today(),
         "enfermedades": [
             "paralisis facial"
         ],
