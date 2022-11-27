@@ -48,9 +48,6 @@ def get_user_by_id(id):
     """
     try:
         usuario = db.usuarios.find_one({"_id": ObjectId(id)})
-        print("buscando usuario")
-        print(id)
-        print(usuario)
 
         usuario_obj = User(id=usuario["_id"],
                            mail=usuario.get("mail"),
@@ -58,7 +55,6 @@ def get_user_by_id(id):
                            password=usuario.get("password"),
                            rol=usuario.get("rol"),
                            parent=usuario.get("parent"))
-        print("usuario_obj por id:", usuario_obj)
         return usuario_obj
     except Exception as e:
         return e
