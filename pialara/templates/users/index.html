@@ -12,49 +12,41 @@
   </form>
 
   <section class="container d-flex flex-wrap justify-content-center gap-3">
-    <article class="card shadow-sm" style="width: 20rem">
-      <header class="card-header"><i class="bi bi-gear me-2"></i>Administrador</header>
-      <section class="card-body">
-        <h5 class="card-title">Nombre del administrador</h5>
-        <p class="card-text"><i class="bi bi-envelope-at me-2"></i>admin@email.com</p>
-        <a href="#" class="btn btn-primary"><i class="bi bi-pencil me-2"></i>Editar</a>
-      </section>
-    </article>
-
-    <article class="card shadow-sm" style="width: 20rem">
-      <header class="card-header"><i class="bi bi-journals me-2"></i>Técnico</header>
-      <section class="card-body">
-        <h5 class="card-title">Nombre del técnico</h5>
-        <p class="card-text"><i class="bi bi-envelope-at me-2"></i>tecnico@email.com</p>
-        <a href="#" class="btn btn-primary"><i class="bi bi-pencil me-2"></i>Editar</a>
-      </section>
-    </article>
-
-    <article class="card shadow-sm" style="width: 20rem">
-      <header class="card-header"><i class="bi bi-person me-2"></i>Cliente</header>
-      <section class="card-body">
-        <h5 class="card-title">Nombre del cliente</h5>
-        <p class="card-text"><i class="bi bi-envelope-at me-2"></i>cliente@email.com</p>
-        <a href="#" class="btn btn-primary"><i class="bi bi-pencil me-2"></i>Editar</a>
-      </section>
-    </article>
-
-    <article class="card shadow-sm" style="width: 20rem">
-      <header class="card-header"><i class="bi bi-gear me-2"></i>Administrador</header>
-      <section class="card-body">
-        <h5 class="card-title">Nombre del administrador</h5>
-        <p class="card-text"><i class="bi bi-envelope-at me-2"></i>admin@email.com</p>
-        <a href="#" class="btn btn-primary"><i class="bi bi-pencil me-2"></i>Editar</a>
-      </section>
-    </article>
-
-    <article class="card shadow-sm" style="width: 20rem">
-      <header class="card-header"><i class="bi bi-journals me-2"></i>Técnico</header>
-      <section class="card-body">
-        <h5 class="card-title">Nombre del técnico</h5>
-        <p class="card-text"><i class="bi bi-envelope-at me-2"></i>tecnico@email.com</p>
-        <a href="#" class="btn btn-primary"><i class="bi bi-pencil me-2"></i>Editar</a>
-      </section>
-    </article>
+    {% for user in users %}
+      <article class="card shadow-sm" style="width: 20rem">
+        <header class="card-header">
+          {% if user.rol == 0 %}
+            <i class="bi bi-gear me-2"></i>{{ 'Administrador' if user.sexo == 'H' else 'Administradora' }}
+          {% elif user.rol == 1 %}
+            <i class="bi bi-journals me-2"></i>{{ 'Técnico' if user.sexo == 'H' else 'Técnica' }}
+          {% elif user.rol == 2 %}
+            <i class="bi bi-person me-2"></i>Cliente
+          {% endif %}
+        </header>
+        <section class="card-body d-flex flex-column">
+          <h5 class="card-title">{{ user.nombre }}</h5>
+          <p class="card-text mb-1">
+            <i class="bi bi-envelope-at me-2"></i>{{ user.mail }}
+          </p>
+          {% if user.rol == 2 %}
+            <p class="card-text mb-1">
+              <i class="bi bi-geo-alt me-2"></i>{{ user.provincia }}
+            </p>
+            <p class="card-text mb-1">
+              <i class="bi bi-file-medical me-2"></i>{{ user.enfermedades|join(', ') }}
+            </p>
+            <p class="card-text mb-1">
+              <i class="bi bi-megaphone me-2"></i>{{ user.dis|join(', ') }}
+            </p>
+          {% endif %}
+          <p class="card-text mb-3">
+            <i class="bi bi-clock me-2"></i>{{ user.ultima_conexion.strftime('%d/%m/%Y - %H:%M') }}
+          </p>
+          <a href="/users/update/{{ user._id }}" class="btn btn-primary align-self-start mt-auto">
+            <i class="bi bi-pencil me-2"></i>Editar
+          </a>
+        </section>
+      </article>
+    {% endfor %}
   </section>
 {% endblock %}
