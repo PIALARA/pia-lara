@@ -18,7 +18,7 @@ usuarios = [{
     "fecha_nacimiento": datetime(1998, 5, 17),
     "mail": "rococo@gmail.com",
     "password": generate_password_hash("admin", method='sha256'),
-    "rol": 0,
+    "rol": "admin",
     "nombre": "Rocío",
     "sexo": "M",
     "ultima_conexion": datetime.today()
@@ -27,7 +27,7 @@ usuarios = [{
         "fecha_nacimiento": datetime(1989, 5, 17),
         "mail": "mario@gmail.com",
         "password": generate_password_hash("admin", method='sha256'),
-        "rol": 2,
+        "rol": "cliente",
         "nombre": "Mario",
         "sexo": "H",
         "provincia": "Alicante",
@@ -43,7 +43,7 @@ usuarios = [{
         "fecha_nacimiento": datetime(1957, 4, 21),
         "mail": "ines@gmail.com",
         "password": generate_password_hash("admin", method='sha256'),
-        "rol": 1,
+        "rol": "tecnico",
         "nombre": "Inés",
         "sexo": "M",
         "ultima_conexion": datetime.today()
@@ -53,7 +53,7 @@ usuarios = [{
         "fecha_nacimiento": datetime(1997, 2, 4),
         "mail": "pedro@gmail.com",
         "password": generate_password_hash("admin", method='sha256'),
-        "rol": 2,
+        "rol": "cliente",
         "nombre": "Pedro",
         "sexo": "H",
         "provincia": "Alicante",
@@ -69,7 +69,7 @@ usuarios = [{
         "fecha_nacimiento": datetime(1996, 3, 1),
         "mail": "pedro@gmail.com",
         "password": generate_password_hash("admin", method='sha256'),
-        "rol": 2,
+        "rol": "cliente",
         "nombre": "Pedro",
         "sexo": "H",
         "provincia": "Alicante",
@@ -86,7 +86,7 @@ usuarios = [{
         "fecha_nacimiento": datetime(1945, 2, 12),
         "mail": "pedro@gmail.com",
         "password": generate_password_hash("admin", method='sha256'),
-        "rol": 2,
+        "rol": "cliente",
         "nombre": "Hector",
         "sexo": "H",
         "provincia": "Madrid",
@@ -131,11 +131,11 @@ userValidator = {
                 "bsonType": 'string'
             },
             "rol": {
-                "bsonType": 'int',
+                "bsonType": 'string',
                 'enum': [
-                    0,
-                    1,
-                    2
+                    "admin",
+                    "tecnico",
+                    "cliente"
                 ]
             },
             "provincia": {

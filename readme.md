@@ -116,3 +116,17 @@ u.update_many({"nombre": "Test"}, { "$set": {"email":"asddasd@asdads.com"}})
 ```python
 u.update_many({"nombre": "Test"}, { "$set": {"email":"asddasd@asdads.com"}}, upsert=True)
 ```
+
+#### Proteger ruta por roles
+
+Se ha creado un decorador en el fichero decorators.py para poder usarlo y asi comprobar que el usuario esta logeado y tiene un rol determinado
+
+Su uso seria para comprobar que tiene el rol "admin" para la ruta "/profile" seria:
+
+```python
+from pialara.decorators import rol_required
+@bp.route('/profile')
+@rol_required("admin")
+def profile():
+    return render_template('auth/profile.html')
+```
