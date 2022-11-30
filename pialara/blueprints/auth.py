@@ -4,7 +4,6 @@ from flask import (
 from flask_login import login_required, login_user, current_user, logout_user
 from werkzeug.security import check_password_hash
 from pialara import db
-from pialara.decorators import rol_required
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 

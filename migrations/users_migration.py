@@ -27,7 +27,7 @@ usuarios = [{
         "fecha_nacimiento": datetime(1989, 5, 17),
         "mail": "mario@gmail.com",
         "password": generate_password_hash("admin", method='sha256'),
-        "rol": "usuario",
+        "rol": "cliente",
         "nombre": "Mario",
         "sexo": "H",
         "provincia": "Alicante",
@@ -53,7 +53,7 @@ usuarios = [{
         "fecha_nacimiento": datetime(1997, 2, 4),
         "mail": "pedro@gmail.com",
         "password": generate_password_hash("admin", method='sha256'),
-        "rol": "usuario",
+        "rol": "cliente",
         "nombre": "Pedro",
         "sexo": "H",
         "provincia": "Alicante",
@@ -69,7 +69,7 @@ usuarios = [{
         "fecha_nacimiento": datetime(1996, 3, 1),
         "mail": "pedro@gmail.com",
         "password": generate_password_hash("admin", method='sha256'),
-        "rol": "usuario",
+        "rol": "cliente",
         "nombre": "Pedro",
         "sexo": "H",
         "provincia": "Alicante",
@@ -86,7 +86,7 @@ usuarios = [{
         "fecha_nacimiento": datetime(1945, 2, 12),
         "mail": "pedro@gmail.com",
         "password": generate_password_hash("admin", method='sha256'),
-        "rol": "usuario",
+        "rol": "cliente",
         "nombre": "Hector",
         "sexo": "H",
         "provincia": "Madrid",
@@ -135,7 +135,7 @@ userValidator = {
                 'enum': [
                     "admin",
                     "tecnico",
-                    "usuario"
+                    "cliente"
                 ]
             },
             "provincia": {
