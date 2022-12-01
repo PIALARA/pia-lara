@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>syllabus create page</h1>
+
+<hr class="rounded">
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="notification is-danger">
+    {{ messages[0] }}
+</div>
+{% endif %}
+{% endwith %}
+<hr class="rounded">
+
+<form method="POST" action="/syllabus/update">
+    <input name="fid" value="{{ syllabus.get('_id') }}" type="hidden">
+
+    <br><br>
+
+    <label for="ftext">Texto:</label><br>
+    <textarea name="ftext" placeholder="Frase" rows="5" cols="100">{{ syllabus.get('texto') }}</textarea>
+
+    <br><br>
+
+    <label for="ftags">Tags: (Ej: Dislalia, Paralisis facial, Futbol...)</label><br>
+    <textarea name="ftags" placeholder="Tags" rows="1" cols="70">{{ tags }}</textarea>
+
+    <br><br><br>
+
+    <button>Actualizar</button>
+
+</form>
+
+{% endblock %}
