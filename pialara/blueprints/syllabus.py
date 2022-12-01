@@ -9,11 +9,11 @@ from pialara.db import get_db
 def index():
     return render_template('syllabus/index.html')
 
-"""
-@bp.route('/create/:id')
+@bp.route('/create')
 def create():
     return render_template('syllabus/create.html')
 
+"""
 @bp.route('/create/:id', methods=['post'])
 def create_post():
     flash('creado correctamente')
