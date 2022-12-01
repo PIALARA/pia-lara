@@ -21,25 +21,41 @@
           </button>
         </div>
         <div class="offcanvas offcanvas-start text-bg-dark" id="demo">
-          <a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+          <a href="{{ url_for("auth.logout") }}" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
             <h4 class="text-light font-weight-bold mb-0"><i class="bi bi-mic-fill"></i> PIA Lara</h4>
           </a>
           <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-sm-start" id="menuMobile">
-            <li><a href="/users" class="d-block text-light p-3 border-0"><i class="bi bi-person-circle lead m-2"></i>Usuarios</a></li>
+            <li><a href="{{ url_for("users.index") }}" class="d-block text-light p-3 border-0"><i class="bi bi-person-circle lead m-2"></i>Usuarios</a></li>
             <li><a href="/Audios" class="d-block text-light p-3 border-0"><i class="bi bi-file-earmark-music m-2 lead"></i>Audios</a></li>
-            <li><a href="/frases" class="d-block text-light p-3 border-0"><i class="bi bi-book m-2 lead"></i>Frases</a>
+            <li><a href="{{ url_for("syllabus.index") }}" class="d-block text-light p-3 border-0"><i class="bi bi-book m-2 lead"></i>Frases</a>
             </li>
           </ul>
+          <div class="pb-3 text-white text-decoration-none pt-5 text-center">
+            <a href="#">
+              <h5 id="user" class="text-light"><i class="bi bi-person-fill"></i> {{ current_user.nombre }}</h5>
+            </a>
+            <a href="{{ url_for("auth.logout") }}">
+              <p id="logout" class="text-light">Logout</p>
+            </a>
+          </div>
         </div>
         <div class="d-none d-sm-block flex-column align-items-center align-items-sm-start px-3 pt-2 ">
-          <a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+          <a href="{{ url_for("auth.logout") }}" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
             <h4 class="text-light font-weight-bold mb-0"><i class="bi bi-mic-fill"></i> PIA Lara</h4>
           </a>
           <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menuDesktop">
-            <li><a href="/users" class="d-block text-light p-3 border-0"><i class="bi bi-person-circle lead m-2"></i>Usuarios</a></li>
+            <li><a href="{{ url_for("users.index") }}" class="d-block text-light p-3 border-0"><i class="bi bi-person-circle lead m-2"></i>Usuarios</a></li>
             <li><a href="/Audios" class="d-block text-light p-3 border-0"><i class="bi bi-file-earmark-music m-2 lead "></i>Audios</a></li>
-            <li><a href="/frases" class="d-block text-light p-3 border-0"><i class="bi bi-book m-2 lead "></i>Frases</a></li>
+            <li><a href="{{ url_for("syllabus.index") }}" class="d-block text-light p-3 border-0"><i class="bi bi-book m-2 lead "></i>Frases</a></li>
           </ul>
+          <div class="pb-3 text-white text-decoration-none pt-5 text-center">
+            <a href="#">
+              <h5 id="user" class="text-light"><i class="bi bi-person-fill"></i> {{ current_user.nombre }}</h5>
+            </a>
+            <a href="{{ url_for("auth.logout") }}">
+              <p id="logout" class="text-light">Logout</p>
+            </a>
+          </div>
         </div>
       </div>
       <div class="col col-md-9 col-xl-10 px-sm-11 px-0">
