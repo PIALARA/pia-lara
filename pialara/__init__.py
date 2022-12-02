@@ -21,11 +21,12 @@ def create_app():
     login_manager.init_app(app)
 
     # Blueprints
-    from pialara.blueprints import auth, syllabus, main, users
+    from pialara.blueprints import auth, syllabus, main, users, audios
     app.register_blueprint(auth.bp)
     app.register_blueprint(syllabus.bp)
     app.register_blueprint(main.bp)
     app.register_blueprint(users.bp)
+    app.register_blueprint(audios.bp)
 
     @login_manager.user_loader
     def load_user(user_id):
