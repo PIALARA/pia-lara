@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+
+
+{% block content %}
+  <h1 class="text-center p-3">Actualizar usuario</h1>
+  <div class="tab-content py-4" id="nav-tabContent">
+      <form class="container" method="POST" style="max-width: 20rem">
+        <div class="mb-3">
+          <label for="nombre" class="form-label">Nombre</label>
+          <input type="text" class="form-control" id="nombre" name="nombre" required value="{{model.nombre}}" />
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" name="email" required value="{{model.mail}}"/>
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Contraseña</label>
+          <input type="password" class="form-control" id="password" name="password" required />
+        </div>
+        <div class="mb-3">
+          <label for="password-repeat" class="form-label">Repetir contraseña</label>
+          <input type="password" class="form-control" id="password-repeat" required />
+        </div>
+
+        <div class="mb-3">
+          <button class="btn btn-primary w-100 shadow" type="submit">
+            <i class="bi bi-plus-square me-2"></i>Actualizar
+          </button>
+        </div>
+      </form>
+  </div>
+{% endblock %}
