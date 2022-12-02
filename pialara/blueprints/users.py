@@ -6,6 +6,8 @@ from flask_login import login_required, current_user
 from pialara.db import db
 from pialara.models.Usuario import Usuario
 from bson.objectid import ObjectId
+from werkzeug.security import generate_password_hash
+from pialara.models.MongoModel import MongoModel as mongo
 
 bp = Blueprint('users', __name__, url_prefix='/users')
 
@@ -52,8 +54,12 @@ def update_post(id):
     print(id)
     print(nombre)
     print(email)
-    print(password)
 
+
+    resultado = mongo.update_one({"_id":id},{"$set":{'nombre':nombre, 'email':email}})
+
+
+    print(resultado)
     return render_template('users/index.html')
 
 """
