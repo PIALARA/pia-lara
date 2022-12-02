@@ -48,7 +48,7 @@ def create_post():
 
     #Comprobar el resultado y mostrar mensaje
     if result.acknowledged:
-        flash('Texto subido correctamente')
+        flash('Texto subido correctamentee')
         return redirect(url_for('syllabus.create'))
 
     flash('Error al subir texto, inténtelo de nuevo...')
