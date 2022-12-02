@@ -1,6 +1,14 @@
 {% extends 'layout.html' %}
 
 {% block content %}
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="notification is-danger">
+    {{ messages[0] }}
+</div>
+{% endif %}
+{% endwith %}
 <H3 class=" m-2">Frases</H3>
 <a href="/syllabus/create" class="btn btn-success m-2"><i class="bi bi-plus-square"></i></a>
 <div class="card m-2">
@@ -10,8 +18,19 @@
   <div class="card-body">
     <h5 class="card-title">Special title treatment</h5>
     <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-    <a href="#" class="btn btn-danger"><i class="bi bi-trash"></i></a>
-    <a href="#" class="btn btn-warning"><i class="bi bi-ear"></i></i></a>
+    <a href="#" class="btn btn-danger"><i class="bi bi-trash" /></a>
+    <a href="#" class="btn btn-warning"><i class="bi bi-ear" /></a>
+  </div>
+</div>
+<div class="card m-2">
+  <div class="card-header">
+    <a>Frase 1</a>
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Special title treatment</h5>
+    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+    <a href="#" class="btn btn-danger"><i class="bi bi-trash" /></a>
+    <a href="#" class="btn btn-warning"><i class="bi bi-ear" /></a>
   </div>
 </div>
 <div class="card m-2">
@@ -22,18 +41,7 @@
     <h5 class="card-title">Special title treatment</h5>
     <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
     <a href="#" class="btn btn-danger"><i class="bi bi-trash"></i></a>
-    <a href="#" class="btn btn-warning"><i class="bi bi-ear"></i></i></a>
-  </div>
-</div>
-<div class="card m-2">
-  <div class="card-header">
-    <a>Frase 1</a>
-  </div>
-  <div class="card-body">
-    <h5 class="card-title">Special title treatment</h5>
-    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-    <a href="#" class="btn btn-danger"><i class="bi bi-trash"></i></a>
-    <a href="#" class="btn btn-warning"><i class="bi bi-ear"></i></i></a>
+    <a href="#" class="btn btn-warning"><i class="bi bi-ear" /></a>
   </div>
 </div>
 {% endblock %}
