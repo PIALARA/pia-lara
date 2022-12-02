@@ -49,7 +49,7 @@ def create_post():
     #Comprobar el resultado y mostrar mensaje
     if result.acknowledged:
         flash('Texto subido correctamentee')
-        return redirect(url_for('syllabus.create'))
+        return redirect(url_for('syllabus.index'))
 
     flash('Error al subir texto, inténtelo de nuevo...')
 
@@ -68,15 +68,15 @@ def update(id):
 
     aux = aux[2:]
 
-    return render_template('syllabus/modify.html', syllabus=syllabus, tags=aux)
+    return render_template('syllabus/update.html', syllabus=syllabus, tags=aux)
 
-@bp.route('/update', methods=['POST'])
+@bp.route('/update/<string:id>', methods=['POST'])
 @login_required
-def update_post():
+def update_post(id):
     # Obtener los datos del formulario
     text = request.form.get('ftext')
     tags = request.form.get('ftags')
-    fraseID = request.form.get('fid')
+    fraseID = id
 
     # Obtener los datos del usuario
     usuario = Usuario()
@@ -94,13 +94,11 @@ def update_post():
 
     # Comprobar el resultado y mostrar mensaje
     if result.acknowledged:
-        #flash('Texto actualizado correctamente')
+        flash('Texto actualizado correctamente')
         return redirect(url_for('syllabus.index'))
 
     flash('Error al actualizar texto, inténtelo de nuevo...')
 
-
-    return render_template('syllabus/index.html')
 
 
 """

@@ -13,8 +13,7 @@
 {% endwith %}
 <hr class="rounded">
 
-<form method="POST" action="/syllabus/update">
-    <input name="fid" value="{{ syllabus.get('_id') }}" type="hidden">
+<form method="POST" action="{{url_for('syllabus.update', id=syllabus.get('_id'))}}">
 
     <br><br>
 
