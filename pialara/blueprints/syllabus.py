@@ -48,10 +48,12 @@ def create_post():
 
     #Comprobar el resultado y mostrar mensaje
     if result.acknowledged:
-        flash('Texto subido correctamentee')
+        flash('Texto creado correctamente')
         return redirect(url_for('syllabus.index'))
+    else:
+        flash('La frase no se ha creado. Error genérico')
+        return redirect(url_for('syllabus.create'))
 
-    flash('Error al subir texto, inténtelo de nuevo...')
 
 
 @bp.route('/update/<string:id>')
@@ -93,11 +95,15 @@ def update_post(id):
     result = texto.update_one(params1, params2, False)
 
     # Comprobar el resultado y mostrar mensaje
-    if result.acknowledged:
+    if result.acknowledged & result.modified_count == 1:
         flash('Texto actualizado correctamente')
         return redirect(url_for('syllabus.index'))
-
-    flash('Error al actualizar texto, inténtelo de nuevo...')
+    elif result.acknowledged & result.modified_count == 0:
+        flash('Error al actualizar texto, inténtelo de nuevo...')
+        return redirect(url_for('syllabus.update', id=fraseID))
+    else:
+        flash('La frase no se ha actualizado. Error genérico')
+        return redirect(url_for('syllabus.index'))
 
 
 
