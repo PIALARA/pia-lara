@@ -2,4 +2,4 @@ from pialara.models.MongoModel import MongoModel
 
 
 class Syllabus(MongoModel):
-    collection_name = 'syllabus'
+    collection_name = 'sylabus'
