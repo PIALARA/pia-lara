@@ -47,19 +47,19 @@ def update(id):
 @bp.route('/update/<id>', methods=['GET','POST'])
 @login_required
 def update_post(id):
-
+    usu = Usuario()
     nombre = request.form.get('nombre')
     email = request.form.get('email')
-    password = request.form.get('password')
     print(id)
     print(nombre)
     print(email)
 
 
-    resultado = mongo.update_one({"_id":id},{"$set":{'nombre':nombre, 'email':email}})
+    resultado = usu.update_one({'_id': ObjectId(id)},{"$set":{'nombre':nombre, 'mail':email}})
 
 
-    print(resultado)
+    print(resultado.matched_count)
+    print(resultado.modified_count)
     return render_template('users/index.html')
 
 """
