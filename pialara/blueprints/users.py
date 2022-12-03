@@ -36,30 +36,17 @@ def create():
 def update(id):
     u = Usuario()
     model=u.find_one({'_id': ObjectId(id)})
-    if model is None:
-        flash("usuario no existe", "error")
-        return render_template('users/index.html')
-
+   
     return render_template('users/update.html',model=model)
 
-
-
-@bp.route('/update/<id>', methods=['GET','POST'])
+@bp.route('/update/<id>', methods=['POST'])
 @login_required
 def update_post(id):
     usu = Usuario()
     nombre = request.form.get('nombre')
     email = request.form.get('email')
-    print(id)
-    print(nombre)
-    print(email)
-
-
-    resultado = usu.update_one({'_id': ObjectId(id)},{"$set":{'nombre':nombre, 'mail':email}})
-
-
-    print(resultado.matched_count)
-    print(resultado.modified_count)
+  
+    resultado = usu.update_one({'_id': ObjectId(id)},{"$set":{'nombre':nombre, 'mail':email}})  
     return render_template('users/index.html')
 
 """
@@ -79,3 +66,15 @@ def updateData():
     result = db.update_user_all()
     print("Usuario modificado: ",result)
 """
+"""@bp.route('/update/<id>', methods=['GET'])
+@login_required
+def update(id):
+    u = Usuario()
+    model=u.find_one({'_id': ObjectId(id)})
+    if model is None:
+        flash("usuario no existe", "error")
+        return render_template('users/index.html')
+
+    return render_template('users/update.html',model=model)"""
+
+
