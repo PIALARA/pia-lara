@@ -115,7 +115,7 @@ def delete(id):
     result = frase.delete_one(params)
     if result.acknowledged:
         flash('Frase eliminada correctamente')
-        return render_template('syllabus/index.html')
+        return redirect(url_for('syllabus.index'))
     else:
         flash('La frase no se ha eliminado. Error genérico')
-        return render_template('syllabus/index.html')
+        return redirect(url_for('syllabus.index'))
