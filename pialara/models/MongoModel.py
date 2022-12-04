@@ -24,3 +24,6 @@ class MongoModel:
 
     def insert_many(self, values):
         return self.db[self.collection_name].insert_many(values)
+
+    def delete_one(self, values):
+        return self.db[self.collection_name].delete_one(values)
