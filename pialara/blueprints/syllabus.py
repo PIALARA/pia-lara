@@ -16,7 +16,38 @@ from pialara.db import get_db
 
 @bp.route('/')
 def index():
-    return render_template('syllabus/index.html')
+    syllabus = Syllabus()
+    frases = syllabus.find()
+
+    return render_template('syllabus/index.html', syllabus=frases)
+
+@bp.route('/', methods=['POST'])
+@login_required
+def tag():
+    tag_name = request.form.get('tagName')
+    syllabus = Syllabus()
+
+    if tag_name == "":
+        return render_template('syllabus/index.html', syllabus=syllabus.find())
+
+    pipeline = [
+        {
+            '$unwind': {
+                'path': '$tags'
+            }
+        }, {
+            '$match': {
+                'tags': tag_name
+            }
+        }
+    ]
+
+    frases = syllabus.aggregate(pipeline)
+
+    if not frases.alive:
+        flash("No se han encontrado resultados")
+
+    return render_template('syllabus/index.html', syllabus=frases)
 
 
 @bp.route('/create')

@@ -27,3 +27,6 @@ class MongoModel:
 
     def delete_one(self, values):
         return self.db[self.collection_name].delete_one(values)
+
+    def aggregate(self, values):
+        return self.db[self.collection_name].aggregate(values)

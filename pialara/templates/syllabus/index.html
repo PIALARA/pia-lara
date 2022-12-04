@@ -4,13 +4,39 @@
 
 {% with messages = get_flashed_messages() %}
 {% if messages %}
-<div class="notification is-danger">
+<div class="alert alert-danger">
     {{ messages[0] }}
 </div>
 {% endif %}
 {% endwith %}
+
 <H3 class=" m-2">Frases</H3>
 <a href="/syllabus/create" class="btn btn-success m-2"><i class="bi bi-plus-square"></i></a>
+
+<form class="container pb-4" style="max-width: 25rem" method="post" action="{{ url_for("syllabus.tag") }}">
+    <div class="input-group">
+      <input type="search" name="tagName" class="form-control" placeholder="Buscar tag..." aria-label="Buscar tag..."
+        aria-describedby="button-search" />
+      <button class="btn btn-primary" type="submit" id="button-search"><i class="bi bi-search me-2"></i>Buscar</button>
+    </div>
+</form>
+
+{% for frase in syllabus %}
+<div class="card m-2">
+    <div class="card-header">
+    </div>
+    <div class="card-body">
+        <p class="card-text">{{frase.texto}}</p>
+        <footer class="blockquote-footer"><cite title="Tags">Tags: </cite>{{frase.tags}} </footer>
+        <a href="/syllabus/delete/{{ frase._id }}" class="btn btn-danger"><i class="bi bi-trash"></i></a>
+        <a href="#" class="btn btn-warning"><i class="bi bi-ear"></i></a>
+    </div>
+</div>
+{% endfor %}
+
+
+<!--
+
 <div class="card m-2">
   <div class="card-header">
     <a>Frase 1</a>
@@ -44,4 +70,5 @@
     <a href="#" class="btn btn-warning"><i class="bi bi-ear" /></a>
   </div>
 </div>
+-->
 {% endblock %}
