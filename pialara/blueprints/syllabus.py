@@ -107,22 +107,15 @@ def update_post(id):
 
 
 
-"""
-@bp.route('/update/:id')
-def update():
-    return render_template('syllabus/update.html')
-
-@bp.route('/update/:id', methods=['post'])
-def update_post():
-    flash('modificado correctamente')
-    redirect('/update')
-
-
-@bp.route('/delete/:id')
-def delete():
-    return render_template('syllabus/index.html')
-
-@bp.route('/view/:id')
-def view():
-    return render_template('syllabus/index.html')
-"""
+@bp.route('/delete/<string:id>')
+@login_required
+def delete(id):
+    frase = Syllabus()
+    params = {"_id": ObjectId(id)}
+    result = frase.delete_one(params)
+    if result.acknowledged:
+        flash('Frase eliminada correctamente')
+        return render_template('syllabus/index.html')
+    else:
+        flash('La frase no se ha eliminado. Error genérico')
+        return render_template('syllabus/index.html')
