@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>syllabus create page</h1>
+
+<hr class="rounded">
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="notification is-danger">
+    {{ messages[0] }}
+</div>
+{% endif %}
+{% endwith %}
+<hr class="rounded">
+
+
+    <form class="container" method="post" style="max-width: 30rem" action="{{ url_for("syllabus.create") }}">
+    <div class="mb-3">
+      <label for="texto" class="form-label">Texto</label>
+        <textarea id="texto" class="form-control" name="ftext" placeholder="Frase" rows="5" cols="100"></textarea>
+    </div>
+    <div class="mb-3">
+      <label for="tags" class="form-label">Tags (separados por comas)</label>
+        <input class="form-control" id="tags" type="text" name="ftags" placeholder="Tags" rows="1" cols="70" />
+    </div>
+    <div class="mb-3">
+      <button class="btn btn-primary w-100 shadow" type="submit">
+        <i class="bi bi-plus-square me-2"></i>Crear frase
+      </button>
+    </div>
+  </form>
+{% endblock %}

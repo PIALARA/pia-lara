@@ -1,3 +1,4 @@
+import bson
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash
 import os
@@ -206,9 +207,209 @@ userValidator = {
     }
 }
 
+sylabus = [
+    {
+        "_id": bson.objectid.ObjectId("637a078e8659dd172e6afaf5"),
+        "texto": "Esto es una prueba",
+        "creador": {
+            "id": bson.objectid.ObjectId("6379fc6871880707a2c89537"),
+            "nombre": "Rocio",
+            "rol": "admin"
+        },
+        "tags": [
+            "dislalia",
+            "paralisis facial",
+            "futbol",
+            "madrid"
+        ],
+        "audios": [
+            {
+                "id": bson.objectid.ObjectId("637a08118659dd172e6afafa")
+            },
+            {
+                "id": bson.objectid.ObjectId("637a08208659dd172e6afafb")
+            },
+            {
+                "id": bson.objectid.ObjectId("637a08388659dd172e6afafc")
+            }
+        ],
+        "fecha_creacion": datetime.today()
+    },
+
+    {
+        "_id": bson.objectid.ObjectId("638348e9b3ba0b56509dfa1b"),
+        "texto": "Esto es una prueba 2",
+        "creador": {
+            "id": bson.objectid.ObjectId("637fd98b2950843403bd5d8a"),
+            "nombre": "Mario",
+            "rol": "cliente"
+        },
+        "tags": [
+            "dislalia",
+            "paralisis facial",
+            "futbol",
+            "madrid"
+        ],
+        "audios": [
+            {
+                "id": bson.objectid.ObjectId("6379ff018659dd172e6afadc"),
+
+            }
+        ],
+        "fecha_creacion": datetime.today()
+    }
+]
+
+sylabusValidator = {
+    "$jsonSchema": {
+        "required": [
+            'texto',
+            'creador',
+            'fecha_creacion'
+        ],
+        "properties": {
+            "texto": {
+                "bsonType": 'string'
+            },
+            "creador": {
+                "bsonType": 'object'
+            },
+            "tags": {
+                "bsonType": 'array'
+            },
+            "fecha_creacion": {
+                "bsonType": 'date'
+            }
+        }
+    }
+}
+
+audio = [
+    {
+        "_id": bson.objectid.ObjectId("6379ff018659dd172e6afadc"),
+        "fecha": datetime.today(),
+        "texto": {
+            "id": bson.objectid.ObjectId("638348e9b3ba0b56509dfa1b"),
+            "texto": "Esto es una prueba 2",
+            "creador": {
+                "id": bson.objectid.ObjectId("637fb70f9297829bcac1be50"),
+                "rol": "cliente",
+                "nombre": "Sebas"
+            },
+            "tags": [
+                "dislalia",
+                "paralisis facial",
+                "futbol",
+                "madrid"
+            ]
+        },
+        "usuario": {
+            "enfermedad": [
+                "paralisis"
+            ],
+            "id": bson.objectid.ObjectId("637a02b38659dd172e6afae4"),
+            "sexo": "H",
+            "provincia": "alicante",
+            "edad": 42,
+            "nombre": "Jesús",
+            "dis": [
+                "dislalia"
+            ]
+        },
+        "duracion": 60,
+        "notas": "en esta sesion a lo mejor ha habido mucho ruido",
+        "valoracion": 4,
+        "aws_object_id": "https://audio.com/"
+    },
+
+    {
+        "_id": bson.objectid.ObjectId("638351f7b3ba0b56509dfa6b"),
+        "fecha": datetime.today(),
+        "texto": {
+            "id": bson.objectid.ObjectId("638348e9b3ba0b56509dfa1b"),
+            "texto": "Esto es una prueba 2",
+            "creador": {
+                "id":bson.objectid.ObjectId("637fb70f9297829bcac1be50"),
+                "rol": "cliente",
+                "nombre": "Sebas"
+            },
+            "tags": [
+                "dislalia",
+                "paralisis facial",
+                "futbol",
+                "madrid"
+            ]
+        },
+        "usuario": {
+            "enfermedad": [
+                "paralisis"
+            ],
+            "id":bson.objectid.ObjectId("637a02b38659dd172e6afae4"),
+            "sexo": "H",
+            "provincia": "alicante",
+            "edad": 42,
+            "nombre": "Jesús",
+            "dis": [
+                "dislalia"
+            ]
+        },
+        "duracion": 60,
+        "notas": "en esta sesion a lo mejor ha habido mucho ruido",
+        "valoracion": 4,
+        "aws_object_id": "https://audio.com/"
+    }
+
+]
+audioValidator = {
+    "$jsonSchema": {
+        "required": [
+            'fecha',
+            'texto',
+            'usuario',
+            'aws_object_id'
+        ],
+        "properties": {
+            "texto": {
+                "bsonType": 'object'
+            },
+            "usuario": {
+                "bsonType": 'object'
+            },
+            "duracion": {
+                "bsonType": 'int'
+            },
+            "fecha": {
+                "bsonType": 'date'
+            },
+            "notas": {
+                "bsonType": 'string'
+            },
+            "valoracion": {
+                "bsonType": 'int',
+                'enum': [
+                    0,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5
+                ]
+            }
+        }
+    }
+}
 try:
     db.drop_collection("usuarios")
     db.create_collection("usuarios", validator=userValidator)
     db.usuarios.insert_many(usuarios)
+
+    db.drop_collection("sylabus")
+    db.create_collection("sylabus", validator=sylabusValidator)
+    db.sylabus.insert_many(sylabus)
+
+    db.drop_collection("audios")
+    db.create_collection("audios", validator=audioValidator)
+    db.audios.insert_many(audio)
+
 except Exception as e:
     print(e)

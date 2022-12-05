@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="notification is-danger">
+    {{ messages[0] }}
+</div>
+{% endif %}
+{% endwith %}
+
+{% block content %}
+  <h1 class="text-center p-3">Modificar frase</h1>
+
+  <form class="container" method="post" style="max-width: 30rem" action="{{url_for('syllabus.update', id=syllabus.get('_id'))}}">
+    <div class="mb-3">
+      <label for="texto" class="form-label">Texto</label>
+      <textarea name="ftext" placeholder="Frase" class="form-control" id="texto" cols="30" rows="5" required>{{ syllabus.texto }}</textarea>
+    </div>
+    <div class="mb-3">
+      <label for="tags" class="form-label">Tags (separados por comas)</label>
+      <input name="ftags" type="text" class="form-control" id="tags" value="{{ syllabus.tags|join(', ') }}" required />
+    </div>
+    <div class="mb-3">
+      <button class="btn btn-primary w-100 shadow" type="submit">
+        <i class="bi bi-pencil me-2"></i>Modificar frase
+      </button>
+    </div>
+  </form>
+{% endblock %}
+

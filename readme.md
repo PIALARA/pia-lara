@@ -25,6 +25,12 @@ Instalamos los requerimientos
 pip3 install -r requirements.txt
 ```
 
+Nota: Si cuando actualicemos master tenemos actualizaciones en los requerimientos, hay que actualizarlos:
+
+```python3
+pip3 install --upgrade --force-reinstall -r requirements.txt
+```
+
 Ejecutamos
 
 ```

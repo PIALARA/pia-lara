@@ -1,3 +1,4 @@
+import certifi as certifi
 from bson.objectid import ObjectId
 from flask import current_app, g
 from pymongo import ASCENDING
@@ -23,7 +24,8 @@ def get_db():
         db = g._database = MongoClient(
             PIALARA_DB_URI,
             maxPoolSize=50,
-            timeoutMS=2500
+            timeoutMS=2500,
+            tlsCAFile = certifi.where()
         )[PIALARA_DB_DB_NAME]
     return db
 
