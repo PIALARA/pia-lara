@@ -10,7 +10,7 @@ class MongoModel:
     def find(self, params=None):
         return self.db[self.collection_name].find(params)
 
-    def find_one(self, params):
+    def find_one(self, params=None):
         return self.db[self.collection_name].find_one(params)
 
     def update_one(self, mongo_filter, new_values, upsert=False):
