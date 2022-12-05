@@ -1,28 +1,28 @@
 {% extends "layout.html" %}
 
 {% block content %}
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<div class="notification is-danger">
-    {{ messages[0] }}
-</div>
-{% endif %}
-{% endwith %}
-<h1 class="text-center p-3">Crear frase</h1>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="notification is-danger">
+                {{ messages[0] }}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <h1 class="text-center p-3">Crear frase</h1>
 
-<form class="container" method="post" style="max-width: 30rem" action="{{ url_for("syllabus.create") }}">
-    <div class="mb-3">
-        <label for="texto" class="form-label">Texto</label>
-        <textarea id="texto" class="form-control" name="ftext" placeholder="Frase" rows="5" cols="100"></textarea>
-    </div>
-    <div class="mb-3">
-        <label for="tags" class="form-label">Tags (separados por comas)</label>
-        <input class="form-control" id="tags" type="text" name="ftags" placeholder="Tags" rows="1" cols="70" />
-    </div>
-    <div class="mb-3">
-        <button class="btn btn-primary w-100 shadow" type="submit">
-        <i class="bi bi-plus-square me-2"></i>Crear frase
-      </button>
-    </div>
-</form>
+    <form class="container" method="post" style="max-width: 30rem" action="{{ url_for("syllabus.create") }}">
+        <div class="mb-3">
+            <label for="texto" class="form-label">Texto</label>
+            <textarea id="texto" class="form-control" name="ftext" placeholder="Frase" rows="5" cols="100"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="tags" class="form-label">Tags (separados por comas)</label>
+            <input class="form-control" id="tags" type="text" name="ftags" placeholder="Tags" rows="1" cols="70"/>
+        </div>
+        <div class="mb-3">
+            <button class="btn btn-primary w-100 shadow" type="submit">
+                <i class="bi bi-plus-square me-2"></i>Crear frase
+            </button>
+        </div>
+    </form>
 {% endblock %}
