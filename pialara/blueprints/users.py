@@ -1,10 +1,13 @@
+from werkzeug.security import generate_password_hash
 
 from datetime import datetime
+from bson.objectid import ObjectId
 from urllib import request
 
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
+
 from flask_login import login_required, current_user
 from pialara.decorators import rol_required
 from pialara.models.Usuario import Usuario
