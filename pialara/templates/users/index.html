@@ -12,7 +12,8 @@
   {% endif %}
 {% endwith %}
 
-  <h1 class="text-center p-3">Lista de usuarios</h1>
+   <H3 class=" m-2">Lista de usuarios</H3>
+<a href="/users/create" class="btn btn-success m-2"><i class="bi bi-plus-square"></i></a>
 
   <form class="container pb-4" style="max-width: 25rem">
     <div class="input-group">
@@ -50,9 +51,12 @@
               <i class="bi bi-megaphone me-2"></i>{{ user.dis|join(', ') }}
             </p>
           {% endif %}
-          <p class="card-text mb-3">
+          <p class="card-text mb-1">
             <i class="bi bi-clock me-2"></i>{{ user.ultima_conexion.strftime('%d/%m/%Y - %H:%M') }}
           </p>
+            <p class="card-text mb-3">
+                <i class="bi bi-person"></i>  {{ user.rol }}
+            </p>
           <a href="{{ url_for('users.update',id=user._id) }}" class="btn btn-primary align-self-start mt-auto">
             <i class="bi bi-pencil me-2"></i>Editar
           </a>
