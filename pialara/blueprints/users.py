@@ -122,8 +122,7 @@ def update_post(id):
     usu = Usuario()
     nombre = request.form.get('nombre')
     email = request.form.get('email')
-  
-    resultado = usu.update_one({'_id': ObjectId(id)},{"$set":{'nombre':nombre, 'mail':email}})
+
     resultado = usu.update_one({'_id': ObjectId(id)}, {"$set": {'nombre': nombre, 'mail': email}})
 
     if resultado.acknowledged & resultado.modified_count == 1:
