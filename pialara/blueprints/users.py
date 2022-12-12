@@ -2,10 +2,7 @@ from werkzeug.security import generate_password_hash
 
 from datetime import datetime
 from bson.objectid import ObjectId
-<<<<<<< HEAD
 from flask import Blueprint, render_template, request
-from flask_login import login_required,current_user
-=======
 from urllib import request
 
 from flask import (
@@ -14,7 +11,6 @@ from flask import (
 
 from flask_login import login_required, current_user
 from pialara.decorators import rol_required
->>>>>>> master
 from pialara.models.Usuario import Usuario
 
 bp = Blueprint('users', __name__, url_prefix='/users')
