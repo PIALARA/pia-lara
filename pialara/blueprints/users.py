@@ -123,22 +123,8 @@ def update_post(id):
     nombre = request.form.get('nombre')
     email = request.form.get('email')
   
-    resultado = usu.update_one({'_id': ObjectId(id)},{"$set":{'nombre':nombre, 'mail':email}})  
-    return render_template('users/index.html')
-
-"""
-@bp.route('/update', methods=['POST'])
-@login_required
-def updateData():
-    id = request.form.get('id')
-    nombre = request.form.get('nombre')
-    email = request.form.get('email')
-    password = request.form.get('password')
-    fecha_nacimiento = request.form.get('fecha_nacimiento')
-    sexo = request.form.get('sexo')
-    provincia = request.form.get('provincia')
-    enfermedades = request.form.get('enfermedades')
-    dis = request.form.get('dis')
+    resultado = usu.update_one({'_id': ObjectId(id)},{"$set":{'nombre':nombre, 'mail':email}})
+    resultado = usu.update_one({'_id': ObjectId(id)}, {"$set": {'nombre': nombre, 'mail': email}})
 
     if resultado.acknowledged & resultado.modified_count == 1:
         flash('Usuario actualizado correctamente', 'success')
@@ -149,3 +135,4 @@ def updateData():
     else:
         flash('La usuario no se ha actualizado. Error genérico', 'danger')
         return redirect(url_for('users.index'))
+
