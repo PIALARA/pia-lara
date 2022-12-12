@@ -15,7 +15,7 @@ def index():
     syllabus = Syllabus()
     frases = syllabus.find()
 
-    return render_template('syllabus/index.html', syllabus=frases)
+    return render_template('syllabus/index.html', syllabus=frases, tag_name='')
 
 
 @bp.route('/', methods=['POST'])
@@ -25,7 +25,7 @@ def tag():
     syllabus = Syllabus()
 
     if tag_name == "":
-        return render_template('syllabus/index.html', syllabus=syllabus.find())
+        return render_template('syllabus/index.html', syllabus=syllabus.find(), tag_name=tag_name)
 
     pipeline = [
         {
@@ -44,7 +44,7 @@ def tag():
     if not frases.alive:
         flash("No se han encontrado resultados", "danger")
 
-    return render_template('syllabus/index.html', syllabus=frases)
+    return render_template('syllabus/index.html', syllabus=frases, tag_name=tag_name)
 
 
 @bp.route('/create')

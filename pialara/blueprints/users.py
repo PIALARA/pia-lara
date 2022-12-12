@@ -21,8 +21,23 @@ def index():
     else:
         users = u.find({"rol": {"$eq": 'cliente'}})
 
-    return render_template('users/index.html', users=users)
+    return render_template('users/index.html', users=users, user_name='')
 
+
+@bp.route('/', methods=['POST'])
+@login_required
+@rol_required(['admin', 'tecnico'])
+def search_user():
+    user_name = request.form.get('userName')
+    u = Usuario()
+
+    logged_rol = current_user.rol
+    if logged_rol == "admin":
+        users = u.find({'nombre': {"$regex": user_name, '$options': 'i'}})
+    else:
+        users = u.find({"rol": {"$eq": 'cliente'}, 'nombre': {"$regex": user_name, '$options': 'i'}})
+
+    return render_template('users/index.html', users=users, user_name=user_name)
 
 @bp.route('/create')
 @login_required
