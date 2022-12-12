@@ -398,6 +398,71 @@ audioValidator = {
         }
     }
 }
+
+enfermedades = [
+    {
+        "nombre": 'Enfermedad 1',
+        "visible" : 1
+    },
+    {
+        "nombre": 'Enfermedad 2',
+        "visible" : 1
+    },
+    {
+        "nombre": 'Enfermedad 2',
+        "visible" : 0
+    }
+]
+
+enfermedadesValidator = {
+    "$jsonSchema": {
+        "required": [
+            'nombre',
+            'visible'
+        ],
+        "properties": {
+            "nombre": {
+                "bsonType": 'string'
+            },
+            "visible": {
+                "bsonType": 'int'
+            }
+        }
+    }
+}
+
+disfonias = [
+    {
+        "nombre": 'Disfonia 1',
+        "visible" : 1
+    },
+    {
+        "nombre": 'Disfonia 2',
+        "visible" : 1
+    },
+    {
+        "nombre": 'Disfonia 2',
+        "visible" : 0
+    }
+]
+
+disfoniasValidator = {
+    "$jsonSchema": {
+        "required": [
+            'nombre',
+            'visible'
+        ],
+        "properties": {
+            "nombre": {
+                "bsonType": 'string'
+            },
+            "visible": {
+                "bsonType": 'int'
+            }
+        }
+    }
+}
+
 try:
     db.drop_collection("usuarios")
     db.create_collection("usuarios", validator=userValidator)
@@ -411,5 +476,12 @@ try:
     db.create_collection("audios", validator=audioValidator)
     db.audios.insert_many(audio)
 
+    db.drop_collection("enfermedades")
+    db.create_collection("enfermedades", validator=enfermedadesValidator)
+    db.enfermedades.insert_many(enfermedades)
+
+    db.drop_collection("disfonias")
+    db.create_collection("disfonias", validator=disfoniasValidator)
+    db.disfonias.insert_many(disfonias)
 except Exception as e:
     print(e)
