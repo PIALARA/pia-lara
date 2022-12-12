@@ -137,47 +137,16 @@ def update_post(id):
     usu = Usuario()
     nombre = request.form.get('nombre')
     email = request.form.get('email')
-  
-    resultado = usu.update_one({'_id': ObjectId(id)},{"$set":{'nombre':nombre, 'mail':email}})
+
+    resultado = usu.update_one({'_id': ObjectId(id)}, {"$set": {'nombre': nombre, 'mail': email}})
+
     if resultado.acknowledged & resultado.modified_count == 1:
-        flash('Usuario actualizado correctamente')
-        if(current_user.rol == 'cliente'):
-            return render_template('audios/create.html')
+        flash('Usuario actualizado correctamente', 'success')
         return redirect(url_for('users.index'))
     elif resultado.acknowledged & resultado.modified_count == 0:
-        flash('Error al actualizar el usuario, inténtelo de nuevo...')
+        flash('Error al actualizar el usuario, inténtelo de nuevo...', 'danger')
         return redirect(url_for('users.update', id=id))
     else:
-        flash('La usuario no se ha actualizado. Error genérico')
-        if(current_user.rol == 'cliente'):
-            return render_template('audios/create.html')
+        flash('La usuario no se ha actualizado. Error genérico', 'danger')
         return redirect(url_for('users.index'))
 
-
-"""
-@bp.route('/update', methods=['POST'])
-@login_required
-def updateData():
-    id = request.form.get('id')
-    nombre = request.form.get('nombre')
-    email = request.form.get('email')
-    password = request.form.get('password')
-    fecha_nacimiento = request.form.get('fecha_nacimiento')
-    sexo = request.form.get('sexo')
-    provincia = request.form.get('provincia')
-    enfermedades = request.form.get('enfermedades')
-    dis = request.form.get('dis')
-
-    result = db.update_user_all()
-    print("Usuario modificado: ",result)
-"""
-"""@bp.route('/update/<id>', methods=['GET'])
-@login_required
-def update(id):
-    u = Usuario()
-    model=u.find_one({'_id': ObjectId(id)})
-    if model is None:
-        flash("usuario no existe", "error")
-        return render_template('users/index.html')
-
-    return render_template('users/update.html',model=model)"""

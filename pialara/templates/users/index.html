@@ -1,6 +1,17 @@
 {% extends 'layout.html' %}
 
 {% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">
+        {{ message }}
+        </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
    <H3 class=" m-2">Lista de usuarios</H3>
 <a href="/users/create" class="btn btn-success m-2"><i class="bi bi-plus-square"></i></a>
 
