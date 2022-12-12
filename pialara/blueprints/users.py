@@ -1,13 +1,11 @@
 from _curses import flash
 from urllib import request
 
-from flask import Blueprint, render_template, request
 from flask_login import login_required, current_user
-from pialara.db import db
 from pialara.models.Usuario import Usuario
 from bson.objectid import ObjectId
-from werkzeug.security import generate_password_hash
-from pialara.models.MongoModel import MongoModel as mongo
+
+from flask import ( Blueprint, flash, g, redirect, render_template, request, session, url_for)
 
 bp = Blueprint('users', __name__, url_prefix='/users')
 
@@ -45,36 +43,17 @@ def update_post(id):
     usu = Usuario()
     nombre = request.form.get('nombre')
     email = request.form.get('email')
-  
-    resultado = usu.update_one({'_id': ObjectId(id)},{"$set":{'nombre':nombre, 'mail':email}})  
-    return render_template('users/index.html')
 
-"""
-@bp.route('/update', methods=['POST'])
-@login_required
-def updateData():
-    id = request.form.get('id')
-    nombre = request.form.get('nombre')
-    email = request.form.get('email')
-    password = request.form.get('password')
-    fecha_nacimiento = request.form.get('fecha_nacimiento')
-    sexo = request.form.get('sexo')
-    provincia = request.form.get('provincia')
-    enfermedades = request.form.get('enfermedades')
-    dis = request.form.get('dis')
+    resultado = usu.update_one({'_id': ObjectId(id)},{"$set":{'nombre':nombre, 'mail':email}})
+    if resultado.acknowledged & resultado.modified_count == 1:
+        flash('Usuario actualizado correctamente')
+        return redirect(url_for('users.index'))
+    elif resultado.acknowledged & resultado.modified_count == 0:
+        flash('Error al actualizar el usuario, inténtelo de nuevo...')
+        return redirect(url_for('users.update', id=id))
+    else:
+        flash('La usuario no se ha actualizado. Error genérico')
+        return redirect(url_for('users.index'))
 
-    result = db.update_user_all()
-    print("Usuario modificado: ",result)
-"""
-"""@bp.route('/update/<id>', methods=['GET'])
-@login_required
-def update(id):
-    u = Usuario()
-    model=u.find_one({'_id': ObjectId(id)})
-    if model is None:
-        flash("usuario no existe", "error")
-        return render_template('users/index.html')
-
-    return render_template('users/update.html',model=model)"""
 
 
