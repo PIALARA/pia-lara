@@ -45,10 +45,9 @@ def update_post(id):
 
     resultado = usu.update_one({'_id': ObjectId(id)},{"$set":{'nombre':nombre, 'mail':email}})
 
-    flash('Usuario actualizado correctamente')
-    if resultado.acknowledged & resultado.modified_count == 1:
-        print("s")
 
+    if resultado.acknowledged & resultado.modified_count == 1:
+        flash('Usuario actualizado correctamente')
         return redirect(url_for('users.index'))
     elif resultado.acknowledged & resultado.modified_count == 0:
         flash('Error al actualizar el usuario, inténtelo de nuevo...')
