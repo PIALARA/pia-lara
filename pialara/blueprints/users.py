@@ -56,8 +56,16 @@ def update_post(id):
         flash('La usuario no se ha actualizado. Error genérico')
         return redirect(url_for('users.index'))
 
-
-
+    resultado = usu.update_one({'_id': ObjectId(id)},{"$set":{'nombre':nombre, 'mail':email}})
+    if resultado.acknowledged & resultado.modified_count == 1:
+        flash('Usuario actualizado correctamente')
+        return redirect(url_for('users.index'))
+    elif resultado.acknowledged & resultado.modified_count == 0:
+        flash('Error al actualizar el usuario, inténtelo de nuevo...')
+        return redirect(url_for('users.update', id=id))
+    else:
+        flash('La usuario no se ha actualizado. Error genérico')
+        return redirect(url_for('users.index'))
 
 
 
