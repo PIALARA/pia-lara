@@ -22,10 +22,15 @@
   </section>
 
   <section class="container py-3 text-center">
-    <button class="btn btn-lg btn-success">
+    <button class="btn btn-lg btn-success" id="record-button">
       <i class="bi bi-mic me-2"></i>Grabar
     </button>
+    <button class="btn btn-lg btn-danger" id="record-stop-button">
+      <i class="bi bi-mic me-2"></i>Parar
+    </button>
+    <audio src="" id="recorded-audio"></audio>
   </section>
 
   <script src="{{ url_for('static', filename='js/speech-synthesis.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/speech-recording.js') }}"></script>
 {% endblock %}
