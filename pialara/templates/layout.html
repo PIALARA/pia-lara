@@ -34,7 +34,7 @@
           </ul>
           <div class="pb-3 text-white text-decoration-none pt-5 text-center">
             <a href="#">
-              <h5 id="user" class="text-light"><i class="bi bi-person-fill"></i> {{ current_user.nombre }} <strong>({{ current_user.rol }})</strong> </h5>
+              <h5 id="user" class="text-light"><i class="bi bi-person-fill"></i> {{ current_user.nombre }} <strong class="rol_layout">({{ current_user.rol }})</strong> </h5>
             </a>
             <a href="{{ url_for("auth.logout") }}">
               <p id="logout" class="text-light">Logout</p>
