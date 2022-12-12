@@ -4,10 +4,10 @@
    <H3 class=" m-2">Lista de usuarios</H3>
 <a href="/users/create" class="btn btn-success m-2"><i class="bi bi-plus-square"></i></a>
 
-  <form class="container pb-4" style="max-width: 25rem">
+  <form class="container pb-4" style="max-width: 25rem" method="post">
     <div class="input-group">
-      <input type="search" class="form-control" placeholder="Buscar usuarios..." aria-label="Buscar usuarios..."
-        aria-describedby="button-search" />
+      <input type="search" name="userName" class="form-control" placeholder="Buscar usuarios..." aria-label="Buscar usuarios..."
+        aria-describedby="button-search" value="{{ user_name }}"/>
       <button class="btn btn-primary" type="submit" id="button-search"><i class="bi bi-search me-2"></i>Buscar</button>
     </div>
   </form>
