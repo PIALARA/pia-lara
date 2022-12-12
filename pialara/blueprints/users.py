@@ -1,7 +1,7 @@
 from urllib import request
 from bson.objectid import ObjectId
 from flask import Blueprint, render_template, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from pialara.models.Usuario import Usuario
 
 bp = Blueprint('users', __name__, url_prefix='/users')
@@ -12,13 +12,14 @@ bp = Blueprint('users', __name__, url_prefix='/users')
 def index():
     u = Usuario()
 
-    # logged_rol = current_user.rol
-    # if logged_rol == "Administrador":
-    #     users = db.users.find()
-    # else:
-    #     raise Exception("Operación no permitida para el rol", logged_rol)
+    users = []
+    logged_rol = current_user.rol
+    if logged_rol == "admin":
+        users = u.find()
+    else:
+        raise Exception('usuario no administrador', current_user.rol)
 
-    return render_template('users/index.html', users=u.find())
+    return render_template('users/index.html', users=users)
 
 @bp.route('/create')
 @login_required
