@@ -1,6 +1,17 @@
 {% extends 'layout.html' %}
 
 {% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
   <h1 class="text-center p-3">Crear usuario</h1>
 
   <nav class="nav nav-tabs justify-content-center" id="nav-tab" role="tablist">
@@ -23,22 +34,22 @@
   <div class="tab-content py-4" id="nav-tabContent">
     <section class="tab-pane fade show active" id="nav-administrador" role="tabpanel"
       aria-labelledby="nav-administrador-tab" tabindex="0">
-      <form class="container" style="max-width: 20rem">
+      <form class="container" style="max-width: 20rem" method="post">
         <div class="mb-3">
           <label for="nombre" class="form-label">Nombre</label>
-          <input type="text" class="form-control" id="nombre" required />
+          <input type="text" class="form-control" id="nombre" name="nombre_admin" required />
         </div>
         <div class="mb-3">
           <label for="email" class="form-label">Email</label>
-          <input type="email" class="form-control" id="email" required />
+          <input type="email" class="form-control" id="email" name="email_admin" required />
         </div>
         <div class="mb-3">
           <label for="password" class="form-label">Contraseña</label>
-          <input type="password" class="form-control" id="password" required />
+          <input type="password" class="form-control" id="password" name="pass1" required />
         </div>
         <div class="mb-3">
           <label for="password-repeat" class="form-label">Repetir contraseña</label>
-          <input type="password" class="form-control" id="password-repeat" required />
+          <input type="password" class="form-control" id="password-repeat" name="pass2" required />
         </div>
         <div class="mb-3">
           <button class="btn btn-primary w-100 shadow" type="submit">
@@ -49,22 +60,22 @@
     </section>
 
     <section class="tab-pane fade" id="nav-tecnico" role="tabpanel" aria-labelledby="nav-tecnico-tab" tabindex="0">
-      <form class="container" style="max-width: 20rem">
+      <form class="container" style="max-width: 20rem" method="post">
         <div class="mb-3">
           <label for="nombre" class="form-label">Nombre</label>
-          <input type="text" class="form-control" id="nombre" required />
+          <input type="text" class="form-control" id="nombre" name="nombre_tecnico" required />
         </div>
         <div class="mb-3">
           <label for="email" class="form-label">Email</label>
-          <input type="email" class="form-control" id="email" required />
+          <input type="email" class="form-control" id="email" name="email_tecnico" required />
         </div>
         <div class="mb-3">
           <label for="password" class="form-label">Contraseña</label>
-          <input type="password" class="form-control" id="password" required />
+          <input type="password" class="form-control" id="password" name="pass1" required />
         </div>
         <div class="mb-3">
           <label for="password-repeat" class="form-label">Repetir contraseña</label>
-          <input type="password" class="form-control" id="password-repeat" required />
+          <input type="password" class="form-control" id="password-repeat" name="pass2" required />
         </div>
         <div class="mb-3">
           <button class="btn btn-primary w-100 shadow" type="submit">
@@ -75,37 +86,37 @@
     </section>
 
     <section class="tab-pane fade" id="nav-cliente" role="tabpanel" aria-labelledby="nav-cliente-tab" tabindex="0">
-      <form class="container" style="max-width: 20rem">
+      <form class="container" style="max-width: 20rem" method="post">
         <div class="mb-3">
           <label for="nombre" class="form-label">Nombre</label>
-          <input type="text" class="form-control" id="nombre" required />
+          <input type="text" class="form-control" id="nombre" name="nombre_cliente" required />
         </div>
         <div class="mb-3">
           <label for="email" class="form-label">Email</label>
-          <input type="email" class="form-control" id="email" required />
+          <input type="email" class="form-control" id="email" name="email_cliente" required />
         </div>
         <div class="mb-3">
           <label for="password" class="form-label">Contraseña</label>
-          <input type="password" class="form-control" id="password" required />
+          <input type="password" class="form-control" id="password" name="pass1" required />
         </div>
         <div class="mb-3">
           <label for="password-repeat" class="form-label">Repetir contraseña</label>
-          <input type="password" class="form-control" id="password-repeat" required />
+          <input type="password" class="form-control" id="password-repeat" name="pass2" required />
         </div>
         <div class="mb-3">
           <label for="fecha_nacimiento" class="form-label">Fecha de nacimiento</label>
-          <input type="date" class="form-control" id="fecha_nacimiento" required />
+          <input type="date" class="form-control" id="fecha_nacimiento" name="fnac_cliente" required />
         </div>
         <div class="mb-3">
           <label for="sexo" class="form-label">Sexo</label>
-          <select class="form-select" id="sexo" required>
+          <select class="form-select" id="sexo" name="sexo_cliente" required>
             <option value="H">Hombre</option>
             <option value="M">Mujer</option>
           </select>
         </div>
         <div class="mb-3">
           <label for="provincia" class="form-label">Provincia</label>
-          <select class="form-select" id="provincia" required>
+          <select class="form-select" id="provincia" name="provincia_cliente" required>
             <option value="Alicante">Alicante</option>
             <option value="Valencia">Valencia</option>
             <option value="Castellón">Castellón</option>
@@ -115,15 +126,15 @@
         <fieldset class="mb-3">
           <legend class="fs-6">Enfermedades</legend>
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="enfermedades" value="enfermedad-1" id="enfermedad-1" />
+            <input class="form-check-input" type="checkbox" name="enfermedades" value="enfermedad1" id="enfermedad-1" />
             <label class="form-check-label" for="enfermedad-1">Enfermedad 1</label>
           </div>
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="enfermedades" value="enfermedad-2" id="enfermedad-2" />
+            <input class="form-check-input" type="checkbox" name="enfermedades" value="enfermedad2" id="enfermedad-2" />
             <label class="form-check-label" for="enfermedad-2">Enfermedad 2</label>
           </div>
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="enfermedades" value="enfermedad-3" id="enfermedad-3" />
+            <input class="form-check-input" type="checkbox" name="enfermedades" value="enfermedad3" id="enfermedad-3" />
             <label class="form-check-label" for="enfermedad-3">Enfermedad 3</label>
           </div>
         </fieldset>
