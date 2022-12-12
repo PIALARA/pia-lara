@@ -1,7 +1,7 @@
 from urllib import request
 from bson.objectid import ObjectId
 from flask import Blueprint, render_template, request
-from flask_login import login_required
+from flask_login import login_required,current_user
 from pialara.models.Usuario import Usuario
 
 bp = Blueprint('users', __name__, url_prefix='/users')
@@ -41,6 +41,8 @@ def update_post(id):
     email = request.form.get('email')
   
     resultado = usu.update_one({'_id': ObjectId(id)},{"$set":{'nombre':nombre, 'mail':email}})  
+    if(current_user.rol == 'cliente'):
+        return render_template('audios/create.html')
     return render_template('users/index.html')
 
 """
