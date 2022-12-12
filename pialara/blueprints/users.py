@@ -1,31 +1,36 @@
+<<<<<<< HEAD
 from datetime import datetime
 from urllib import request
 
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
-from flask_login import login_required, current_user
-from pialara.db import db
-from pialara.models.Usuario import Usuario
+=======
+from urllib import request
 from bson.objectid import ObjectId
-from werkzeug.security import generate_password_hash
-from pialara.models.MongoModel import MongoModel as mongo
+from flask import Blueprint, render_template, request
+>>>>>>> master
+from flask_login import login_required, current_user
+from pialara.decorators import rol_required
+from pialara.models.Usuario import Usuario
 
 bp = Blueprint('users', __name__, url_prefix='/users')
 
 
 @bp.route('/')
 @login_required
+@rol_required(['admin', 'tecnico'])
 def index():
     u = Usuario()
 
-    # logged_rol = current_user.rol
-    # if logged_rol == "Administrador":
-    #     users = db.users.find()
-    # else:
-    #     raise Exception("Operación no permitida para el rol", logged_rol)
+    users = []
+    logged_rol = current_user.rol
+    if logged_rol == "admin":
+        users = u.find()
+    else:
+        users = u.find({"rol": {"$eq": 'cliente'}})
 
-    return render_template('users/index.html', users=u.find())
+    return render_template('users/index.html', users=users)
 
 
 @bp.route('/create')
@@ -106,9 +111,10 @@ def existeCorreo(email):
 @login_required
 def update(id):
     u = Usuario()
-    model=u.find_one({'_id': ObjectId(id)})
-   
-    return render_template('users/update.html',model=model)
+    model = u.find_one({'_id': ObjectId(id)})
+
+    return render_template('users/update.html', model=model)
+
 
 @bp.route('/update/<id>', methods=['POST'])
 @login_required
@@ -156,5 +162,3 @@ def update(id):
         return render_template('users/index.html')
 
     return render_template('users/update.html',model=model)"""
-
-
