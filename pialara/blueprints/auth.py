@@ -34,7 +34,10 @@ def login_post():
 
 @bp.route('/profile')
 def profile():
-    return render_template('auth/profile.html')
+    if current_user.rol != "cliente":
+        return render_template('auth/profile.html')
+    else:
+        return render_template('audios/create.html')
 
 
 @bp.route('/logout')
