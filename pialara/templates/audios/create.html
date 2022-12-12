@@ -28,7 +28,9 @@
     <button class="btn btn-lg btn-danger" id="record-stop-button">
       <i class="bi bi-mic me-2"></i>Parar
     </button>
-    <audio src="" id="recorded-audio"></audio>
+    <form method="POST" action="{{ url_for("auth.login") }}>
+      <audio id="audio" src="" id="recorded-audio"></audio>
+    </form>
   </section>
 
   <script src="{{ url_for('static', filename='js/speech-synthesis.js') }}"></script>
