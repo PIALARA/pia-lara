@@ -1,13 +1,8 @@
-from _curses import flash
 from urllib import request
-
-from flask import Blueprint, render_template, request
-from flask_login import login_required, current_user
-from pialara.db import db
-from pialara.models.Usuario import Usuario
 from bson.objectid import ObjectId
-from werkzeug.security import generate_password_hash
-from pialara.models.MongoModel import MongoModel as mongo
+from flask import Blueprint, render_template, request
+from flask_login import login_required
+from pialara.models.Usuario import Usuario
 
 bp = Blueprint('users', __name__, url_prefix='/users')
 
