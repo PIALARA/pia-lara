@@ -30,3 +30,6 @@ class MongoModel:
 
     def aggregate(self, values):
         return self.db[self.collection_name].aggregate(values)
+
+    def count_documents(self, values):
+        return self.db[self.collection_name].count_documents(values)
