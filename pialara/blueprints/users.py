@@ -3,6 +3,7 @@ from bson.objectid import ObjectId
 from flask import Blueprint, render_template, request
 from flask_login import login_required
 from pialara.models.Usuario import Usuario
+from pialara.decorators import rol_required
 
 bp = Blueprint('users', __name__, url_prefix='/users')
 
