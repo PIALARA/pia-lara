@@ -29,7 +29,7 @@ def login_post():
 
     # marcamos al usuario como autenticado en flask_login
     login_user(user, remember=remember)
-    return redirect(url_for('auth.profile', nombre=current_user.nombre, rol=current_user.rol))
+    return redirect(url_for('auth.profile', nombre=current_user.nombre, id=current_user.id, rol=current_user.rol))
 
 
 @bp.route('/profile')

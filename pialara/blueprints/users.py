@@ -2,6 +2,7 @@ from werkzeug.security import generate_password_hash
 
 from datetime import datetime
 from bson.objectid import ObjectId
+from flask import Blueprint, render_template, request
 from urllib import request
 
 from flask import (
@@ -124,12 +125,16 @@ def update_post(id):
     resultado = usu.update_one({'_id': ObjectId(id)},{"$set":{'nombre':nombre, 'mail':email}})
     if resultado.acknowledged & resultado.modified_count == 1:
         flash('Usuario actualizado correctamente')
+        if(current_user.rol == 'cliente'):
+            return render_template('audios/create.html')
         return redirect(url_for('users.index'))
     elif resultado.acknowledged & resultado.modified_count == 0:
         flash('Error al actualizar el usuario, inténtelo de nuevo...')
         return redirect(url_for('users.update', id=id))
     else:
         flash('La usuario no se ha actualizado. Error genérico')
+        if(current_user.rol == 'cliente'):
+            return render_template('audios/create.html')
         return redirect(url_for('users.index'))
 
 
