@@ -1,17 +1,13 @@
 import datetime
-
+from bson.objectid import ObjectId
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
+    Blueprint, flash, redirect, render_template, request, url_for
 )
-
+from flask_login import current_user, login_required
 from pialara.models.Syllabus import Syllabus
 from pialara.models.Usuario import Usuario
-from bson.objectid import ObjectId
-from flask_login import current_user, login_required
 
 bp = Blueprint('syllabus', __name__, url_prefix='/syllabus')
-
-from pialara.db import get_db
 
 
 @bp.route('/')
