@@ -20,7 +20,6 @@ def index():
 
     return render_template('users/index.html', users=u.find())
 
-
 @bp.route('/create')
 @login_required
 def create():
