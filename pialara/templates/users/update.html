@@ -2,12 +2,14 @@
 
 {% block content %}
 
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<div class="alert alert-danger">
-    {{ messages[0] }}
-</div>
-{% endif %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">
+        {{ message }}
+        </div>
+    {% endfor %}
+  {% endif %}
 {% endwith %}
 
   <h1 class="text-center p-3">Actualizar usuario</h1>
