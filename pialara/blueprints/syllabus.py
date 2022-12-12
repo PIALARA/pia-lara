@@ -17,6 +17,7 @@ def index():
 
     return render_template('syllabus/index.html', syllabus=frases)
 
+
 @bp.route('/', methods=['POST'])
 @login_required
 def tag():
@@ -41,7 +42,7 @@ def tag():
     frases = syllabus.aggregate(pipeline)
 
     if not frases.alive:
-        flash("No se han encontrado resultados")
+        flash("No se han encontrado resultados", "danger")
 
     return render_template('syllabus/index.html', syllabus=frases)
 
@@ -55,32 +56,31 @@ def create():
 @bp.route('/create', methods=['POST'])
 @login_required
 def create_post():
-    #Obtener los datos del formulario
+    # Obtener los datos del formulario
     text = request.form.get('ftext')
     tags = request.form.get('ftags')
 
-    #Obtener los datos del usuario
+    # Obtener los datos del usuario
     usuario = Usuario()
     params = {"mail": current_user.email}
     user = usuario.find_one(params)
 
-
-    #Convertir el array de los tags
+    # Convertir el array de los tags
     tagsArray = tags.split(", ")
 
-    #Crear el texto en la base de datos
+    # Crear el texto en la base de datos
     texto = Syllabus()
-    aux = {"texto": text, "creador": {"id": user.get("_id"), "nombre": user.get("nombre"), "rol": user.get("rol")}, "tags": tagsArray, "fecha_creacion": datetime.datetime.now()}
+    aux = {"texto": text, "creador": {"id": user.get("_id"), "nombre": user.get("nombre"), "rol": user.get("rol")},
+           "tags": tagsArray, "fecha_creacion": datetime.datetime.now()}
     result = texto.insert_one(aux)
 
-    #Comprobar el resultado y mostrar mensaje
+    # Comprobar el resultado y mostrar mensaje
     if result.acknowledged:
-        flash('Texto creado correctamente')
+        flash('Texto creado correctamente', 'success')
         return redirect(url_for('syllabus.index'))
     else:
-        flash('La frase no se ha creado. Error genérico')
+        flash('La frase no se ha creado. Error genérico', 'danger')
         return redirect(url_for('syllabus.create'))
-
 
 
 @bp.route('/update/<string:id>')
@@ -98,6 +98,7 @@ def update(id):
     aux = aux[2:]
 
     return render_template('syllabus/update.html', syllabus=syllabus, tags=aux)
+
 
 @bp.route('/update/<string:id>', methods=['POST'])
 @login_required
@@ -118,7 +119,7 @@ def update_post(id):
     # Crear el texto en la base de datos
     texto = Syllabus()
     params1 = {"_id": ObjectId(fraseID)}
-    params2 = {"$set":  {"texto": text, "tags": tagsArray}}
+    params2 = {"$set": {"texto": text, "tags": tagsArray}}
     result = texto.update_one(params1, params2, False)
 
     # Comprobar el resultado y mostrar mensaje
@@ -131,7 +132,6 @@ def update_post(id):
     else:
         flash('La frase no se ha actualizado. Error genérico')
         return redirect(url_for('syllabus.index'))
-
 
 
 @bp.route('/delete/<string:id>')
