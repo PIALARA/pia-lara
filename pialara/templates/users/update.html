@@ -1,7 +1,15 @@
 {% extends 'layout.html' %}
 
-
 {% block content %}
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="alert alert-danger">
+    {{ messages[0] }}
+</div>
+{% endif %}
+{% endwith %}
+
   <h1 class="text-center p-3">Actualizar usuario</h1>
   <div class="tab-content py-4" id="nav-tabContent">
       <form class="container" method="POST" style="max-width: 20rem">
