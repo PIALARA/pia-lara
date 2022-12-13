@@ -31,7 +31,7 @@ def login_post():
     login_user(user, remember=remember)
 
     if user.rol == 'cliente':
-        return redirect(url_for('audios.client-tag'))
+        return redirect(url_for('audios.client_tag'))
 
     return redirect(url_for('users.index'))
 
