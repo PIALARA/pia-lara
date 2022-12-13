@@ -1,5 +1,4 @@
 const recordButton = document.querySelector('#record-button');
-const recordStopButton = document.querySelector('#record-stop-button');
 const recordedAudio = document.querySelector('#recorded-audio');
 const sendAudio = document.querySelector('#send-button');
 
@@ -14,7 +13,7 @@ function handlerFunction(stream) {
   mediaRecorder = new MediaRecorder(stream);
   mediaRecorder.addEventListener('dataavailable', e => {
     audioChunks.push(e.data);
-    if (mediaRecorder.state == 'inactive') {
+    if (mediaRecorder.state === 'inactive') {
       let blob = new Blob(audioChunks, { type: 'audio/mpeg-3' });
       console.log(blob);
       // sendData(blob);
@@ -27,20 +26,19 @@ function handlerFunction(stream) {
 }
 
 recordButton.addEventListener('click', e => {
-  console.log('Recording are started..');
-  recordButton.disabled = true;
-  recordStopButton.disabled = false;
-
-  audioChunks = [];
-  mediaRecorder.start();
-});
-
-recordStopButton.addEventListener('click', e => {
-  console.log('Recording are stopped.');
-  recordButton.disabled = false;
-  recordStopButton.disabled = true;
-
-  mediaRecorder.stop();
+  if (mediaRecorder.state === 'inactive') {
+    console.log('Recording are started..');
+    recordButton.classList.replace('btn-success', 'btn-danger');
+    recordButton.innerHTML = '<i class="bi bi-stop me-2"></i>Parar de grabar';
+    recordedAudio.controls = false;
+    audioChunks = [];
+    mediaRecorder.start();
+  } else if (mediaRecorder.state === 'recording') {
+    console.log('Recording are stopped.');
+    recordButton.classList.replace('btn-danger', 'btn-success');
+    recordButton.innerHTML = '<i class="bi bi-mic me-2"></i>Volver a grabar';
+    mediaRecorder.stop();
+  }
 });
 
 sendAudio.addEventListener('click', e => {
