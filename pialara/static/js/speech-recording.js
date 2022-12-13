@@ -43,7 +43,7 @@ recordButton.addEventListener('click', e => {
 
 sendAudio.addEventListener('click', e => {
   var form = new FormData();
-  form.append('file', generalBlob, URL.createObjectURL(generalBlob));
+  form.append('file', generalBlob);
   form.append('title', 'data.mp3');
   //Chrome inspector shows that the post data includes a file and a title.
   $.ajax({
