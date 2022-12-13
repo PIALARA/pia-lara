@@ -29,15 +29,11 @@ def login_post():
 
     # marcamos al usuario como autenticado en flask_login
     login_user(user, remember=remember)
-    return redirect(url_for('auth.profile', nombre=current_user.nombre, id=current_user.id, rol=current_user.rol))
 
+    if user.rol == 'cliente':
+        return redirect(url_for('audios.client-tag'))
 
-@bp.route('/profile')
-def profile():
-    if current_user.rol != "cliente":
-        return render_template('auth/profile.html')
-    else:
-        return render_template('audios/create.html')
+    return redirect(url_for('users.index'))
 
 
 @bp.route('/logout')
