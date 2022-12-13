@@ -75,7 +75,7 @@ def create_post():
     user = Usuario()
 
     if pass1 != pass2:
-        flash("Las contraseñas no son iguales")
+        flash("Las contraseñas no son iguales", 'danger')
         return render_template('users/create.html')
 
 

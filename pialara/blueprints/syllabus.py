@@ -124,13 +124,13 @@ def update_post(id):
 
     # Comprobar el resultado y mostrar mensaje
     if result.acknowledged & result.modified_count == 1:
-        flash('Texto actualizado correctamente')
+        flash('Texto actualizado correctamente', 'success')
         return redirect(url_for('syllabus.index'))
     elif result.acknowledged & result.modified_count == 0:
-        flash('Error al actualizar texto, inténtelo de nuevo...')
+        flash('Error al actualizar texto, inténtelo de nuevo...', 'danger')
         return redirect(url_for('syllabus.update', id=fraseID))
     else:
-        flash('La frase no se ha actualizado. Error genérico')
+        flash('La frase no se ha actualizado. Error genérico', 'danger')
         return redirect(url_for('syllabus.index'))
 
 
@@ -141,8 +141,8 @@ def delete(id):
     params = {"_id": ObjectId(id)}
     result = frase.delete_one(params)
     if result.acknowledged:
-        flash('Frase eliminada correctamente')
+        flash('Frase eliminada correctamente', 'success')
         return redirect(url_for('syllabus.index'))
     else:
-        flash('La frase no se ha eliminado. Error genérico')
+        flash('La frase no se ha eliminado. Error genérico', 'danger')
         return redirect(url_for('syllabus.index'))

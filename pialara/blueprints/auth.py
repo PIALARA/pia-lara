@@ -23,7 +23,7 @@ def login_post():
     # comprobamos si el usuario existe
     # cogemos la contraseña, la hasheamos y la comparamos con la contraseña hasheada
     if not user or not check_password_hash(user.password, password):
-        flash('Por favor, comprueba tus datos y vuélvelo a intentar.')
+        flash('Por favor, comprueba tus datos y vuélvelo a intentar', 'danger')
         # si el usuario no existe, o está mal la contraseña, recargamos la página
         return redirect(url_for('auth.login'))
 
@@ -44,5 +44,5 @@ def profile():
 @login_required
 def logout():
     logout_user()
-    flash('Sesión cerrada con éxito')
+    flash('Sesión cerrada con éxito', 'success')
     return redirect(url_for('auth.login'))

@@ -34,13 +34,15 @@
                     <h2><i class="bi bi-mic-fill"></i></h2>
                 </div>
                 <h2 class="fw-bold text-center py-3">Bienvenido</h2>
-                {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                        <div class="alert alert-danger">
-                            {{ messages[0] }}
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div class="alert alert-{{ category }}">
+                        {{ message }}
                         </div>
-                    {% endif %}
-                    {% endwith %}
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
                 <form method="POST" action="{{ url_for("auth.login") }}">
                     <div class="mb-4">
                         <label for="user" class="formlabel">User</label>
