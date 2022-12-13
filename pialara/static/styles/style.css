@@ -8,3 +8,17 @@
 {
     height: 100vh !important;
 }
+
+.tipo_admin{
+    color:red
+
+}
+
+.tipo_cliente{
+    color:green
+
+}
+.tipo_tecnico{
+    color:blue
+
+}
