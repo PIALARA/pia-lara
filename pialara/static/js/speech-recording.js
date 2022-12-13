@@ -1,8 +1,10 @@
 const recordButton = document.querySelector('#record-button');
 const recordStopButton = document.querySelector('#record-stop-button');
 const recordedAudio = document.querySelector('#recorded-audio');
+const sendAudio = document.querySelector('#send-button');
 
 let audioChunks = [];
+let generalBlob = '';
 
 navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
   handlerFunction(stream);
@@ -19,26 +21,10 @@ function handlerFunction(stream) {
       const url = URL.createObjectURL(blob);
       recordedAudio.controls = true;
       recordedAudio.src = url;
+      generalBlob = blob
     }
   });
 }
-
-// function sendData(data) {
-//   var form = new FormData();
-//   form.append('file', data, 'data.mp3');
-//   form.append('title', 'data.mp3');
-//   //Chrome inspector shows that the post data includes a file and a title.
-//   $.ajax({
-//     type: 'POST',
-//     url: '/save-record',
-//     data: form,
-//     cache: false,
-//     processData: false,
-//     contentType: false,
-//   }).done(function (data) {
-//     console.log(data);
-//   });
-// }
 
 recordButton.addEventListener('click', e => {
   console.log('Recording are started..');
@@ -55,4 +41,21 @@ recordStopButton.addEventListener('click', e => {
   recordStopButton.disabled = true;
 
   mediaRecorder.stop();
+});
+
+sendAudio.addEventListener('click', e => {
+  var form = new FormData();
+  form.append('file', generalBlob, URL.createObjectURL(generalBlob));
+  form.append('title', 'data.mp3');
+  //Chrome inspector shows that the post data includes a file and a title.
+  $.ajax({
+      type: 'POST',
+      url: '/audios/save-record',
+      data: form,
+      cache: false,
+      processData: false,
+      contentType: false
+  }).done(function(data) {
+      window.location.href = "create";
+  });
 });

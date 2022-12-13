@@ -28,10 +28,12 @@
     <button class="btn btn-lg btn-danger" id="record-stop-button">
       <i class="bi bi-mic me-2"></i>Parar
     </button>
-    <form method="POST" action="{{ url_for("auth.login") }}>
-      <audio id="audio" src="" id="recorded-audio"></audio>
-    </form>
+    <button class="btn btn-lg btn-danger" id="send-button">
+      <i class="bi bi-mic me-2"></i>Enviar
+    </button>
+    <audio src="" id="recorded-audio"></audio>
   </section>
+
 
   <script src="{{ url_for('static', filename='js/speech-synthesis.js') }}"></script>
   <script src="{{ url_for('static', filename='js/speech-recording.js') }}"></script>
