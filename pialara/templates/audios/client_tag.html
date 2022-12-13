@@ -1,4 +1,37 @@
 {% extends 'client.html' %}
+
 {% block content %}
-<p>client tag</p>
+  <h1 class="p-3 text-center">Seleccionar tag</h1>
+
+  <form class="mx-auto py-3" action="" style="max-width: 30rem;">
+    <div class="input-group mb-3">
+      <input type="search" class="form-control" placeholder="Buscar tags..." aria-label="Buscar tags..." aria-describedby="search">
+      <button class="btn btn-primary" type="submit" id="search">
+        <i class="bi bi-search me-2"></i>Buscar
+      </button>
+    </div>
+  </form>
+
+  <section class="mx-auto py-3 d-flex justify-content-center flex-wrap gap-3" style="max-width: 50rem;">
+    {% for tag in tags %}
+      <a href="/audios/client-record/{ tag.id }" class="btn btn-lg btn-primary">{{ tag.nombre }}</a>
+    {% endfor %}
+
+    <!-- Ejemplos (eliminar) -->
+    <a href="/audios/client-record/1" class="btn btn-lg btn-primary">Tag 1</a>
+    <a href="/audios/client-record/2" class="btn btn-lg btn-primary">Tag 2</a>
+    <a href="/audios/client-record/3" class="btn btn-lg btn-primary">Tag 3</a>
+    <a href="/audios/client-record/4" class="btn btn-lg btn-primary">Tag 4</a>
+    <a href="/audios/client-record/5" class="btn btn-lg btn-primary">Tag 5</a>
+    <a href="/audios/client-record/6" class="btn btn-lg btn-primary">Tag 6</a>
+    <a href="/audios/client-record/7" class="btn btn-lg btn-primary">Tag 7</a>
+    <a href="/audios/client-record/8" class="btn btn-lg btn-primary">Tag 8</a>
+    <a href="/audios/client-record/9" class="btn btn-lg btn-primary">Tag 9</a>
+    <a href="/audios/client-record/10" class="btn btn-lg btn-primary">Tag 10</a>
+    <a href="/audios/client-record/11" class="btn btn-lg btn-primary">Tag 11</a>
+    <a href="/audios/client-record/12" class="btn btn-lg btn-primary">Tag 12</a>
+    <a href="/audios/client-record/13" class="btn btn-lg btn-primary">Tag 13</a>
+    <a href="/audios/client-record/14" class="btn btn-lg btn-primary">Tag 14</a>
+    <a href="/audios/client-record/15" class="btn btn-lg btn-primary">Tag 15</a>
+  </section>
 {% endblock %}
