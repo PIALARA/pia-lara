@@ -2,9 +2,13 @@ body{
     margin: 0;
     padding: 0;
     background: #ffe359;
-    background: linear-gradient(to right,#ffa751,#ffe259);
+    background: url("../img/bg.svg") no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
     height: 100vh;
 }
-html{
-    background: linear-gradient(to right,#ffa751,#ffe259);
+.inciarSesion{
+    background-color: #123e80 !important;
 }
