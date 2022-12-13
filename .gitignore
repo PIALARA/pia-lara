@@ -24,5 +24,5 @@ htmlcov/
 .coverage
 .coverage.*
 *,cover
-
+*.wav
 .ini
