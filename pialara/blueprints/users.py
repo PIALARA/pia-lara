@@ -50,8 +50,12 @@ def search_user():
 
 @bp.route('/create')
 @login_required
+@rol_required(['admin', 'tecnico'])
 def create():
-    return render_template('users/create.html')
+    u = Usuario()
+    logged_rol = current_user.rol
+
+    return render_template('users/create.html',rol=logged_rol)
 
 @bp.route('/create', methods=['POST'])
 @login_required
