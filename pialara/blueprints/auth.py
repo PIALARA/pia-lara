@@ -12,7 +12,6 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 def login():
     return render_template('auth/login.html')
 
-
 @bp.route('/login', methods=['POST'])
 def login_post():
     email = request.form.get('email')
@@ -34,6 +33,19 @@ def login_post():
         return redirect(url_for('audios.client_tag'))
 
     return redirect(url_for('users.index'))
+@bp.route('/email_rec_password')
+def email_rec_password():
+    return render_template('auth/email_rec_password.html')
+
+@bp.route('/info_rec_password')
+def info_rec_password():
+    return render_template('auth/info_rec_password.html')
+
+@bp.route('/rec_password',methods=['GET','POST'])
+def rec_password():
+    return render_template('auth/rec_password.html')
+
+
 
 
 @bp.route('/logout')
