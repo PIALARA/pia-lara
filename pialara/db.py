@@ -34,16 +34,6 @@ def get_db():
 db = LocalProxy(get_db)
 
 
-def get_all_users():
-    """
-    Devuelve una lista con todos los usuarios del sistema
-    """
-    try:
-        return list(db.users.find({}).sort("nombre", ASCENDING))
-    except Exception as e:
-        return e
-
-
 def get_user_by_id(id):
     """
     Devuelve un objeto User a partir de su id
@@ -58,26 +48,6 @@ def get_user_by_id(id):
                            rol=usuario.get("rol"),
                            parent=usuario.get("parent"))
         return usuario_obj
-    except Exception as e:
-        return e
-
-
-def get_users(rol):
-    """
-    Devuelve una lista con los usuarios de un determinado rol
-    """
-    try:
-        return list(db.users.find({"rol": rol}))
-    except Exception as e:
-        return e
-
-
-def get_child_users_by_email(email):
-    """
-    Devuelve una lista con los usuarios cuyo padre contenga determinado email
-    """
-    try:
-        return list(db.users.find({"parent": email}))
     except Exception as e:
         return e
 
@@ -102,39 +72,3 @@ def get_user(email):
     except Exception as e:
         print("Se ha producido un error", e)
         return None
-
-
-def insert_user(user):
-    """
-    Inserta un usuario en la base de datos
-    """
-    try:
-        doc = {"email": user.email,
-               "password": user.password,
-               "nombre": user.nombre,
-               "rol": user.rol,
-               "parent": user.parent}
-        return db.users.insert_one(doc)
-    except Exception as e:
-        return e
-
-
-def update_user(user):
-    """
-    Modifica un usuario (sólo atributos básicos)
-    """
-    try:
-        expr = {"$set": {"nombre": user.nombre, "email": user.email, "rol": user.rol}}
-        return db.users.update_one({"_id": ObjectId(user.id)}, expr)
-    except Exception as e:
-        return e
-
-
-def delete_user(id):
-    """
-    Elimina un usuario por su id
-    """
-    try:
-        return db.users.delete_one({"_id": ObjectId(id)})
-    except Exception as e:
-        return e
