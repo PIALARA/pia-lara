@@ -30,7 +30,7 @@
             <li><a href="{{ url_for("users.index") }}" class="d-block text-light p-3 border-0"><i class="bi bi-person-circle lead m-2"></i>Usuarios</a></li>
             <li><a href="{{ url_for("syllabus.index") }}" class="d-block text-light p-3 border-0"><i class="bi bi-book m-2 lead"></i>Frases</a>
             {% endif %}
-            <li><a href="{{ url_for("audios.index") }}" class="d-block text-light p-3 border-0"><i class="bi bi-file-earmark-music m-2 lead"></i>Audios</a></li>
+            <li><a href="{{ url_for("audios.tag_list") }}" class="d-block text-light p-3 border-0"><i class="bi bi-file-earmark-music m-2 lead"></i>Audios</a></li>
             </li>
           </ul>
           <div class="pb-3 text-white text-decoration-none pt-5 text-center">
@@ -52,7 +52,7 @@
             <li><a href="{{ url_for("users.index") }}" class="d-block text-light p-3 border-0"><i class="bi bi-person-circle lead m-2"></i>Usuarios</a></li>
             <li><a href="{{ url_for("syllabus.index") }}" class="d-block text-light p-3 border-0"><i class="bi bi-book m-2 lead"></i>Frases</a>
             {% endif %}
-            <li><a href="{{ url_for("audios.index") }}" class="d-block text-light p-3 border-0"><i class="bi bi-file-earmark-music m-2 lead"></i>Audios</a></li>
+            <li><a href="{{ url_for("audios.tag_list") }}" class="d-block text-light p-3 border-0"><i class="bi bi-file-earmark-music m-2 lead"></i>Audios</a></li>
           </ul>
           <div class="pb-3 text-white text-decoration-none pt-5 text-center">
             <a href="{{ url_for('users.update',id=current_user.id) }}">

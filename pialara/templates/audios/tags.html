@@ -1,0 +1,49 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">
+        {{ message }}
+        </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+    <h1 class="text-center p-3">Grabación de audios</h1>
+
+    <form class="container pb-4" style="max-width: 25rem" method="post" action="{{ url_for("audios.tag_search") }}">
+        <div class="input-group">
+            <input type="search" name="tagName" class="form-control" placeholder="Buscar etiqueta..."
+                   aria-label="Buscar tag..."
+                   aria-describedby="button-search" value="{{ tag_name }}"/>
+            <button class="btn btn-primary" type="submit" id="button-search"><i class="bi bi-search me-2"></i>Buscar
+            </button>
+        </div>
+    </form>
+
+
+    {% if not tag_name %}
+    <h5 class="text-left p-3">Estas son las etiquetas com más frases:</h5>
+    {% endif %}
+
+    <section class="container d-flex flex-wrap justify-content-center gap-3">
+        {% for frase in syllabus %}
+            <article class="card shadow-sm" style="width: 15rem">
+                <div class="card-header">
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ frase._id.upper() }}</p>
+                    <footer class="blockquote-footer"><cite title="Tags"></cite>{{ frase.total }} frases</footer>
+                    <a href="/audios/tag/{{frase._id}}" class="btn btn-primary">Empezar</a>
+                </div>
+
+            </article>
+        {% endfor %}
+    </section>
+
+
+
+{% endblock %}

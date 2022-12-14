@@ -34,7 +34,7 @@ def tag():
             }
         }, {
             '$match': {
-                'tags': tag_name
+                'tags': {'$regex': tag_name, '$options': 'i'}
             }
         }
     ]
@@ -42,7 +42,7 @@ def tag():
     frases = syllabus.aggregate(pipeline)
 
     if not frases.alive:
-        flash("No se han encontrado resultados", "danger")
+        flash("No se han encontrado resultados de la etiqueta '" + tag_name + "'", "danger")
 
     return render_template('syllabus/index.html', syllabus=frases, tag_name=tag_name)
 
