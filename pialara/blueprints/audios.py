@@ -12,35 +12,8 @@ from pialara.models.Syllabus import Syllabus
 bp = Blueprint('audios', __name__, url_prefix='/audios')
 
 @bp.route('/client-tag')
-def client_tag():
-    return render_template('audios/client_tag.html')
-
-@bp.route('/client-record')
-def client_record():
-    return render_template('audios/client_record.html')
-
-@bp.route('/client-text')
-def client_text():
-    return render_template('audios/client_text.html')
-
-## @todo deleteme
-@bp.route('/create')
-def index():
-    return render_template('audios/create.html')
-
-@bp.route('/save-record', methods=['POST'])
-def save_record():
-    file = request.files['file']
-    # Hemos pensado en guardar timestamp + id de usuario. Ver si se guarda en mp3 o wav
-    print(current_user.id)
-    filename = secure_filename('prueba.wav')
-    file.save(os.path.join('./', filename))
-    print(file)
-    return render_template('audios/create.html')
-
-@bp.route('/')
 @login_required
-def tag_list():
+def client_tag():
     syllabus = Syllabus()
     pipeline = [
         {
@@ -61,22 +34,46 @@ def tag_list():
         }
     ]
 
-    frases = syllabus.aggregate(pipeline)
+    tags = syllabus.aggregate(pipeline)
 
-    if not frases.alive:
-        flash("No se han encontrado frases", "danger")
+    return render_template('audios/client_tag.html', tags=tags)
 
-    return render_template('audios/tags.html', syllabus=frases)
+@bp.route('/client-record/<string:tag_name>')
+@login_required
+def client_record(tag_name):
+    return render_template('audios/client_record.html', tag_name=tag_name)
+
+@bp.route('/client-text')
+@login_required
+def client_text():
+    return render_template('audios/client_text.html')
+
+## @todo deleteme
+@bp.route('/create')
+@login_required
+def index():
+    return render_template('audios/create.html')
+
+@bp.route('/save-record', methods=['POST'])
+@login_required
+def save_record():
+    file = request.files['file']
+    # Hemos pensado en guardar timestamp + id de usuario. Ver si se guarda en mp3 o wav
+    print(current_user.id)
+    filename = secure_filename('prueba.wav')
+    file.save(os.path.join('./', filename))
+    print(file)
+    return render_template('audios/create.html')
 
 
-@bp.route('/', methods=['POST'])
+@bp.route('/client-tag', methods=['POST'])
 @login_required
 def tag_search():
     tag_name = request.form.get('tagName')
     syllabus = Syllabus()
 
     if tag_name == "":
-        return redirect(url_for('audios.tag_list'))
+        return redirect(url_for('audios.client_tag'))
 
     pipeline = [
         {
@@ -102,11 +99,12 @@ def tag_search():
     if not tags.alive:
         flash("No se han encontrado resultados de la etiqueta '" + tag_name + "'", "danger")
 
-    return render_template('audios/tags.html', syllabus=tags, tag_name=tag_name)
+    return render_template('audios/client_tag.html', tags=tags, tag_name=tag_name)
 
 
 @bp.route('/tag/<string:tag>')
 @login_required
+#Sin uso
 def tag_syllabus(tag):
     syllabus = Syllabus()
 
