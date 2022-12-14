@@ -44,55 +44,17 @@
                 {% endwith %}
                 <form method="POST" action="{{ url_for("auth.login") }}">
                     <div class="mb-4">
-                        <label for="user" class="formlabel">User</label>
+                        <label for="user" class="formlabel">Email</label>
                         <input class="form-control" type="email" name="email" placeholder="Tu Email" autofocus="">
                     </div>
                     <div class="mb-4">
-                        <label for="password" class="formlabel">Password</label>
+                        <label for="password" class="formlabel">Contraseña</label>
                         <input class="form-control" type="password" name="password" placeholder="Tu contraseña">
                     </div>
                     <div class="d-grid gap-2  d-md-block">
                         <button type="submit" class="btn inciarSesion text-light">Iniciar Sesión</button>
                     </div>
-
-                    <div class="my-3">
-                        <span>No tienes cuenta? <a href="#">Regístrate</a></span><br>
-                        <span><a href="#">Recuperar Password</a></span>
-                    </div>
                 </form>
-
-                <div class="container w-100 my-4">
-                    <div class="row text-center">
-                        <div class="col-12">Iniciar Sesión</div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col">
-                            <button class="btn btn-outline-primary w-100 my-1">
-                                <div class="row align-items-center">
-                                    <div class="col-2 d-none d-md-block">
-                                        <img src="{{ url_for('static',filename='img/fb.png') }}" width="32" alt="">
-                                    </div>
-                                    <div class="col-12 col-md-10 text-center">
-                                        Facebook
-                                    </div>
-                                </div>
-                            </button>
-                        </div>
-                        <div class="col">
-                            <button class="btn btn-outline-danger w-100 my-1">
-                                <div class="row align-items-center">
-                                    <div class="col-2 d-none d-md-block">
-                                        <img src="{{ url_for('static',filename='img/go.png') }}" width="32" alt="">
-                                    </div>
-                                    <div class="col-12 col-md-10 text-center">
-                                        Google
-                                    </div>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>

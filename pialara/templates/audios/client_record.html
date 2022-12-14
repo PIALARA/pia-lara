@@ -1,0 +1,38 @@
+{% extends 'client.html' %}
+
+{% block content %}
+  <h1 class="text-center p-3">Grabación de audios</h1>
+
+  <section class="container py-3">
+    <article class="card shadow text-center mx-auto" style="width: 50vw;">
+      <div class="card-header">Tag: <span class="badge bg-secondary">{{ tag }}</span></div>
+      <div class="card-body d-flex flex-column align-items-center gap-4">
+        <div class="container d-flex justify-content-center gap-4">
+          <button class="btn btn-lg btn-warning" id="play-button">
+            <i class="bi bi-ear me-2"></i>Escuchar frase
+          </button>
+          <button class="btn btn-lg btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#syllabus-collapse" aria-expanded="false" aria-controls="syllabus-collapse">
+            <i class="bi bi-card-text me-2"></i>Mostrar frase
+          </button>
+        </div>
+        <div class="collapse" id="syllabus-collapse">
+          <p class="card-text fs-2" id="syllabus-text">{{ syllabus.texto }}</p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="container py-3 text-center d-flex flex-column align-items-center gap-3">
+    <button class="btn btn-lg btn-success" id="record-button">
+      <i class="bi bi-mic me-2"></i>Grabar
+    </button>
+    <button class="btn btn-lg btn-secondary" id="send-button">
+      <i class="bi bi-send me-2"></i>Enviar
+    </button>
+    <audio src="" id="recorded-audio"></audio>
+  </section>
+
+
+  <script src="{{ url_for('static', filename='js/speech-synthesis.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/speech-recording.js') }}"></script>
+{% endblock %}
