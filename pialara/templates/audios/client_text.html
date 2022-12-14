@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{% extends 'client.html' %}
 
 {% block content %}
   <h1 class="text-center p-3">Grabación de audios</h1>
@@ -14,8 +14,8 @@
             <i class="bi bi-card-text me-2"></i>Mostrar frase
           </button>
         </div>
-        <div class="collapse" id="syllabus-collapse">
-          <p class="card-text fs-2" id="syllabus-text">Grabación de audio.</p>
+        <div class="collapse show" id="syllabus-collapse">
+          <textarea class="form-control fs-2" id="syllabus-text" rows="3" cols="50" placeholder="Escribe aquí tu frase."></textarea>
         </div>
       </div>
     </article>

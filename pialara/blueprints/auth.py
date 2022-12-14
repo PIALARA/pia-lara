@@ -23,26 +23,22 @@ def login_post():
     # comprobamos si el usuario existe
     # cogemos la contraseña, la hasheamos y la comparamos con la contraseña hasheada
     if not user or not check_password_hash(user.password, password):
-        flash('Por favor, comprueba tus datos y vuélvelo a intentar.')
+        flash('Por favor, comprueba tus datos y vuélvelo a intentar', 'danger')
         # si el usuario no existe, o está mal la contraseña, recargamos la página
         return redirect(url_for('auth.login'))
 
     # marcamos al usuario como autenticado en flask_login
     login_user(user, remember=remember)
-    return redirect(url_for('auth.profile', nombre=current_user.nombre, id=current_user.id, rol=current_user.rol))
 
+    if user.rol == 'cliente':
+        return redirect(url_for('audios.client_tag'))
 
-@bp.route('/profile')
-def profile():
-    if current_user.rol != "cliente":
-        return render_template('auth/profile.html')
-    else:
-        return render_template('audios/create.html')
+    return redirect(url_for('users.index'))
 
 
 @bp.route('/logout')
 @login_required
 def logout():
     logout_user()
-    flash('Sesión cerrada con éxito')
+    flash('Sesión cerrada con éxito', 'success')
     return redirect(url_for('auth.login'))
