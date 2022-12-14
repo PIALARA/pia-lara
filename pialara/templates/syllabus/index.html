@@ -17,7 +17,7 @@
 
     <form class="container pb-4" style="max-width: 25rem" method="post" action="{{ url_for("syllabus.tag") }}">
         <div class="input-group">
-            <input type="search" name="tagName" class="form-control" placeholder="Buscar tag..."
+            <input type="search" name="tagName" class="form-control" placeholder="Buscar etiqueta..."
                    aria-label="Buscar tag..."
                    aria-describedby="button-search" value="{{ tag_name }}"/>
             <button class="btn btn-primary" type="submit" id="button-search"><i class="bi bi-search me-2"></i>Buscar
@@ -31,7 +31,7 @@
             </div>
             <div class="card-body">
                 <p class="card-text">{{ frase.texto }}</p>
-                <footer class="blockquote-footer"><cite title="Tags">Tags: </cite>{{ frase.tags }} </footer>
+                <footer class="blockquote-footer"><cite title="Tags">Etiquetas: </cite>{{ frase.tags }} </footer>
                 <a href="/syllabus/delete/{{ frase._id }}" class="btn btn-danger"><i class="bi bi-trash"></i></a>
                 <a href="#" class="btn btn-warning"><i class="bi bi-ear"></i></a>
             </div>
