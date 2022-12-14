@@ -17,10 +17,10 @@
         <div class="top">
             <ul class="navbar">
                 <li><a href="{{ url_for("audios.client_tag") }}">Selecciona la categoria</a></li>
-                {% if tag|length > 0%}
+                {#{% if tag|length > 0%}#}
                     <li class="active"><a href="{{ url_for("audios.client_record", tag_name=tag) }}">Graba un audio</a></li>
                     <li><a href="{{ url_for("audios.client_text") }}">Graba tu propio audio</a></li>
-                {% endif  %}
+                {#{% endif  %}#}
 
             </ul>
         </div>

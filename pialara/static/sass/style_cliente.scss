@@ -1,51 +1,53 @@
-.wrapper, html, body {
-    height: 100%;
-    margin: 0;
-    font-family: 'Zilla Slab', serif;
+.wrapper,
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Zilla Slab', serif;
 }
 
-body{
-  background-image: linear-gradient(to top,#fff 20%, #f3f2f1);
+body {
+  background-image: linear-gradient(to top, #fff 20%, #f3f2f1);
 }
 
-.wrapper{
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    align-items: center;
-    justify-content: space-between;
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.top{
+.top {
+  width: 100%;
+  max-width: 600px;
+  .navbar {
     width: 100%;
-    max-width: 600px;
-    .navbar{
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
+    display: flex;
+    justify-content: space-between;
 
-        li{
-            list-style: none;
+    li {
+      list-style: none;
 
-            &.active a{
-                color: #629ff4;
-                border-bottom: 2px solid #629ff4;
-            }
-        }
-
-        a{
-            color: #333;
-            text-decoration: none;
-            font-size: 20px;
-        }
+      &.active a {
+        color: #629ff4;
+        border-bottom: 2px solid #629ff4;
+      }
     }
+
+    a {
+      color: #333;
+      text-decoration: none;
+      font-size: 20px;
+    }
+  }
 }
 
-.frase{
-    border: 1px solid rgba(0,0,0,.2);
-    border-radius: 2px;
-    font-size: 30px;
-    padding: 10px 25px;
+.frase {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  font-size: 30px;
+  padding: 10px 25px;
 }
 
 // client_record
@@ -54,7 +56,6 @@ body{
   border: none;
   border-radius: 50%;
   padding: 20px;
-  margin: 20px;
   display: inline-block;
   position: relative;
   background: white;
@@ -83,7 +84,43 @@ body{
   }
 }
 
+.btn {
+  font-family: inherit;
+  font-size: inherit;
+  color: #000;
+  text-decoration: none;
+  display: inline-block;
+  border: 1px solid #ccc;
+  padding: 12px 28px;
+  border-radius: 50px;
+  transition: ease-in-out all 0.3s;
+  background-color: transparent;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #000;
+  }
+
+  & > span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    & > span {
+        display: flex;
+        align-items: center;
+    }
+  }
+}
+
 .syllabus-card {
   border-radius: 10px;
   box-shadow: 0 0 18px 3px rgba(0, 0, 0, 0.2);
+}
+
+.bottom {
+  display: flex;
+  justify-content: right;
+  gap: 1rem;
+  margin: 1rem 1rem 1rem auto;
 }
