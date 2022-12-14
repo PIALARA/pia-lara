@@ -66,23 +66,12 @@ def client_record(tag_name):
 
     return render_template('audios/client_record.html', tag=tag_name, syllabus=random_syllabus)
 
-    return render_template('audios/create.html', tag_name=tag_name)
-
-@bp.route('/client-write/<string:tag_name>')
-@login_required
-def client_write(tag_name):
-    return render_template('audios/client_write.html', tag_name=tag_name)
 
 @bp.route('/client-text')
 @login_required
 def client_text():
     return render_template('audios/client_text.html')
 
-## @todo deleteme
-@bp.route('/create')
-@login_required
-def index():
-    return render_template('audios/create.html')
 
 @bp.route('/save-record', methods=['POST'])
 @login_required
