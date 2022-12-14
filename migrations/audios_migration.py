@@ -5,6 +5,7 @@ import os
 import configparser
 from datetime import datetime
 
+
 config = configparser.ConfigParser()
 config.read(os.path.abspath(os.path.join(".ini")))
 
