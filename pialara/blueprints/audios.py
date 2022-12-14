@@ -41,7 +41,7 @@ def client_tag():
 @bp.route('/client-record/<string:tag_name>')
 @login_required
 def client_record(tag_name):
-    return render_template('audios/client_record.html', tag_name=tag_name)
+    return render_template('audios/client_text.html', tag_name=tag_name)
 
 @bp.route('/client-text')
 @login_required
