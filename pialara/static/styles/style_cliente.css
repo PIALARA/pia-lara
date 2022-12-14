@@ -1,33 +1,93 @@
-.wrapper, html, body {
+.wrapper,
+html,
+body {
   height: 100%;
-  margin: 0; }
+  margin: 0;
+}
 
 body {
-  background-image: linear-gradient(to top, #fff 20%, #f3f2f1); }
+  background-image: linear-gradient(to top, #fff 20%, #f3f2f1);
+}
 
 .wrapper {
   display: flex;
   flex-direction: column;
   height: 100%;
   align-items: center;
-  justify-content: space-between; }
+  justify-content: space-between;
+}
 
 .top {
   width: 100%;
-  max-width: 500px; }
-  .top .navbar {
-    width: 100%;
-    display: flex;
-    justify-content: space-between; }
-    .top .navbar li {
-      list-style: none; }
-      .top .navbar li.active {
-        color: #629ff4;
-        border-bottom: 2px solid #629ff4; }
+  max-width: 500px;
+}
+.top .navbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.top .navbar li {
+  list-style: none;
+}
+.top .navbar li.active {
+  color: #629ff4;
+  border-bottom: 2px solid #629ff4;
+}
 
 .frase {
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 2px;
-  padding: 10px 25px; }
+  padding: 10px 25px;
+}
 
-/*# sourceMappingURL=style_cliente.css.map */
+.record-button {
+  border: none;
+  border-radius: 50%;
+  padding: 20px;
+  margin: 20px;
+  display: inline-block;
+  position: relative;
+  background: white;
+  box-shadow: 0 0 18px 3px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+  -webkit-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+  -webkit-animation-duration: 2s;
+          animation-duration: 2s;
+  cursor: pointer;
+}
+.record-button:hover {
+  box-shadow: 0 0 24px 7px rgba(0, 0, 0, 0.3);
+  -webkit-animation-name: recorButtonAnim;
+          animation-name: recorButtonAnim;
+  -webkit-animation-timing-function: ease;
+          animation-timing-function: ease;
+}
+
+@-webkit-keyframes recorButtonAnim {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes recorButtonAnim {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.syllabus-card {
+  border-radius: 10px;
+  box-shadow: 0 0 18px 3px rgba(0, 0, 0, 0.2);
+}/*# sourceMappingURL=style_cliente.css.map */

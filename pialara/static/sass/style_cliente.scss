@@ -1,41 +1,83 @@
-.wrapper, html, body {
-    height: 100%;
-    margin: 0;
+.wrapper,
+html,
+body {
+  height: 100%;
+  margin: 0;
 }
 
-body{
-  background-image: linear-gradient(to top,#fff 20%, #f3f2f1);
+body {
+  background-image: linear-gradient(to top, #fff 20%, #f3f2f1);
 }
 
-.wrapper{
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    align-items: center;
-    justify-content: space-between;
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.top{
+.top {
+  width: 100%;
+  max-width: 500px;
+  .navbar {
     width: 100%;
-    max-width: 500px;
-    .navbar{
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
+    display: flex;
+    justify-content: space-between;
 
-        li{
-            list-style: none;
+    li {
+      list-style: none;
 
-            &.active{
-                color: #629ff4;
-                border-bottom: 2px solid #629ff4;
-            }
-        }
+      &.active {
+        color: #629ff4;
+        border-bottom: 2px solid #629ff4;
+      }
     }
+  }
 }
 
-.frase{
-    border: 1px solid rgba(0,0,0,.2);
-    border-radius: 2px  ;
-    padding: 10px 25px;
+.frase {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  padding: 10px 25px;
+}
+
+// client_record
+
+.record-button {
+  border: none;
+  border-radius: 50%;
+  padding: 20px;
+  margin: 20px;
+  display: inline-block;
+  position: relative;
+  background: white;
+  box-shadow: 0 0 18px 3px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+  animation-iteration-count: infinite;
+  animation-duration: 2s;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 0 24px 7px rgba(0, 0, 0, 0.3);
+    animation-name: recorButtonAnim;
+    animation-timing-function: ease;
+  }
+}
+
+@keyframes recorButtonAnim {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.syllabus-card {
+  border-radius: 10px;
+  box-shadow: 0 0 18px 3px rgba(0, 0, 0, 0.2);
 }
