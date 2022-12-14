@@ -5,7 +5,7 @@
 
   <section class="container py-3">
     <article class="card shadow text-center mx-auto" style="width: 50vw;">
-      <div class="card-header">Tag: <span class="badge bg-secondary">{{ tag }}</span></div>
+      <div class="card-header">Tag: <span class="badge bg-secondary tag">{{ tag }}</span></div>
       <div class="card-body d-flex flex-column align-items-center gap-4">
         <div class="container d-flex justify-content-center gap-4">
           <button class="btn btn-lg btn-warning" id="play-button">
@@ -23,16 +23,21 @@
   </section>
 
   <section class="container py-3 text-center d-flex flex-column align-items-center gap-3">
+    <canvas class="visualizer rounded" height="60px"></canvas>
     <button class="btn btn-lg btn-success" id="record-button">
       <i class="bi bi-mic me-2"></i>Grabar
     </button>
     <button class="btn btn-lg btn-secondary" id="send-button">
-      <i class="bi bi-send me-2"></i>Enviar
+      <div hidden id="spinner" class="spinner-border spinner-border-sm" role="status">
+        <span class="sr-only"></span>
+      </div>
+      Enviar
     </button>
     <audio src="" id="recorded-audio"></audio>
   </section>
 
 
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script src="{{ url_for('static', filename='js/speech-synthesis.js') }}"></script>
   <script src="{{ url_for('static', filename='js/speech-recording.js') }}"></script>
 {% endblock %}
