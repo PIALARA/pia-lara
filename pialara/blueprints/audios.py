@@ -1,4 +1,5 @@
 import os.path
+import random
 
 from flask import Blueprint, render_template
 from flask import (
@@ -41,8 +42,30 @@ def client_tag():
 @bp.route('/client-record/<string:tag_name>')
 @login_required
 def client_record(tag_name):
+    syllabus = Syllabus()
 
-    return render_template('audios/client_record.html', tag_name=tag_name)
+    pipeline = [
+        {
+            '$unwind': {
+                'path': '$tags'
+            }
+        }, {
+            '$match': {
+                'tags': {'$regex': tag_name, '$options': 'i'}
+            }
+        }
+    ]
+
+    syllabus = syllabus.aggregate(pipeline)
+
+    syllabus_list = [syllabus_item for syllabus_item in syllabus]
+    random_syllabus = random.choice(syllabus_list)
+
+    # if not frases.alive:
+    #     flash("No se han encontrado frases con la etiqueta '" + tag_name + "'", "danger")
+
+    return render_template('audios/client_record.html', tag=tag_name, syllabus=random_syllabus)
+
 
 @bp.route('/client-text')
 @login_required
@@ -101,30 +124,4 @@ def tag_search():
         flash("No se han encontrado resultados de la etiqueta '" + tag_name + "'", "danger")
 
     return render_template('audios/client_tag.html', tags=tags, tag_name=tag_name)
-
-
-@bp.route('/tag/<string:tag>')
-@login_required
-#Sin uso
-def tag_syllabus(tag):
-    syllabus = Syllabus()
-
-    pipeline = [
-        {
-            '$unwind': {
-                'path': '$tags'
-            }
-        }, {
-            '$match': {
-                'tags': {'$regex': tag, '$options': 'i'}
-            }
-        }
-    ]
-
-    frases = syllabus.aggregate(pipeline)
-
-    if not frases.alive:
-        flash("No se han encontrado frases con la etiqueta '" + tag + "'", "danger")
-
-    return render_template('audios/create.html', frases=frases, tag=tag)
 
