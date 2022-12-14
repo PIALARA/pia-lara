@@ -1,0 +1,33 @@
+.wrapper, html, body {
+  height: 100%;
+  margin: 0; }
+
+body {
+  background-image: linear-gradient(to top, #fff 20%, #f3f2f1); }
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+  justify-content: space-between; }
+
+.top {
+  width: 100%;
+  max-width: 500px; }
+  .top .navbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between; }
+    .top .navbar li {
+      list-style: none; }
+      .top .navbar li.active {
+        color: #629ff4;
+        border-bottom: 2px solid #629ff4; }
+
+.frase {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  padding: 10px 25px; }
+
+/*# sourceMappingURL=style_cliente.css.map */
