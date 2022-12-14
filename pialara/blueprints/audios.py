@@ -60,6 +60,7 @@ def index():
 @bp.route('/save-record', methods=['POST'])
 @login_required
 def save_record():
+    print('save_record')
     file = request.files['file']
     # Hemos pensado en guardar timestamp + id de usuario. Ver si se guarda en mp3 o wav
     timestamp = int(round(datetime.now().timestamp()))
