@@ -18,20 +18,24 @@
           <p class="card-text fs-2" id="syllabus-text">Grabación de audio.</p>
         </div>
       </div>
+      <canvas class="visualizer rounded" height="60px"></canvas>
     </article>
   </section>
 
-  <section class="container py-3 text-center d-flex flex-column align-items-center gap-3">
+  <section class="container main-controls py-3 text-center d-flex flex-column align-items-center gap-3">
     <button class="btn btn-lg btn-success" id="record-button">
       <i class="bi bi-mic me-2"></i>Grabar
     </button>
-    <button class="btn btn-lg btn-secondary" id="send-button">
-      <i class="bi bi-send me-2"></i>Enviar
+    <button hidden class="btn btn-lg btn-secondary" id="send-button">
+      <div hidden id="spinner" class="spinner-border spinner-border-sm" role="status">
+        <span class="sr-only"></span>
+      </div>
+      Enviar
     </button>
     <audio src="" id="recorded-audio"></audio>
   </section>
 
-
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script src="{{ url_for('static', filename='js/speech-synthesis.js') }}"></script>
   <script src="{{ url_for('static', filename='js/speech-recording.js') }}"></script>
 {% endblock %}
