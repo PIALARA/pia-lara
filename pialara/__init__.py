@@ -18,7 +18,7 @@ def create_app():
 
     app.config['AWS_ACCESS_KEY_ID']= config['LOCAL']['AWS_ACCESS_KEY_ID']
     app.config['AWS_SECRET_ACCESS_KEY']= config['LOCAL']['AWS_SECRET_ACCESS_KEY']
-    app.config['AWS_SESSION_TOKEN']= config['LOCAL']['AWS_SECRET_ACCESS_KEY']
+    app.config['AWS_SESSION_TOKEN']= config['LOCAL']['AWS_SESSION_TOKEN']
     app.config['BUCKET_NAME']= config['LOCAL']['BUCKET_NAME']
 
     login_manager = LoginManager()
