@@ -36,64 +36,8 @@
   </nav>
 
   <div class="tab-content py-4" id="nav-tabContent">
-    <section class="tab-pane fade show active" id="nav-administrador" role="tabpanel"
-      aria-labelledby="nav-administrador-tab" tabindex="0">
-      <form class="container js-form" style="max-width: 20rem" method="post">
-        <div class="mb-3">
-          <label for="admin-nombre" class="form-label">Nombre</label>
-          <input type="text" class="form-control" id="admin-nombre" name="nombre_admin" required />
-        </div>
-        <div class="mb-3">
-          <label for="admin-email" class="form-label">Email</label>
-          <input type="email" class="form-control" id="admin-email" name="email_admin" required />
-        </div>
-        <div class="mb-3">
-          <label for="admin-password" class="form-label">Contraseña</label>
-          <input type="password" class="form-control js-password" id="admin-password" name="pass1" required />
-          <div class="invalid-feedback">Introduce la contraseña.</div>
-        </div>
-        <div class="mb-3">
-          <label for="admin-password-repeat" class="form-label">Repetir contraseña</label>
-          <input type="password" class="form-control js-password-repeat" id="admin-password-repeat" name="pass2" required />
-          <div class="invalid-feedback">Las contraseñas deben coincidir.</div>
-        </div>
-        <div class="mb-3">
-          <button class="btn btn-primary w-100 shadow" type="submit">
-            <i class="bi bi-plus-square me-2"></i>Crear administrador
-          </button>
-        </div>
-      </form>
-    </section>
 
-    <section class="tab-pane fade" id="nav-tecnico" role="tabpanel" aria-labelledby="nav-tecnico-tab" tabindex="0">
-      <form class="container js-form" style="max-width: 20rem" method="post">
-        <div class="mb-3">
-          <label for="tecnico-nombre" class="form-label">Nombre</label>
-          <input type="text" class="form-control" id="tecnico-nombre" name="nombre_tecnico" required />
-        </div>
-        <div class="mb-3">
-          <label for="tecnico-email" class="form-label">Email</label>
-          <input type="email" class="form-control" id="tecnico-email" name="email_tecnico" required />
-        </div>
-        <div class="mb-3">
-          <label for="tecnico-password" class="form-label">Contraseña</label>
-          <input type="password" class="form-control js-password" id="tecnico-password" name="pass1" required />
-          <div class="invalid-feedback">Introduce la contraseña.</div>
-        </div>
-        <div class="mb-3">
-          <label for="tecnico-password-repeat" class="form-label">Repetir contraseña</label>
-          <input type="password" class="form-control js-password-repeat" id="tecnico-password-repeat" name="pass2" required />
-          <div class="invalid-feedback">Las contraseñas deben coincidir.</div>
-        </div>
-        <div class="mb-3">
-          <button class="btn btn-primary w-100 shadow" type="submit">
-            <i class="bi bi-plus-square me-2"></i>Crear técnico
-          </button>
-        </div>
-      </form>
-    </section>
-
-    <section class="tab-pane fade" id="nav-cliente" role="tabpanel" aria-labelledby="nav-cliente-tab" tabindex="0">
+    <section class="tab-pane fade show active" id="nav-cliente" role="tabpanel" aria-labelledby="nav-cliente-tab" tabindex="0">
       <form class="container js-form" style="max-width: 20rem" method="post">
         <div class="mb-3">
           <label for="cliente-nombre" class="form-label">Nombre</label>
@@ -166,6 +110,63 @@
         <div class="mb-3">
           <button class="btn btn-primary w-100 shadow" type="submit">
             <i class="bi bi-plus-square me-2"></i>Crear cliente
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="tab-pane fade" id="nav-tecnico" role="tabpanel" aria-labelledby="nav-tecnico-tab" tabindex="0">
+      <form class="container js-form" style="max-width: 20rem" method="post">
+        <div class="mb-3">
+          <label for="tecnico-nombre" class="form-label">Nombre</label>
+          <input type="text" class="form-control" id="tecnico-nombre" name="nombre_tecnico" required />
+        </div>
+        <div class="mb-3">
+          <label for="tecnico-email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="tecnico-email" name="email_tecnico" required />
+        </div>
+        <div class="mb-3">
+          <label for="tecnico-password" class="form-label">Contraseña</label>
+          <input type="password" class="form-control js-password" id="tecnico-password" name="pass1" required />
+          <div class="invalid-feedback">Introduce la contraseña.</div>
+        </div>
+        <div class="mb-3">
+          <label for="tecnico-password-repeat" class="form-label">Repetir contraseña</label>
+          <input type="password" class="form-control js-password-repeat" id="tecnico-password-repeat" name="pass2" required />
+          <div class="invalid-feedback">Las contraseñas deben coincidir.</div>
+        </div>
+        <div class="mb-3">
+          <button class="btn btn-primary w-100 shadow" type="submit">
+            <i class="bi bi-plus-square me-2"></i>Crear técnico
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="tab-pane fade" id="nav-administrador" role="tabpanel"
+      aria-labelledby="nav-administrador-tab" tabindex="0">
+      <form class="container js-form" style="max-width: 20rem" method="post">
+        <div class="mb-3">
+          <label for="admin-nombre" class="form-label">Nombre</label>
+          <input type="text" class="form-control" id="admin-nombre" name="nombre_admin" required />
+        </div>
+        <div class="mb-3">
+          <label for="admin-email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="admin-email" name="email_admin" required />
+        </div>
+        <div class="mb-3">
+          <label for="admin-password" class="form-label">Contraseña</label>
+          <input type="password" class="form-control js-password" id="admin-password" name="pass1" required />
+          <div class="invalid-feedback">Introduce la contraseña.</div>
+        </div>
+        <div class="mb-3">
+          <label for="admin-password-repeat" class="form-label">Repetir contraseña</label>
+          <input type="password" class="form-control js-password-repeat" id="admin-password-repeat" name="pass2" required />
+          <div class="invalid-feedback">Las contraseñas deben coincidir.</div>
+        </div>
+        <div class="mb-3">
+          <button class="btn btn-primary w-100 shadow" type="submit">
+            <i class="bi bi-plus-square me-2"></i>Crear administrador
           </button>
         </div>
       </form>
