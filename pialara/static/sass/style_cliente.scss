@@ -1,6 +1,7 @@
 .wrapper, html, body {
     height: 100%;
     margin: 0;
+    font-family: 'Zilla Slab', serif;
 }
 
 body{
@@ -17,7 +18,7 @@ body{
 
 .top{
     width: 100%;
-    max-width: 500px;
+    max-width: 600px;
     .navbar{
         width: 100%;
         display: flex;
@@ -26,16 +27,23 @@ body{
         li{
             list-style: none;
 
-            &.active{
+            &.active a{
                 color: #629ff4;
                 border-bottom: 2px solid #629ff4;
             }
+        }
+
+        a{
+            color: #333;
+            text-decoration: none;
+            font-size: 20px;
         }
     }
 }
 
 .frase{
     border: 1px solid rgba(0,0,0,.2);
-    border-radius: 2px  ;
+    border-radius: 2px;
+    font-size: 30px;
     padding: 10px 25px;
 }

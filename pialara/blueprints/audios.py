@@ -43,6 +43,11 @@ def client_tag():
 def client_record(tag_name):
     return render_template('audios/client_text.html', tag_name=tag_name)
 
+@bp.route('/client-write/<string:tag_name>')
+@login_required
+def client_write(tag_name):
+    return render_template('audios/client_write.html', tag_name=tag_name)
+
 @bp.route('/client-text')
 @login_required
 def client_text():
