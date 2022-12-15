@@ -1,6 +1,6 @@
 import os.path
 import boto3
-
+import random
 from flask import current_app
 from flask import Blueprint, render_template
 from flask import (
@@ -60,27 +60,12 @@ def index():
 @bp.route('/save-record', methods=['POST'])
 @login_required
 def save_record():
-    print('save_record')
     file = request.files['file']
     # Hemos pensado en guardar timestamp + id de usuario. Ver si se guarda en mp3 o wav
-    timestamp = int(round(datetime.now().timestamp()))
-    filename = str(current_user.id)+'_'+str(timestamp)+'.wav'
-
-    print(type(filename))
-    # Guardado en S3
-
-    print(current_app.config["AWS_SESSION_TOKEN"])
-    s3c = boto3.client(
-        's3',
-        region_name='ca-central-1',
-        aws_access_key_id=current_app.config["AWS_ACCESS_KEY_ID"],
-        aws_secret_access_key=current_app.config['AWS_SECRET_ACCESS_KEY'],
-        aws_session_token=current_app.config["AWS_SESSION_TOKEN"]
-    )
+    print(current_user.id)
+    filename = secure_filename('prueba.wav')
+    file.save(os.path.join('./', filename))
     print(file)
-
-    response =s3c.upload_fileobj(file, current_app.config["BUCKET_NAME"], filename)
-
     return render_template('audios/create.html')
 
 

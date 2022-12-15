@@ -79,33 +79,25 @@
         </div>
         <fieldset class="mb-3">
           <legend class="fs-6">Enfermedades</legend>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="enfermedades" value="enfermedad1" id="enfermedad-1" />
-            <label class="form-check-label" for="enfermedad-1">Enfermedad 1</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="enfermedades" value="enfermedad2" id="enfermedad-2" />
-            <label class="form-check-label" for="enfermedad-2">Enfermedad 2</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="enfermedades" value="enfermedad3" id="enfermedad-3" />
-            <label class="form-check-label" for="enfermedad-3">Enfermedad 3</label>
-          </div>
+          {% for enfermedad in enfermedades %}
+            {% if enfermedad.visible == 1 %}
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="enfermedades" value="{{ enfermedad.nombre }}" id="enf-{{enfermedad.nombre}}" />
+                <label class="form-check-label" for="enf-{{enfermedad.nombre}}">{{enfermedad.nombre}}</label>
+              </div>
+            {% endif %}
+          {% endfor %}
         </fieldset>
         <fieldset class="mb-3">
           <legend class="fs-6">Dis</legend>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="dis" value="dis-1" id="dis-1" />
-            <label class="form-check-label" for="dis-1">Dis 1</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="dis" value="dis-2" id="dis-2" />
-            <label class="form-check-label" for="dis-2">Dis 2</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="dis" value="dis-3" id="dis-3" />
-            <label class="form-check-label" for="dis-3">Dis 3</label>
-          </div>
+          {% for disfonia in disfonias %}
+          {% if disfonia.visible == 1 %}
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="dis" value="{{disfonia.nombre}}" id="dis-{{disfonia.nombre}}" />
+                <label class="form-check-label" for="dis-{{disfonia.nombre}}">{{disfonia.nombre}}</label>
+              </div>
+          {% endif %}
+          {% endfor %}
         </fieldset>
         <div class="mb-3">
           <button class="btn btn-primary w-100 shadow" type="submit">
