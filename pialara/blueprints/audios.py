@@ -109,9 +109,9 @@ def save_record():
              "tags": ["dislalia", "paralisis"]
              }
     newAudio = {"aws_object_id": filename,
-                "usuario": current_user,
+                "usuario": current_user.id, #Falta el usuario como objeto
                 "fecha": datetime.now(),
-                "texto": textoOb,
+                "texto": textoOb, #Falta como obtiene el texto el HTML
                 "duracion": 60
                 }
     result = audio.insert_one(newAudio)
