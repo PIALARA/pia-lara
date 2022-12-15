@@ -21,12 +21,13 @@
       <i class="bi bi-person me-2"></i>Cliente
     </button>
 
+  {%if rol == "admin"%}
     <button class="nav-link" id="nav-tecnico-tab" data-bs-toggle="tab" data-bs-target="#nav-tecnico" type="button"
       role="tab" aria-controls="nav-tecnico" aria-selected="true">
       <i class="bi bi-journals me-2"></i>Técnico
     </button>
 
-    {%if rol == "admin"%}
+
       <button class="nav-link" id="nav-administrador-tab" data-bs-toggle="tab" data-bs-target="#nav-administrador"
         type="button" role="tab" aria-controls="nav-administrador" aria-selected="true">
         <i class="bi bi-gear me-2"></i>Administrador
