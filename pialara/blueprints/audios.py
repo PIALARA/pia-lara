@@ -14,7 +14,6 @@ from pialara.models.Audios import Audios
 from pialara.models.Syllabus import Syllabus
 from datetime import datetime
 
-
 bp = Blueprint('audios', __name__, url_prefix='/audios')
 
 @bp.route('/client-tag')
@@ -87,9 +86,12 @@ def index():
 @login_required
 def save_record():
     file = request.files['file']
+    duration = request.form.get('duration')
+
+    print(duration)
     # Hemos pensado en guardar timestamp + id de usuario. Ver si se guarda en mp3 o wav
     timestamp = int(round(datetime.now().timestamp()))
-    filename = str(current_user.id)+'_'+str(timestamp)+'.wav'
+    filename = str(current_user.id)+'_'+str(timestamp)+'clea.wav'
 
     # Guardado en S3
     s3c = boto3.client(
@@ -112,7 +114,7 @@ def save_record():
                 "usuario": current_user.id, #Falta el usuario como objeto
                 "fecha": datetime.now(),
                 "texto": textoOb, #Falta como obtiene el texto el HTML
-                "duracion": 60
+                "duracion": float(duration)
                 }
     result = audio.insert_one(newAudio)
 

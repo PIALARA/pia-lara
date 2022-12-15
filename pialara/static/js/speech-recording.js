@@ -10,6 +10,7 @@ let audioChunks = [];
 let generalBlob = '';
 const canvasCtx = canvas.getContext("2d");
 let audioCtx;
+let duration;
 
 navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
   handlerFunction(stream);
@@ -56,6 +57,7 @@ sendAudio.addEventListener('click', e => {
   var form = new FormData();
   form.append('file', generalBlob);
   form.append('title', 'data.mp3');
+  form.append('duration', duration);
   //Chrome inspector shows that the post data includes a file and a title.
   $.ajax({
       type: 'POST',
@@ -81,6 +83,10 @@ sendAudio.addEventListener('click', e => {
         }
       });
   });
+});
+
+recordedAudio.addEventListener('loadedmetadata', e=>{
+    duration = recordedAudio.duration;
 });
 
 function visualize(stream) {
