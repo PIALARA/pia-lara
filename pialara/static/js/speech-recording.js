@@ -4,6 +4,7 @@ const sendAudio = document.querySelector('#send-button');
 const spinner = document.querySelector('#spinner');
 const canvas = document.querySelector('.visualizer');
 const mainSection = document.querySelector('.main-controls');
+const tag = document.querySelector('.tag').innerText;
 
 let audioChunks = [];
 let generalBlob = '';
@@ -73,10 +74,10 @@ sendAudio.addEventListener('click', e => {
       }).then((value) => {
         switch (value) {
           case "audio":
-            window.location.href = "create";
+            window.location.href = tag;
             break;
           default:
-            window.location.href = "create";
+            window.location.href = tag;
         }
       });
   });
@@ -138,9 +139,3 @@ function visualize(stream) {
 
   }
 }
-
-window.onresize = function() {
-  canvas.width = mainSection.offsetWidth;
-}
-
-window.onresize();

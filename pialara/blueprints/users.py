@@ -30,7 +30,7 @@ def index():
     if logged_rol == "admin":
         users = u.find()
     else:
-        users = u.find({"rol": {"$eq": 'cliente'}})
+        users = u.find({"rol": {"$eq": 'cliente'}, "parent": {"$eq": current_user.email}})
 
     return render_template('users/index.html', users=users, user_name='')
 
