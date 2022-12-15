@@ -94,8 +94,7 @@
 
   &:hover {
     box-shadow: 0 0 24px 7px rgba(0, 0, 0, 0.3);
-    animation-name: record-button-animation;
-    animation-timing-function: ease;
+    transform: scale(1.1);
   }
 
   svg {
