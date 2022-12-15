@@ -72,11 +72,6 @@ def client_record(tag_name):
 def client_text():
     return render_template('audios/client_text.html')
 
-## @todo deleteme
-@bp.route('/create')
-@login_required
-def index():
-    return render_template('audios/create.html')
 
 @bp.route('/save-record', methods=['POST'])
 @login_required

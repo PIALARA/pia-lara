@@ -26,3 +26,4 @@ htmlcov/
 *,cover
 *.wav
 .ini
+static/.sass-cache

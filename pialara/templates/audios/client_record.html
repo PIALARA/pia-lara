@@ -1,41 +1,53 @@
 {% extends 'client.html' %}
 
 {% block content %}
-  <h1 class="text-center p-3">Grabación de audios</h1>
+  <section class="syllabus">
+    <header class="syllabus__header">
+      <h2 class="tag">Frase ({{ tag }})</h2>
+    </header>
 
-  <section class="container py-3">
-    <article class="card shadow text-center mx-auto" style="width: 50vw;">
-      <div class="card-header">Tag: <span class="badge bg-secondary tag">{{ tag }}</span></div>
-      <div class="card-body d-flex flex-column align-items-center gap-4">
-        <div class="container d-flex justify-content-center gap-4">
-          <button class="btn btn-lg btn-warning" id="play-button">
-            <i class="bi bi-ear me-2"></i>Escuchar frase
-          </button>
-          <button class="btn btn-lg btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#syllabus-collapse" aria-expanded="false" aria-controls="syllabus-collapse">
-            <i class="bi bi-card-text me-2"></i>Mostrar frase
-          </button>
-        </div>
-        <div class="collapse" id="syllabus-collapse">
-          <p class="card-text fs-2" id="syllabus-text">{{ syllabus.texto }}</p>
-        </div>
-      </div>
-    </article>
+    <section class="syllabus__buttons">
+      <button class="button" type="button" id="play-button">
+        <span><i class="bi bi-ear me-2"></i></span>
+        <span>Escuchar</span>
+      </button>
+      <button class="button show-syllabus-button" type="button">
+        <span><i class="bi bi-card-text me-2"></i></span>
+        <span>Mostrar</span>
+      </button>
+    </section>
+
+    <section class="syllabus__text" id="syllabus-collapse">
+      <p id="syllabus-text">{{ syllabus.texto }}</p>
+    </section>
   </section>
 
-  <section class="container py-3 text-center d-flex flex-column align-items-center gap-3">
-    <canvas class="visualizer rounded" height="60px"></canvas>
-    <button class="btn btn-lg btn-success" id="record-button">
-      <i class="bi bi-mic me-2"></i>Grabar
+  <section class="audio">
+    <canvas class="visualizer" height="60px"></canvas>
+    <audio src="" id="recorded-audio"></audio>
+
+    <button class="record-button">
+      <svg class="svg-record" width="29" height="28" viewBox="0 0 29 28"><defs><path id="mic-path13" d="M9.333 18.667A4.68 4.68 0 0 0 14 14V4.667A4.68 4.68 0 0 0 9.333 0a4.68 4.68 0 0 0-4.666 4.667V14a4.68 4.68 0 0 0 4.666 4.667zM7 4.667a2.34 2.34 0 0 1 2.333-2.334 2.34 2.34 0 0 1 2.334 2.334V14a2.34 2.34 0 0 1-2.334 2.333A2.34 2.34 0 0 1 7 14V4.667zm11.667 7V14c0 4.783-3.617 8.633-8.167 9.217v2.45H14c.7 0 1.167.466 1.167 1.166S14.7 28 14 28H4.667c-.7 0-1.167-.467-1.167-1.167s.467-1.166 1.167-1.166h3.5v-2.45C3.617 22.633 0 18.667 0 14v-2.333c0-.7.467-1.167 1.167-1.167s1.166.467 1.166 1.167V14c0 3.85 3.15 7 7 7s7-3.15 7-7v-2.333c0-.7.467-1.167 1.167-1.167s1.167.467 1.167 1.167z"></path></defs><g fill="none" fill-rule="evenodd" transform="translate(5)"><mask id="mic-mask13" fill="#fff"><use xlink:href="#mic-path13"></use></mask><use xlink:href="#mic-path13"></use><g fill="#FF4F5E" mask="url(#mic-mask13)"><path d="M-5 0h28v28H-5z"></path></g></g></svg>
+
+      <svg class="svg-stop" width="28" height="28" viewBox="0 0 28 28"><defs><path id="stop-path28" d="M19.833 0H3.5C1.517 0 0 1.517 0 3.5v16.333c0 1.984 1.517 3.5 3.5 3.5h16.333c1.984 0 3.5-1.516 3.5-3.5V3.5c0-1.983-1.516-3.5-3.5-3.5zM21 19.833c0 .7-.467 1.167-1.167 1.167H3.5c-.7 0-1.167-.467-1.167-1.167V3.5c0-.7.467-1.167 1.167-1.167h16.333c.7 0 1.167.467 1.167 1.167v16.333z"></path></defs><g fill="none" fill-rule="evenodd" transform="translate(2.333 2.333)"><mask id="stop-mask28" fill="#fff"><use xlink:href="#stop-path28"></use></mask><g fill="#FF4F5E" mask="url(#stop-mask28)"><path d="M-2.333-2.333h28v28h-28z"></path></g></g></svg>
     </button>
-    <button class="btn btn-lg btn-secondary" id="send-button">
+  </section>
+
+  <section class="bottom">
+    <button class="button send-button" id="send-button">
       <div hidden id="spinner" class="spinner-border spinner-border-sm" role="status">
         <span class="sr-only"></span>
       </div>
       Enviar
     </button>
-    <audio src="" id="recorded-audio"></audio>
-  </section>
 
+    <a href="" class="button skip-button">
+      <span>Saltar</span>
+      <span>
+        <svg width="22" height="22" viewBox="0 0 22 22"><defs><path id="skip-path4" d="M12.558 6.142l-4.583 4.583a.832.832 0 0 1-.642.275.832.832 0 0 1-.641-.275.886.886 0 0 1 0-1.283L10.633 5.5 6.692 1.558a.886.886 0 0 1 0-1.283.886.886 0 0 1 1.283 0l4.583 4.583a.886.886 0 0 1 0 1.284zM6.142 4.858L1.558.275a.886.886 0 0 0-1.283 0 .886.886 0 0 0 0 1.283L4.217 5.5.275 9.442a.886.886 0 0 0 0 1.283.832.832 0 0 0 .642.275.832.832 0 0 0 .641-.275l4.584-4.583a.886.886 0 0 0 0-1.284z"></path></defs><g fill="none" fill-rule="evenodd" transform="translate(4.583 5.5)"><mask id="skip-mask4" fill="#fff"><use xlink:href="#skip-path4"></use></mask><use fill="#000" fill-rule="nonzero" xlink:href="#skip-path4"></use><g fill="#000" mask="url(#skip-mask4)"><path d="M-4.583-5.5h22v22h-22z"></path></g></g></svg>
+      </span>
+    </a>
+  </section>
 
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script src="{{ url_for('static', filename='js/speech-synthesis.js') }}"></script>
