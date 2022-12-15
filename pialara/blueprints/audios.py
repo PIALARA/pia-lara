@@ -89,10 +89,8 @@ def save_record():
     timestamp = int(round(datetime.now().timestamp()))
     filename = str(current_user.id)+'_'+str(timestamp)+'.wav'
 
-    print(type(filename))
     # Guardado en S3
 
-    print(current_app.config["AWS_SESSION_TOKEN"])
     s3c = boto3.client(
         's3',
         region_name='ca-central-1',
@@ -100,7 +98,6 @@ def save_record():
         aws_secret_access_key=current_app.config['AWS_SECRET_ACCESS_KEY'],
         aws_session_token=current_app.config["AWS_SESSION_TOKEN"]
     )
-    print(file)
 
     response =s3c.upload_fileobj(file, current_app.config["BUCKET_NAME"], filename)
 
