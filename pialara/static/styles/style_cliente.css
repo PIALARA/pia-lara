@@ -60,6 +60,9 @@ body {
   height: auto;
   display: block;
 }
+.header__empty {
+  width: 40px;
+}
 
 .button {
   font-family: inherit;
