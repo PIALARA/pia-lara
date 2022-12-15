@@ -9,6 +9,8 @@ from flask import (
 )
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
+
+from pialara.models.Audios import Audios
 from pialara.models.Syllabus import Syllabus
 from datetime import datetime
 
@@ -90,7 +92,6 @@ def save_record():
     filename = str(current_user.id)+'_'+str(timestamp)+'.wav'
 
     # Guardado en S3
-
     s3c = boto3.client(
         's3',
         region_name='ca-central-1',
@@ -100,6 +101,21 @@ def save_record():
     )
 
     response =s3c.upload_fileobj(file, current_app.config["BUCKET_NAME"], filename)
+
+    # Guardado en Mongo
+    audio = Audios()
+    textoOb={"id":"638348e9b3ba0b56509dfa1b",
+             "texto": "Esto es un ejemplo",
+             "tags": ["dislalia", "paralisis"]
+             }
+    newAudio = {"aws_object_id": filename,
+                "usuario": current_user,
+                "fecha": datetime.now(),
+                "texto": textoOb,
+                "duracion": 60
+                }
+    result = audio.insert_one(newAudio)
+
 
     return render_template('audios/create.html')
 
