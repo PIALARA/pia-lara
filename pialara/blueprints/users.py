@@ -12,6 +12,8 @@ from flask import (
 from flask_login import login_required, current_user
 from pialara.decorators import rol_required
 from pialara.models.Usuario import Usuario
+from pialara.models.Enfermedades import Enfermedades
+from pialara.models.Disfonias import Disfonias
 from pialara.decorators import rol_required
 
 bp = Blueprint('users', __name__, url_prefix='/users')
@@ -28,7 +30,7 @@ def index():
     if logged_rol == "admin":
         users = u.find()
     else:
-        users = u.find({"rol": {"$eq": 'cliente'}})
+        users = u.find({"rol": {"$eq": 'cliente'}, "parent": {"$eq": current_user.email}})
 
     return render_template('users/index.html', users=users, user_name='')
 
@@ -55,7 +57,15 @@ def create():
     u = Usuario()
     logged_rol = current_user.rol
 
-    return render_template('users/create.html',rol=logged_rol)
+    enfermedades = Enfermedades()
+    disfonias = Disfonias()
+
+    return render_template(
+        'users/create.html',
+        rol=logged_rol,
+        enfermedades=enfermedades.find(),
+        disfonias=disfonias.find()
+    )
 
 @bp.route('/create', methods=['POST'])
 @login_required

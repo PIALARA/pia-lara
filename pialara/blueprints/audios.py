@@ -1,5 +1,6 @@
 import os.path
 import boto3
+import random
 
 from flask import current_app
 from flask import Blueprint, render_template
@@ -44,7 +45,30 @@ def client_tag():
 @bp.route('/client-record/<string:tag_name>')
 @login_required
 def client_record(tag_name):
-    return render_template('audios/client_text.html', tag_name=tag_name)
+    syllabus = Syllabus()
+
+    pipeline = [
+        {
+            '$unwind': {
+                'path': '$tags'
+            }
+        }, {
+            '$match': {
+                'tags': {'$regex': tag_name, '$options': 'i'}
+            }
+        }
+    ]
+
+    syllabus = syllabus.aggregate(pipeline)
+
+    syllabus_list = [syllabus_item for syllabus_item in syllabus]
+    random_syllabus = random.choice(syllabus_list)
+
+    # if not frases.alive:
+    #     flash("No se han encontrado frases con la etiqueta '" + tag_name + "'", "danger")
+
+    return render_template('audios/client_record.html', tag=tag_name, syllabus=random_syllabus)
+
 
 @bp.route('/client-text')
 @login_required
@@ -60,7 +84,6 @@ def index():
 @bp.route('/save-record', methods=['POST'])
 @login_required
 def save_record():
-    print('save_record')
     file = request.files['file']
     # Hemos pensado en guardar timestamp + id de usuario. Ver si se guarda en mp3 o wav
     timestamp = int(round(datetime.now().timestamp()))
@@ -118,30 +141,4 @@ def tag_search():
         flash("No se han encontrado resultados de la etiqueta '" + tag_name + "'", "danger")
 
     return render_template('audios/client_tag.html', tags=tags, tag_name=tag_name)
-
-
-@bp.route('/tag/<string:tag>')
-@login_required
-#Sin uso
-def tag_syllabus(tag):
-    syllabus = Syllabus()
-
-    pipeline = [
-        {
-            '$unwind': {
-                'path': '$tags'
-            }
-        }, {
-            '$match': {
-                'tags': {'$regex': tag, '$options': 'i'}
-            }
-        }
-    ]
-
-    frases = syllabus.aggregate(pipeline)
-
-    if not frases.alive:
-        flash("No se han encontrado frases con la etiqueta '" + tag + "'", "danger")
-
-    return render_template('audios/create.html', frases=frases, tag=tag)
 
