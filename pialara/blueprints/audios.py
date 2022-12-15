@@ -1,14 +1,18 @@
 import os.path
+import boto3
 import random
 
+from flask import current_app
 from flask import Blueprint, render_template
 from flask import (
-    Blueprint, flash, redirect, render_template, request, url_for
+    Blueprint, flash, redirect, render_template, request, url_for, jsonify
 )
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
-from pialara.models.Syllabus import Syllabus
 
+from pialara.models.Audios import Audios
+from pialara.models.Syllabus import Syllabus
+from datetime import datetime
 
 bp = Blueprint('audios', __name__, url_prefix='/audios')
 
@@ -77,11 +81,44 @@ def client_text():
 @login_required
 def save_record():
     file = request.files['file']
+    duration = request.form.get('duration')
+
+    print(duration)
     # Hemos pensado en guardar timestamp + id de usuario. Ver si se guarda en mp3 o wav
-    print(current_user.id)
-    filename = secure_filename('prueba.wav')
-    file.save(os.path.join('./', filename))
-    print(file)
+    timestamp = int(round(datetime.now().timestamp()))
+    filename = str(current_user.id)+'_'+str(timestamp)+'clea.wav'
+
+    # Guardado en S3
+    s3c = boto3.client(
+        's3',
+        region_name='ca-central-1',
+        aws_access_key_id=current_app.config["AWS_ACCESS_KEY_ID"],
+        aws_secret_access_key=current_app.config['AWS_SECRET_ACCESS_KEY'],
+        aws_session_token=current_app.config["AWS_SESSION_TOKEN"]
+    )
+
+    response =s3c.upload_fileobj(file, current_app.config["BUCKET_NAME"], filename)
+
+    # Guardado en Mongo
+    audio = Audios()
+    textoOb={"id":"638348e9b3ba0b56509dfa1b",
+             "texto": "Esto es un ejemplo",
+             "tags": ["dislalia", "paralisis"]
+             }
+    newAudio = {"aws_object_id": filename,
+                "usuario": current_user.id, #Falta el usuario como objeto
+                "fecha": datetime.now(),
+                "texto": textoOb, #Falta como obtiene el texto el HTML
+                "duracion": float(duration)
+                }
+    result = audio.insert_one(newAudio)
+
+    data = {
+        "status": 'ok',
+        "message": "El audio ha sido almacenado correctamente."
+    }
+
+    return jsonify(data)
     return render_template('audios/create.html')
 
 

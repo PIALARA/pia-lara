@@ -17,18 +17,29 @@ db = MongoClient(DB_URI)[DB_NAME]
 
 usuarios = [{
     "fecha_nacimiento": datetime(1998, 5, 17),
-    "mail": "rococo@gmail.com",
-    "password": generate_password_hash("admin", method='sha256'),
-    "rol": "admin",
+    "mail": "cliente@cliente.com",
+    "password": generate_password_hash("cliente", method='sha256'),
+    "rol": "cliente",
     "nombre": "Rocío",
     "sexo": "M",
+    "parent": "tecnico@tecnico.com",
+    "ultima_conexion": datetime.today()
+},
+{
+    "fecha_nacimiento": datetime(1998, 5, 17),
+    "mail": "clienteFake@clienteFake.com",
+    "password": generate_password_hash("cliente", method='sha256'),
+    "rol": "cliente",
+    "nombre": "Cliente sin tecnico",
+    "sexo": "M",
+    "parent": "uncorreo@uncorreo.com",
     "ultima_conexion": datetime.today()
 },
     {
         "fecha_nacimiento": datetime(1989, 5, 17),
-        "mail": "mario@gmail.com",
+        "mail": "admin@admin.com",
         "password": generate_password_hash("admin", method='sha256'),
-        "rol": "cliente",
+        "rol": "admin",
         "nombre": "Mario",
         "sexo": "H",
         "provincia": "Alicante",
@@ -42,8 +53,8 @@ usuarios = [{
     },
     {
         "fecha_nacimiento": datetime(1957, 4, 21),
-        "mail": "ines@gmail.com",
-        "password": generate_password_hash("admin", method='sha256'),
+        "mail": "tecnico@tecnico.com",
+        "password": generate_password_hash("tecnico", method='sha256'),
         "rol": "tecnico",
         "nombre": "Inés",
         "sexo": "M",
@@ -51,55 +62,15 @@ usuarios = [{
 
     },
     {
-        "fecha_nacimiento": datetime(1997, 2, 4),
-        "mail": "pedro@gmail.com",
-        "password": generate_password_hash("admin", method='sha256'),
-        "rol": "cliente",
-        "nombre": "Pedro",
-        "sexo": "H",
-        "provincia": "Alicante",
-        "ultima_conexion": datetime.today(),
-        "enfermedades": [
-            "paralisis facial"
-        ],
-        "dis": [
-            "disfemia"
-        ]
-    },
-    {
-        "fecha_nacimiento": datetime(1996, 3, 1),
-        "mail": "pedro@gmail.com",
-        "password": generate_password_hash("admin", method='sha256'),
-        "rol": "cliente",
-        "nombre": "Pedro",
-        "sexo": "H",
-        "provincia": "Alicante",
-        "ultima_conexion": datetime.today(),
-        "enfermedades": [
-            "paralisis facial"
-        ],
-        "dis": [
-            "disfemia"
-        ]
-    },
+        "fecha_nacimiento": datetime(1957, 4, 21),
+        "mail": "tecnico2@tecnico.com",
+        "password": generate_password_hash("tecnico", method='sha256'),
+        "rol": "tecnico",
+        "nombre": "Alberto",
+        "sexo": "M",
+        "ultima_conexion": datetime.today()
 
-    {
-        "fecha_nacimiento": datetime(1945, 2, 12),
-        "mail": "pedro@gmail.com",
-        "password": generate_password_hash("admin", method='sha256'),
-        "rol": "cliente",
-        "nombre": "Hector",
-        "sexo": "H",
-        "provincia": "Madrid",
-        "ultima_conexion": datetime.today(),
-        "enfermedades": [
-            "iptus"
-        ],
-        "dis": [
-            "dislexia"
-        ]
     }
-
 ]
 
 userValidator = {
@@ -114,6 +85,9 @@ userValidator = {
         ],
         "properties": {
             "mail": {
+                "bsonType": 'string'
+            },
+            "parent": {
                 "bsonType": 'string'
             },
             "password": {
