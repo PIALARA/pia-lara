@@ -42,7 +42,7 @@
                     {% endfor %}
                   {% endif %}
                 {% endwith %}
-                <form method="POST" action="{{ url_for('auth.login') }}">
+                <form method="POST" action="{{ url_for("auth.login") }}">
                     <div class="mb-4">
                         <label for="user" class="formlabel">User</label>
                         <input class="form-control" type="email" name="email" placeholder="Tu Email" autofocus="">
@@ -57,7 +57,7 @@
 
                     <div class="my-3">
                         <span>No tienes cuenta? <a href="#">Regístrate</a></span><br>
-                        <span><a href="{{ url_for('auth.email_rec_password') }}">Recuperar Password</a></span>
+                        <span><a href="#">Recuperar Password</a></span>
                     </div>
                 </form>
 

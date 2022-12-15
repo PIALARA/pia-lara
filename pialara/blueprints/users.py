@@ -12,6 +12,8 @@ from flask import (
 from flask_login import login_required, current_user
 from pialara.decorators import rol_required
 from pialara.models.Usuario import Usuario
+from pialara.models.Enfermedades import Enfermedades
+from pialara.models.Disfonias import Disfonias
 from pialara.decorators import rol_required
 
 bp = Blueprint('users', __name__, url_prefix='/users')
@@ -55,7 +57,15 @@ def create():
     u = Usuario()
     logged_rol = current_user.rol
 
-    return render_template('users/create.html',rol=logged_rol)
+    enfermedades = Enfermedades()
+    disfonias = Disfonias()
+
+    return render_template(
+        'users/create.html',
+        rol=logged_rol,
+        enfermedades=enfermedades.find(),
+        disfonias=disfonias.find()
+    )
 
 @bp.route('/create', methods=['POST'])
 @login_required
