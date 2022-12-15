@@ -108,6 +108,11 @@
   display: none;
 }
 
+.send-button {
+  background-color: rgb(249, 81, 96);
+  color: white;
+}
+
 @-webkit-keyframes record-button-animation {
   0% {
     transform: scale(1);
