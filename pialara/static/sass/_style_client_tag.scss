@@ -1,0 +1,35 @@
+.tags-form {
+  max-width: 30rem;
+  margin-inline: auto;
+  padding-block: 1rem;
+  display: flex;
+  justify-content: center;
+
+  &__input {
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0.8rem;
+    border-radius: 100px 0 0 100px;
+    border: 1px solid rgb(183, 183, 183);
+    border-right: none;
+  }
+
+  &__button {
+    font-family: inherit;
+    font-size: inherit;
+    background-color: rgb(255, 255, 255);
+    padding: 0.8rem;
+    padding-inline: 1.3rem 1.7rem;
+    border-radius: 0 100px 100px 0;
+    border: 1px solid rgb(183, 183, 183);
+    cursor: pointer;
+  }
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+}

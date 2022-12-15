@@ -1,0 +1,148 @@
+.syllabus {
+  width: 50rem;
+  max-width: calc(100% - 2rem);
+  margin: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 1rem;
+  box-shadow: 0 0 18px 3px rgba(0, 0, 0, 0.2);
+
+  &__header {
+    padding: 0.5rem 1rem;
+    width: 100%;
+    border-bottom: 1px solid rgb(209, 209, 209);
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 1rem 1rem 0 0;
+    text-align: center;
+    margin-bottom: 1rem;
+
+    h2 {
+      margin: 0;
+      font-size: 1rem;
+    }
+  }
+
+  &__buttons {
+    width: 100%;
+    display: flex;
+    gap: 1rem;
+    padding-inline: 1rem;
+    justify-content: center;
+
+    > * {
+      width: 50%;
+    }
+  }
+
+  &__text {
+    font-size: 2.5rem;
+    text-align: center;
+    width: 100%;
+    padding-inline: 1rem;
+
+    p,
+    textarea {
+      margin-block: 1rem;
+      transition: margin 500ms;
+
+      &.hide-syllabus-text {
+        height: 0;
+        visibility: hidden;
+        margin: 0;
+        margin-bottom: 1rem;
+      }
+    }
+
+    textarea {
+      margin-block: 1rem;
+      width: 100%;
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+    }
+  }
+}
+
+.audio {
+  margin-block: 1rem;
+  margin-top: auto;
+  padding-block: 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+
+  audio {
+    height: 60px;
+  }
+}
+
+.record-button {
+  border: none;
+  border-radius: 50%;
+  padding: 20px;
+  display: inline-block;
+  position: relative;
+  background: white;
+  box-shadow: 0 0 18px 3px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+  animation-iteration-count: infinite;
+  animation-duration: 2s;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 0 24px 7px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+  }
+
+  svg {
+    display: block;
+
+    &.svg-stop {
+      display: none;
+    }
+  }
+
+  &.recording {
+    animation-name: record-button-animation;
+
+    & .svg-stop {
+      display: block;
+    }
+
+    & .svg-record {
+      display: none;
+    }
+  }
+}
+
+.send-button {
+  background-color: rgb(249, 81, 96);
+  color: white;
+}
+
+@keyframes record-button-animation {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.visualizer {
+  display: none;
+}
+
+.bottom {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+}

@@ -46,7 +46,7 @@ def search_user():
     if logged_rol == "admin":
         users = u.find({'nombre': {"$regex": user_name, '$options': 'i'}})
     else:
-        users = u.find({"rol": {"$eq": 'cliente'}, 'nombre': {"$regex": user_name, '$options': 'i'}})
+        users = u.find({"rol": {"$eq": 'cliente'}, 'nombre': {"$regex": user_name, '$options': 'i'}, "parent": {"$eq": current_user.email}})
 
     return render_template('users/index.html', users=users, user_name=user_name)
 
@@ -115,7 +115,7 @@ def create_post():
                    "fecha_nacimiento": fecha, "ultima_conexion": datetime.now(),
                    "sexo": sexoCliente, "provincia": provinciaCliente,
                    "enfermedades": enfermedadesCliente, "dis": disCliente,
-                   }
+                   "parent": current_user.email}
         result = user.insert_one(newUser)
 
 
