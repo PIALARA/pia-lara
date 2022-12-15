@@ -67,6 +67,10 @@ body {
       display: block;
     }
   }
+
+  &__empty {
+    width: 40px;
+  }
 }
 
 .button {
@@ -101,5 +105,8 @@ body {
 #send-button:disabled {
   background: #ccc !important;
   opacity: .7;
-
 }
+
+
+@import "style_client_tag";
+@import "style_client_audio";

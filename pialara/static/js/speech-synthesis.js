@@ -1,6 +1,7 @@
 const syllabusText = document.querySelector('#syllabus-text');
 const playButton = document.querySelector('#play-button');
 const showSyllabusButton = document.querySelector('.show-syllabus-button');
+const showSyllabusButtonText = document.querySelector('.show-syllabus-button-text');
 
 const audio = new SpeechSynthesisUtterance();
 
@@ -29,6 +30,7 @@ playButton.addEventListener('click', () => {
   }
 });
 
-showSyllabusButton.addEventListener('click', () => {
+showSyllabusButton && showSyllabusButton.addEventListener('click', () => {
   syllabusText.classList.toggle('hide-syllabus-text');
+  showSyllabusButtonText.textContent = syllabusText.classList.contains('hide-syllabus-text') ? 'Mostrar' : 'Ocultar';
 });

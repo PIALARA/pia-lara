@@ -2,7 +2,6 @@ const recordButton = document.querySelector('.record-button');
 const recordedAudio = document.querySelector('#recorded-audio');
 const spinner = document.querySelector('#spinner');
 const canvas = document.querySelector('.visualizer');
-const tag = document.querySelector('.tag').innerText;
 const $sendButton = $("#send-button");
 
 let audioChunks = [];
