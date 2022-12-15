@@ -5,6 +5,7 @@ import os
 import configparser
 from datetime import datetime
 
+
 config = configparser.ConfigParser()
 config.read(os.path.abspath(os.path.join(".ini")))
 
@@ -92,43 +93,61 @@ audio = [
 
 ]
 audioValidator = {
+
     "$jsonSchema": {
         "required": [
-            'fecha',
-            'texto',
-            'usuario',
-            'aws_object_id'
+          'fecha',
+          'aws_object_id'
         ],
         "properties": {
-            "texto": {
-                "bsonType": 'object'
-            },
-            "usuario": {
-                "bsonType": 'object'
-            },
-            "duracion": {
-                "bsonType": 'int'
-            },
-            "fecha": {
-                "bsonType": 'date'
-            },
-            "notas": {
-                "bsonType": 'string'
-            },
-            "valoracion": {
-                "bsonType": 'int',
-                'enum': [
-                    0,
-                    1,
-                    2,
-                    3,
-                    4,
-                    5
-                ]
-            }
+          "duracion": {
+            "bsonType": 'double'
+          },
+          "fecha": {
+            "bsonType": 'date'
+          }
         }
     }
 }
+
+"""
+"$jsonSchema": {
+    "required": [
+        'fecha',
+        'texto',
+        'usuario',
+        'aws_object_id'
+    ],
+    "properties": {
+        "texto": {
+            "bsonType": 'object'
+        },
+        "usuario": {
+            "bsonType": 'object'
+        },
+        "duracion": {
+            "bsonType": 'double'
+        },
+        "fecha": {
+            "bsonType": 'date'
+        },
+        "notas": {
+            "bsonType": 'string'
+        },
+        "valoracion": {
+            "bsonType": 'int',
+            'enum': [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+            ]
+        }
+    }
+}
+"""
 
 try:
     db.drop_collection("audios")
