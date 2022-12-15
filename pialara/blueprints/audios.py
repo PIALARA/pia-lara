@@ -5,7 +5,7 @@ import random
 from flask import current_app
 from flask import Blueprint, render_template
 from flask import (
-    Blueprint, flash, redirect, render_template, request, url_for
+    Blueprint, flash, redirect, render_template, request, url_for, jsonify
 )
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
@@ -113,7 +113,12 @@ def save_record():
                 }
     result = audio.insert_one(newAudio)
 
+    data = {
+        "status": 'ok',
+        "message": "El audio ha sido almacenado correctamente."
+    }
 
+    return jsonify(data)
     return render_template('audios/create.html')
 
 
