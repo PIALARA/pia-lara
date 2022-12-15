@@ -3,7 +3,7 @@ import random
 
 from flask import Blueprint, render_template
 from flask import (
-    Blueprint, flash, redirect, render_template, request, url_for
+    Blueprint, flash, redirect, render_template, request, url_for, jsonify
 )
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
@@ -81,7 +81,13 @@ def save_record():
     print(current_user.id)
     filename = secure_filename('prueba.wav')
     file.save(os.path.join('./', filename))
-    print(file)
+
+    data = {
+        "status": 'ok',
+        "message": "El audio ha sido almacenado correctamente."
+    }
+
+    return jsonify(data)
     return render_template('audios/create.html')
 
 

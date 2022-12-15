@@ -1,10 +1,8 @@
 const recordButton = document.querySelector('.record-button');
 const recordedAudio = document.querySelector('#recorded-audio');
-const sendAudio = document.querySelector('#send-button');
 const spinner = document.querySelector('#spinner');
 const canvas = document.querySelector('.visualizer');
-const mainSection = document.querySelector('.main-controls');
-const tag = document.querySelector('.tag').innerText;
+const $sendButton = $("#send-button");
 
 let audioChunks = [];
 let generalBlob = '';
@@ -22,20 +20,18 @@ function handlerFunction(stream) {
     audioChunks.push(e.data);
     if (mediaRecorder.state === 'inactive') {
       let blob = new Blob(audioChunks, { type: 'audio/mpeg-3' });
-      console.log(blob);
-      // sendData(blob);
       const url = URL.createObjectURL(blob);
       recordedAudio.controls = true;
       recordedAudio.src = url;
       generalBlob = blob;
-      sendAudio.removeAttribute('hidden');
     }
   });
 }
 
-recordButton.addEventListener('click', e => {
+recordButton.addEventListener('click', () => {
   if (mediaRecorder.state === 'inactive') {
-    console.log('Recording are started..');
+    console.log('Recording started.');
+    $sendButton.hide();
     recordButton.classList.add('recording');
     canvas.style.display = 'block';
     recordedAudio.controls = false;
@@ -43,18 +39,22 @@ recordButton.addEventListener('click', e => {
     mediaRecorder.start();
   } else if (mediaRecorder.state === 'recording') {
     canvas.style.display = 'none';
-    console.log('Recording are stopped.');
+    console.log('Recording stopped.');
     recordButton.classList.remove('recording');
+    $sendButton.show();
     mediaRecorder.stop();
   }
 });
 
-sendAudio.addEventListener('click', e => {
-  spinner.removeAttribute('hidden');
-  sendAudio.setAttribute('disabled', 'disabled');
+$sendButton.on('click', () => {
+    spinner.removeAttribute('hidden');
+
   var form = new FormData();
   form.append('file', generalBlob);
   form.append('title', 'data.mp3');
+  $sendButton
+      .attr('disabled', true)
+      .text('espere...');
   //Chrome inspector shows that the post data includes a file and a title.
   $.ajax({
     type: 'POST',
@@ -64,23 +64,30 @@ sendAudio.addEventListener('click', e => {
     processData: false,
     contentType: false,
   }).done(function (data) {
+    console.log(data);
+    $sendButton
+        .hide()
+        .attr('disabled', false)
+        .text('espere...');
+
+    recordedAudio.controls = false;
     swal({
-      title: 'Audio guardado correctamente!',
-      icon: 'success',
+      title: data.message || '',
+      icon: data.status === 'ok' ? 'success' : 'error',
       buttons: {
-        audio: 'Grabar otro audio!',
+        audio: {
+          text: 'Grabar otro audio',
+          value: 'grabar'
+        },
       },
     }).then(value => {
-      switch (value) {
-        case 'audio':
-          window.location.href = tag;
-          break;
-        default:
-          window.location.href = tag;
-      }
-    });
+      console.log(value)
+      if (value === "grabar")
+        window.location.reload()
+    })
   });
-});
+
+})
 
 function visualize(stream) {
   if (!audioCtx) {
