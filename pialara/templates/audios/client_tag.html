@@ -1,35 +1,28 @@
-
 {% extends 'client.html' %}
 
 {% block content %}
-
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="alert alert-{{ category }}">
-        {{ message }}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+          {{ message }}
         </div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
 
-    <div class="tags-form">
-        <form class="mx-auto py-3" style="max-width: 30rem;" method="post" action="{{ url_for("audios.tag_search") }}">
-            <div class="input-group mb-3">
-              <input type="search" name="tagName" class="form-control" placeholder="Buscar etiqueta..."
-                           aria-label="Buscar etiqueta..." aria-describedby="button-search" value="{{ tag_name }}"/>
-              <button class="btn btn-primary" type="submit" id="search">
-                <i class="bi bi-search me-2"></i>Buscar
-              </button>
-            </div>
-        </form>
+  <section>
+    <form class="tags-form" method="post" action="{{ url_for('audios.tag_search') }}">
+      <input class="tags-form__input" type="search" name="tagName" placeholder="Buscar etiqueta..." value="{{ tag_name }}"/>
+      <button class="tags-form__button" type="submit" id="search">
+        <i class="bi bi-search me-2"></i>
+      </button>
+    </form>
+
+    <div class="tags-container">
+      {% for tag in tags %}
+        <a class="tag button" href="/audios/client-record/{{ tag._id }}">{{ tag._id.upper() }}</a>
+      {% endfor %}
     </div>
-
-    <div class="tags-content">
-        {% for tag in tags %}
-          <a href="/audios/client-record/{{ tag._id }}" class="btn btn-lg btn-primary">{{ tag._id.upper() }}</a>
-        {% endfor %}
-    </div>
-
-
+  </section>
 {% endblock %}

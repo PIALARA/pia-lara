@@ -1,7 +1,6 @@
 .wrapper,
 html,
 body {
-  height: 100%;
   margin: 0;
   font-family: 'Zilla Slab', serif;
 }
@@ -10,21 +9,29 @@ body {
   background-image: linear-gradient(to top, #fff 20%, #f3f2f1);
 }
 
+* {
+  box-sizing: border-box;
+}
+
 .wrapper {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   height: 100%;
   align-items: center;
-  justify-content: space-between;
 }
 
-.top {
+.header {
   width: 100%;
   max-width: 600px;
-  .navbar {
-    width: 100%;
+  margin-inline: auto;
+
+  ul {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    margin: 0;
 
     li {
       list-style: none;
@@ -41,55 +48,36 @@ body {
       font-size: 20px;
     }
   }
-}
 
-.frase {
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  border-radius: 2px;
-  font-size: 30px;
-  padding: 10px 25px;
-}
+  h1 {
+    margin: 0;
+  }
 
-// client_record
+  &__button {
+    display: inline-block;
+    height: auto;
+    border-radius: 50%;
+    padding: 10px;
+    box-shadow: 0 2px 4px 0 rgb(0 0 0 / 15%);
 
-.record-button {
-  border: none;
-  border-radius: 50%;
-  padding: 20px;
-  display: inline-block;
-  position: relative;
-  background: white;
-  box-shadow: 0 0 18px 3px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease-in-out;
-  animation-iteration-count: infinite;
-  animation-duration: 2s;
-  cursor: pointer;
-
-  &:hover {
-    box-shadow: 0 0 24px 7px rgba(0, 0, 0, 0.3);
-    animation-name: recorButtonAnim;
-    animation-timing-function: ease;
+    & svg,
+    & i::before {
+      width: 20px;
+      height: auto;
+      display: block;
+    }
   }
 }
 
-@keyframes recorButtonAnim {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.btn {
+.button {
   font-family: inherit;
   font-size: inherit;
   color: #000;
   text-decoration: none;
-  display: inline-block;
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
   border: 1px solid #ccc;
   padding: 12px 28px;
   border-radius: 50px;
@@ -100,27 +88,4 @@ body {
   &:hover {
     border-color: #000;
   }
-
-  & > span {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-
-    & > span {
-        display: flex;
-        align-items: center;
-    }
-  }
-}
-
-.syllabus-card {
-  border-radius: 10px;
-  box-shadow: 0 0 18px 3px rgba(0, 0, 0, 0.2);
-}
-
-.bottom {
-  display: flex;
-  justify-content: right;
-  gap: 1rem;
-  margin: 1rem 1rem 1rem auto;
 }
