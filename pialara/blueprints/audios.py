@@ -119,7 +119,6 @@ def save_record():
     }
 
     return jsonify(data)
-    return render_template('audios/create.html')
 
 
 @bp.route('/client-tag', methods=['POST'])
