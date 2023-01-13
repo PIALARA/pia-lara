@@ -38,12 +38,14 @@ recordButton.addEventListener('click', () => {
         recordedAudio.controls = false;
         audioChunks = [];
         mediaRecorder.start();
+        duration = new Date();
     } else if (mediaRecorder.state === 'recording') {
         canvas.style.display = 'none';
         console.log('Recording stopped.');
         recordButton.classList.remove('recording');
         $sendButton.show();
         mediaRecorder.stop();
+        duration = parseInt((new Date() - duration) / 1000);
     }
 });
 
@@ -94,10 +96,6 @@ $sendButton.on('click', () => {
     });
 
 })
-
-recordedAudio.addEventListener('loadedmetadata', e => {
-    duration = recordedAudio.duration;
-});
 
 function visualize(stream) {
     if (!audioCtx) {

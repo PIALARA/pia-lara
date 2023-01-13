@@ -85,7 +85,6 @@ def client_text():
 def save_record():
     file = request.files['file']
     duration = request.form.get('duration')
-    duration = '20'
 
     # print(duration)
     # # Hemos pensado en guardar timestamp + id de usuario. Ver si se guarda en mp3 o wav
