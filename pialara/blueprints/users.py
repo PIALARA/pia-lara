@@ -164,3 +164,7 @@ def update_post(id):
         flash('La usuario no se ha actualizado. Error genérico', 'danger')
         return redirect(url_for('users.index'))
 
+@bp.route('/consent')
+@login_required
+def consent():
+    return render_template('users/consent.html')
