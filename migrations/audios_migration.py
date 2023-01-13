@@ -1,5 +1,6 @@
 import bson
 from pymongo import MongoClient
+import certifi as certifi
 from werkzeug.security import generate_password_hash
 import os
 import configparser
@@ -14,7 +15,12 @@ config.read(os.path.abspath(os.path.join(".ini")))
 DB_URI = config['LOCAL']['PIALARA_DB_URI']
 DB_NAME = config['LOCAL']['PIALARA_DB_NAME']
 
-db = MongoClient(DB_URI)[DB_NAME]
+db = MongoClient(
+    DB_URI,
+    maxPoolSize = 50,
+    timeoutMS = 2500,
+    tlsCAFile = certifi.where()
+)[DB_NAME]
 
 audio = [
     {
@@ -101,7 +107,7 @@ audioValidator = {
         ],
         "properties": {
           "duracion": {
-            "bsonType": 'double'
+            "bsonType": 'int'
           },
           "fecha": {
             "bsonType": 'date'
@@ -109,45 +115,6 @@ audioValidator = {
         }
     }
 }
-
-"""
-"$jsonSchema": {
-    "required": [
-        'fecha',
-        'texto',
-        'usuario',
-        'aws_object_id'
-    ],
-    "properties": {
-        "texto": {
-            "bsonType": 'object'
-        },
-        "usuario": {
-            "bsonType": 'object'
-        },
-        "duracion": {
-            "bsonType": 'double'
-        },
-        "fecha": {
-            "bsonType": 'date'
-        },
-        "notas": {
-            "bsonType": 'string'
-        },
-        "valoracion": {
-            "bsonType": 'int',
-            'enum': [
-                0,
-                1,
-                2,
-                3,
-                4,
-                5
-            ]
-        }
-    }
-}
-"""
 
 try:
     db.drop_collection("audios")

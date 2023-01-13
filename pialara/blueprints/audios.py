@@ -2,6 +2,7 @@ import os.path
 import boto3
 import random
 
+import bson.objectid
 from flask import current_app
 from flask import Blueprint, render_template
 from flask import (
@@ -15,6 +16,7 @@ from pialara.models.Syllabus import Syllabus
 from datetime import datetime
 
 bp = Blueprint('audios', __name__, url_prefix='/audios')
+
 
 @bp.route('/client-tag')
 @login_required
@@ -42,6 +44,7 @@ def client_tag():
     tags = syllabus.aggregate(pipeline)
 
     return render_template('audios/client_tag.html', tags=tags)
+
 
 @bp.route('/client-record/<string:tag_name>')
 @login_required
@@ -82,42 +85,54 @@ def client_text():
 def save_record():
     file = request.files['file']
     duration = request.form.get('duration')
+    duration = '20'
 
     # print(duration)
     # # Hemos pensado en guardar timestamp + id de usuario. Ver si se guarda en mp3 o wav
-    # timestamp = int(round(datetime.now().timestamp()))
-    # filename = str(current_user.id)+'_'+str(timestamp)+'clea.wav'
+    timestamp = int(round(datetime.now().timestamp()))
+    filename = str(current_user.id) + '_' + str(timestamp) + '.wav'
 
     # # Guardado en S3
-    # s3c = boto3.client(
-    #     's3',
-    #     region_name='ca-central-1',
-    #     aws_access_key_id=current_app.config["AWS_ACCESS_KEY_ID"],
-    #     aws_secret_access_key=current_app.config['AWS_SECRET_ACCESS_KEY'],
-    #     aws_session_token=current_app.config["AWS_SESSION_TOKEN"]
-    # )
+    s3c = boto3.client(
+        's3',
+        region_name='us-east-1',
+        aws_access_key_id=current_app.config["AWS_ACCESS_KEY_ID"],
+        aws_secret_access_key=current_app.config['AWS_SECRET_ACCESS_KEY'],
+        aws_session_token=current_app.config["AWS_SESSION_TOKEN"]
+    )
 
-    # response =s3c.upload_fileobj(file, current_app.config["BUCKET_NAME"], filename)
+    s3c.upload_fileobj(file, current_app.config["BUCKET_NAME"], filename)
 
-    # # Guardado en Mongo
-    # audio = Audios()
-    # textoOb={"id":"638348e9b3ba0b56509dfa1b",
-    #          "texto": "Esto es un ejemplo",
-    #          "tags": ["dislalia", "paralisis"]
-    #          }
-    # newAudio = {"aws_object_id": filename,
-    #             "usuario": current_user.id, #Falta el usuario como objeto
-    #             "fecha": datetime.now(),
-    #             "texto": textoOb, #Falta como obtiene el texto el HTML
-    #             "duracion": float(duration)
-    #             }
-    # result = audio.insert_one(newAudio)
+    # todo mandar tags
+    # todo mandar texto
+
+    # Guardado en Mongo
+    audio = Audios()
+    textoOb = {"id": bson.objectid.ObjectId("638348e9b3ba0b56509dfa1b"),
+               "texto": "Esto es un ejemplo",
+               "tags": ["dislalia", "paralisis"]
+               }
+    newAudio = {"aws_object_id": filename,
+                "usuario": current_user.id,  # Falta el usuario como objeto
+                "fecha": datetime.now(),
+                "texto": textoOb,  # Falta como obtiene el texto el HTML
+                "duracion": int(duration)
+                }
+    result = audio.insert_one(newAudio)
+
+    print('*******************************************')
+    print('*******************************************')
+    print('*******************************************')
+    print('result mongo db')
+    print(result)
+    print('*******************************************')
+    print('*******************************************')
+    print('*******************************************')
 
     data = {
         "status": 'ok',
         "message": "El audio ha sido almacenado correctamente."
     }
-
     return jsonify(data)
 
 
@@ -155,4 +170,3 @@ def tag_search():
         flash("No se han encontrado resultados de la etiqueta '" + tag_name + "'", "danger")
 
     return render_template('audios/client_tag.html', tags=tags, tag_name=tag_name)
-

@@ -1,3 +1,4 @@
+import certifi as certifi
 import bson
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash
@@ -13,7 +14,12 @@ config.read(os.path.abspath(os.path.join(".ini")))
 DB_URI = config['LOCAL']['PIALARA_DB_URI']
 DB_NAME = config['LOCAL']['PIALARA_DB_NAME']
 
-db = MongoClient(DB_URI)[DB_NAME]
+db = MongoClient(
+    DB_URI,
+    maxPoolSize = 50,
+    timeoutMS = 2500,
+    tlsCAFile = certifi.where()
+)[DB_NAME]
 
 sylabus = [
     {
