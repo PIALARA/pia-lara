@@ -167,4 +167,10 @@ def update_post(id):
 @bp.route('/consent')
 @login_required
 def consent():
-    return render_template('users/consent.html')
+    logged_rol = current_user.rol
+    login_url = url_for('users.index')
+
+    if logged_rol == 'cliente':
+        login_url = url_for('audios.client_tag')
+
+    return render_template('users/consent.html', login_url=login_url)
