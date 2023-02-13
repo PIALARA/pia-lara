@@ -13,6 +13,8 @@ def create_app():
     config = configparser.ConfigParser()
     # config.read(os.path.abspath(os.path.join(".ini")))
     config.read('/var/www/pia-lara/.ini')
+    app.debug = True
+
 
     app.config['PIALARA_DB_URI'] = config['LOCAL']['PIALARA_DB_URI']
     app.config['PIALARA_DB_NAME'] = config['LOCAL']['PIALARA_DB_NAME']
