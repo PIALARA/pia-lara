@@ -94,7 +94,7 @@ def save_record():
     # # Guardado en S3
     s3c = boto3.client(
         's3',
-        region_name='us-east-1',
+        region_name='eu-south-2',
         aws_access_key_id=current_app.config["AWS_ACCESS_KEY_ID"],
         aws_secret_access_key=current_app.config['AWS_SECRET_ACCESS_KEY'],
         # aws_session_token=current_app.config["AWS_SESSION_TOKEN"]
