@@ -18,7 +18,7 @@ db = MongoClient(
     DB_URI,
     maxPoolSize = 50,
     timeoutMS = 2500,
-    tlsCAFile = certifi.where()
+    ssl=False
 )[DB_NAME]
 
 enfermedades = [

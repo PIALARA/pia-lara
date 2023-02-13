@@ -6,7 +6,6 @@ import os
 import configparser
 from datetime import datetime
 
-
 config = configparser.ConfigParser()
 config.read(os.path.abspath(os.path.join(".ini")))
 
@@ -17,9 +16,9 @@ DB_NAME = config['LOCAL']['PIALARA_DB_NAME']
 
 db = MongoClient(
     DB_URI,
-    maxPoolSize = 50,
-    timeoutMS = 2500,
-    tlsCAFile = certifi.where()
+    maxPoolSize=50,
+    timeoutMS=2500,
+    ssl=False
 )[DB_NAME]
 
 audio = [
@@ -67,7 +66,7 @@ audio = [
             "id": bson.objectid.ObjectId("638348e9b3ba0b56509dfa1b"),
             "texto": "Esto es una prueba 2",
             "creador": {
-                "id":bson.objectid.ObjectId("637fb70f9297829bcac1be50"),
+                "id": bson.objectid.ObjectId("637fb70f9297829bcac1be50"),
                 "rol": "cliente",
                 "nombre": "Sebas"
             },
@@ -82,7 +81,7 @@ audio = [
             "enfermedad": [
                 "paralisis"
             ],
-            "id":bson.objectid.ObjectId("637a02b38659dd172e6afae4"),
+            "id": bson.objectid.ObjectId("637a02b38659dd172e6afae4"),
             "sexo": "H",
             "provincia": "alicante",
             "edad": 42,
@@ -102,16 +101,16 @@ audioValidator = {
 
     "$jsonSchema": {
         "required": [
-          'fecha',
-          'aws_object_id'
+            'fecha',
+            'aws_object_id'
         ],
         "properties": {
-          "duracion": {
-            "bsonType": 'int'
-          },
-          "fecha": {
-            "bsonType": 'date'
-          }
+            "duracion": {
+                "bsonType": 'int'
+            },
+            "fecha": {
+                "bsonType": 'date'
+            }
         }
     }
 }
@@ -120,5 +119,6 @@ try:
     db.drop_collection("audios")
     db.create_collection("audios", validator=audioValidator)
     db.audios.insert_many(audio)
+    print('Correcto')
 except Exception as e:
     print(e)

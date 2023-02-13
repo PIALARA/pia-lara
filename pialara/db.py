@@ -1,3 +1,5 @@
+import ssl
+
 import certifi as certifi
 from bson.objectid import ObjectId
 from flask import current_app, g
@@ -16,6 +18,7 @@ def get_db():
     Método de configuración para obtener una instancia de db
     """
     db = getattr(g, "_database", None)
+    print('creating db singleton')
 
     PIALARA_DB_URI = current_app.config["PIALARA_DB_URI"]
     PIALARA_DB_DB_NAME = current_app.config["PIALARA_DB_NAME"]
@@ -25,7 +28,7 @@ def get_db():
             PIALARA_DB_URI,
             maxPoolSize=50,
             timeoutMS=2500,
-            tlsCAFile = certifi.where()
+            ssl=False
         )[PIALARA_DB_DB_NAME]
     return db
 
