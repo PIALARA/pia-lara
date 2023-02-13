@@ -8,7 +8,9 @@ config = configparser.ConfigParser()
 config.read(os.path.abspath(os.path.join(".ini")))
 
 
-def create_app():
+def create_app(one, two):
+    print(one)
+    print(two)
     # create and configure the app
     app = Flask(__name__)
 
