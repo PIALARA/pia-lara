@@ -164,3 +164,13 @@ def update_post(id):
         flash('La usuario no se ha actualizado. Error genérico', 'danger')
         return redirect(url_for('users.index'))
 
+@bp.route('/consent')
+@login_required
+def consent():
+    logged_rol = current_user.rol
+    login_url = url_for('users.index')
+
+    if logged_rol == 'cliente':
+        login_url = url_for('audios.client_tag')
+
+    return render_template('users/consent.html', login_url=login_url)

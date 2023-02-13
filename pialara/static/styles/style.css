@@ -25,3 +25,20 @@
 .swal-button{
     background-color: #0d6efd !important;
 }
+
+.legal{
+    padding: 0 50px;
+}
+
+.legal p{
+    font-size: 18px;
+}
+
+.legal .btn{
+    border: 1px solid #666;
+    padding: 10px 20px;
+    border-radius: 50px;
+    margin-top: 25px;
+    display: inline-block;
+    color: #333333;
+}
