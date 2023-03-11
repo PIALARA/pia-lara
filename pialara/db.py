@@ -1,5 +1,3 @@
-import ssl
-
 import certifi as certifi
 from bson.objectid import ObjectId
 from flask import current_app, g
@@ -7,11 +5,11 @@ from pymongo import ASCENDING
 from pymongo import MongoClient
 from werkzeug.local import LocalProxy
 
+from datetime import datetime
+
 from pialara.models.User import User
 
-
 # from project.models import User
-
 
 def get_db():
     """
@@ -36,7 +34,6 @@ def get_db():
 # Utilizamos LocalProxy para leer la variable global usando sólo db
 db = LocalProxy(get_db)
 
-
 def get_user_by_id(id):
     """
     Devuelve un objeto User a partir de su id
@@ -49,11 +46,11 @@ def get_user_by_id(id):
                            nombre=usuario.get("nombre"),
                            password=usuario.get("password"),
                            rol=usuario.get("rol"),
+                           ultima_conexion=usuario.get("ultima_conexion"),
                            parent=usuario.get("parent"))
         return usuario_obj
     except Exception as e:
         return e
-
 
 def get_user(email):
     """
@@ -68,10 +65,23 @@ def get_user(email):
                            nombre=usuario.get("nombre"),
                            password=usuario.get("password"),
                            rol=usuario.get("rol"),
+                           ultima_conexion=usuario.get("ultima_conexion"),
                            parent=usuario.get("parent"))
         print("Usuario objeto por email:", usuario_obj)
 
         return usuario_obj
+    except Exception as e:
+        print("Se ha producido un error", e)
+        return None
+
+
+def update_ultima_conexion(email):
+    """
+    Devuelve un objeto User
+    Método a emplear en el login
+    """
+    try:
+        db.usuarios.update_one({"mail": email}, {"$set": {'ultima_conexion': datetime.now()}})
     except Exception as e:
         print("Se ha producido un error", e)
         return None

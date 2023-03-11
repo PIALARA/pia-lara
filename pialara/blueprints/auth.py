@@ -29,10 +29,14 @@ def login_post():
     # marcamos al usuario como autenticado en flask_login
     login_user(user, remember=remember)
 
+    # le cambiamos la fecha de la última conexión
+    db.update_ultima_conexion(email)
+
     # if user.rol == 'cliente':
     #     return redirect(url_for('audios.client_tag'))logged_rol = current_user.rol
 
     return redirect(url_for('users.consent'))
+
 @bp.route('/email_rec_password')
 def email_rec_password():
     return render_template('auth/email_rec_password.html')
@@ -44,9 +48,6 @@ def info_rec_password():
 @bp.route('/rec_password',methods=['GET','POST'])
 def rec_password():
     return render_template('auth/rec_password.html')
-
-
-
 
 @bp.route('/logout')
 @login_required
