@@ -2,7 +2,7 @@
 
 ## Instalación
 
-**Consideraciones**: Uso los comandos ```python3``` y ```pip3```por que es como lo tengo configurado en mi sistema. Cada uno tendrá que saber cuál utilizar (python vs. python3 / pip vs. pip3) según el entorno de cada uno.
+**Consideraciones**: Uso los comandos `python3` y `pip3` por que es como lo tengo configurado en mi sistema. Cada uno tendrá que saber cuál utilizar (`python` vs. `python3` / `pip` vs. `pip3`) según el entorno de cada uno.
 
 Clonar el repositorio 
 
@@ -18,14 +18,14 @@ python3 -m venv venv
 
 Y activar el entorno virtual (aquí ya cada uno según windows, linux o Mac tendrá que seguir el procedimiento que se explicó en clase)
 
-**Nota**: El directorio venv está puesto en el gitignore para que no se suba al repositorio. Si lo llamáis de otra forma, agregadlo al gitignore
+**Nota**: El directorio venv está puesto en el `.gitignore` para que no se suba al repositorio. Si lo llamáis de otra forma, agregadlo al `.gitignore`
 
 Instalamos los requerimientos
 ```
 pip3 install -r requirements.txt
 ```
 
-Nota: Si cuando actualicemos master tenemos actualizaciones en los requerimientos, hay que actualizarlos:
+Nota: Si cuando actualicemos *master* tenemos actualizaciones en los requerimientos, hay que actualizarlos:
 
 ```python3
 pip3 install --upgrade --force-reinstall -r requirements.txt
@@ -33,8 +33,28 @@ pip3 install --upgrade --force-reinstall -r requirements.txt
 
 Ejecutamos
 
-```
+``` bash
 flask --app pialara --debug run
+```
+
+## Preparación de las variables de entorno
+
+En el raíz del repositorio tenemos el archivo `.ini.sample`, el cual debemos renombrar a `.ini` y configurar las variables de entorno:
+
+``` title=".ini"
+[PROD]
+SECRET_KEY = eac5e91171438960ddec0c9c469a4c3dd42e96aea462afc5ab830f78527ad80e
+PIALARA_DB_URI = mongodb+srv://usuario:contraseña@host
+PIALARA_DB_NAME = pialara
+
+[LOCAL]
+SECRET_KEY = eac5e91171438960ddec0c9c469a4c3dd42e96aea462afc5ab830f78527ad80e
+PIALARA_DB_URI = localhost
+PIALARA_DB_NAME = pialara
+
+aws_access_key_id=clave_aws
+aws_secret_access_key=secret_aws
+aws_session_token=token_aws
 ```
 
 ## Estructura de la aplicación
@@ -49,21 +69,19 @@ Cuando se crea un blueprint, es necesario agregarlo en ```__init__.py``` para qu
 
 ### Vistas
 
-Cada Blueprint va a tener asociado un directorio con su mismo nombre dentro del directorio templates que contendrá sus vistas.
+Cada *Blueprint* va a tener asociado un directorio con su mismo nombre dentro del directorio templates que contendrá sus vistas.
 
-Por ejemplo, el Blueprint auth va a tener el directorio templates/auth para guardar sus vistas.
+Por ejemplo, el *Blueprint* auth va a tener el directorio `templates/auth` para guardar sus vistas.
 
 ### Modelos
 
-Se van a usar modelos para acceder a la base de datos. Cada modelo representa a una colección y tiene que extender de la clase base que se ha creado  ```MongoModel```. Un ejemplo de implementación para crear un modelo que va a acceder a las colecciones de Usuario sería:
+Se van a usar modelos para acceder a la base de datos. Cada modelo representa a una colección y tiene que extender de la clase base que se ha creado  `MongoModel`. Un ejemplo de implementación para crear un modelo que va a acceder a las colecciones de Usuario sería:
 
 ```python
 from pialara.models.MongoModel import MongoModel
 
-
 class Usuario(MongoModel):
     collection_name = 'users'
-
 ```
 
 Es necesario hacer override de la propiedad collection_name y asignarle una cadena con el nombre de la colección.
@@ -75,19 +93,20 @@ u = Usuario()
 ```
 
 Con esto, tendríamos todos los métodos que se han heredado de MongoModel a nuestra disposición sin tener que haberlos implementado. Por ejemplo, podríamos recuperar todos los usuarios con:
+
 ```python
 db.users.find()
 ```
 
 #### Métodos de MongoModel
 
-Los métodos de MongoModel no son más que wrappers de los ofrecidos por la librería PyMongo. Es decir, el método ```user.find(...parametros...)``` sería lo mismo que hacer ```db.users.find(...parametros...)```
+Los métodos de MongoModel no son más que wrappers de los ofrecidos por la librería PyMongo. Es decir, el método `user.find(...parametros...)` sería lo mismo que hacer `db.users.find(...parametros...)`
 
-- find(self, params=None)
-- update_one(self, mongo_filter, new_values, upsert=False)
-- update_many(self, mongo_filter, new_values, upsert=False)
-- insert_one(self, values)
-- insert_many(self, values)
+- `find(self, params=None)`
+- `update_one(self, mongo_filter, new_values, upsert=False)`
+- `update_many(self, mongo_filter, new_values, upsert=False)`
+- `insert_one(self, values)`
+- `insert_many(self, values)`
 
 #### Ejemplos de uso de los modelos
 
@@ -125,9 +144,9 @@ u.update_many({"nombre": "Test"}, { "$set": {"email":"asddasd@asdads.com"}}, ups
 
 #### Proteger ruta por roles
 
-Se ha creado un decorador en el fichero decorators.py para poder usarlo y asi comprobar que el usuario esta logeado y tiene un rol determinado
+Se ha creado un decorador en el fichero decorators.py para poder usarlo y asi comprobar que el usuario esta logueado y tiene un rol determinado
 
-Su uso seria para comprobar que tiene el rol "admin" para la ruta "/profile" seria:
+Su uso sería para comprobar que tiene el rol `admin` para la ruta `/profile` seria:
 
 ```python
 from pialara.decorators import rol_required
