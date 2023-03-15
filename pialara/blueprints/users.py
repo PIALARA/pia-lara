@@ -18,21 +18,24 @@ from pialara.decorators import rol_required
 
 bp = Blueprint('users', __name__, url_prefix='/users')
 
-
 @bp.route('/')
 @login_required
-@rol_required(['admin', 'tecnico'])
+@rol_required(['admin', 'tecnico', 'cliente'])
 def index():
     u = Usuario()
 
     users = []
     logged_rol = current_user.rol
+    url = 'users/index.html'
+
     if logged_rol == "admin":
         users = u.find()
-    else:
+    elif logged_rol == "tecnico":
         users = u.find({"rol": {"$eq": 'cliente'}, "parent": {"$eq": current_user.email}})
+    else:
+        return redirect(url_for('audios.client_tag'))
 
-    return render_template('users/index.html', users=users, user_name='')
+    return render_template(url, users=users, user_name='')
 
 
 @bp.route('/', methods=['POST'])
@@ -43,12 +46,14 @@ def search_user():
     u = Usuario()
 
     logged_rol = current_user.rol
+
+    url = 'users/index.html'
     if logged_rol == "admin":
         users = u.find({'nombre': {"$regex": user_name, '$options': 'i'}})
     else:
         users = u.find({"rol": {"$eq": 'cliente'}, 'nombre': {"$regex": user_name, '$options': 'i'}, "parent": {"$eq": current_user.email}})
-
-    return render_template('users/index.html', users=users, user_name=user_name)
+  
+    return render_template(url, users=users, user_name=user_name)
 
 @bp.route('/create')
 @login_required
@@ -170,7 +175,7 @@ def consent():
     logged_rol = current_user.rol
     login_url = url_for('users.index')
 
-    if logged_rol == 'cliente':
-        login_url = url_for('audios.client_tag')
+    # if logged_rol == 'cliente':
+    #    login_url = url_for('audios.client_tag')
 
     return render_template('users/consent.html', login_url=login_url)
