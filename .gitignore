@@ -18,6 +18,8 @@ __pycache__/
 .idea/
 docs/_build/
 .vscode
+migrations/users_vk.csv
+migrations/sylabus.csv
 
 # Coverage reports
 htmlcov/
