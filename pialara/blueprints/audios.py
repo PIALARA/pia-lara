@@ -27,23 +27,68 @@ def client_tag():
             '$unwind': {
                 'path': '$tags'
             }
-        }, {
+        },
+        {
             '$group': {
                 '_id': '$tags',
                 'total': {
                     '$sum': 1
                 }
             }
-        }, {
+        },
+        {
             '$sort': {
                 'total': -1
             }
+        },
+        { '$limit': 5 }
+    ]
+    tags_mas_frases = syllabus.aggregate(pipeline)
+
+    pipeline = [
+        {
+            '$unwind': {
+                'path': '$tags'
+            }
+        },
+        {
+            '$group': {
+                '_id': '$tags',
+                'total': {
+                    '$sum': 1
+                }
+            }
+        },
+        {
+            '$sort': {
+                'total': -1
+            }
+        },
+        { '$limit': 5 }
+    ]
+    tags_mas_grabadas = syllabus.aggregate(pipeline)
+
+    pipeline = [
+        {
+            '$unwind': {
+                'path': '$tags'
+            }
+        }, {
+            '$group': {
+                '_id': '$tags', 
+                'fecha': {
+                    '$last': '$fecha_creacion'
+                }
+            }
+        }, {
+            '$sample': {
+                'size': 5
+            }
         }
     ]
+    tags_aleatorio = syllabus.aggregate(pipeline)
 
-    tags = syllabus.aggregate(pipeline)
-
-    return render_template('audios/client_tag.html', tags=tags)
+    return render_template('audios/client_tag.html', tags1=tags_mas_frases, tags2=tags_mas_grabadas, tags3=tags_aleatorio)
 
 
 @bp.route('/client-record/<string:tag_name>')
