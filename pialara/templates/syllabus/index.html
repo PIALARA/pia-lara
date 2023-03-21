@@ -1,7 +1,6 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
@@ -12,35 +11,34 @@
         {% endif %}
     {% endwith %}
 
-    <H3 class=" m-2">Frases</H3>
-    <a href="/syllabus/create" class="btn btn-success m-2"><i class="bi bi-plus-square"></i></a>
+    <H3 class="m-2">Frases</H3>
 
     <form class="container pb-4" style="max-width: 25rem" method="post" action="{{ url_for("syllabus.tag") }}">
+        <a href="/syllabus/create" class="btn btn-success m-2"><i class="bi bi-plus-square"></i>&nbsp;&nbsp;&nbsp;Añadir Frase</a>
         <div class="input-group">
             <input type="search" name="tagName" class="form-control" placeholder="Buscar etiqueta..."
                    aria-label="Buscar tag..."
                    aria-describedby="button-search" value="{{ tag_name }}"/>
-            <button class="btn btn-primary" type="submit" id="button-search"><i class="bi bi-search me-2"></i>Buscar
-            </button>
+            <button class="btn btn-primary" type="submit" id="button-search"><i class="bi bi-search me-2"></i>Buscar</button>
         </div>
     </form>
 
+    <section class="container d-flex flex-wrap justify-content-center gap-3">
     {% for frase in syllabus %}
-        <div class="card m-2">
-            <div class="card-header">
-            </div>
-            <div class="card-body">
+        <article class="card shadow-sm" style="width: 20rem">
+            <section class="card-body d-flex flex-column">
                 <p class="card-text">{{ frase.texto }}</p>
                 <footer class="blockquote-footer"><cite title="Tags">Etiquetas: </cite>{{ frase.tags }} </footer>
-                <a href="/syllabus/delete/{{ frase._id }}" class="btn btn-danger"><i class="bi bi-trash"></i></a>
-                <a href="#" class="btn btn-warning"><i class="bi bi-ear"></i></a>
-            </div>
-        </div>
+              </section>
+              <section class="card-footer">                
+                <a href="/syllabus/update/{{ frase._id }}" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                <a href="/syllabus/delete/{{ frase._id }}" class="btn btn-danger" title="borrar texto"><i class="bi bi-trash"></i></a>
+            </section>
+        </article>
     {% endfor %}
-
+   </section>
 
     <!--
-
     <div class="card m-2">
       <div class="card-header">
         <a>Frase 1</a>
