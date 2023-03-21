@@ -2,17 +2,7 @@
 
 {% block content %}
   <header class="header">
-    <ul>
-      <li class="header__empty"></li>
-      <li>
-        <h1>Grabar audios</h1>
-      </li>
-      <li>
-        <a class="header__button" href="{{ url_for('audios.client_text') }}">
-          <i class="bi bi-pencil"></i>
-        </a>
-      </li>
-    </ul>
+    <h1>Etiquetas</h1>
   </header>
 
   {% with messages = get_flashed_messages(with_categories=true) %}
@@ -33,10 +23,41 @@
       </button>
     </form>
 
+    {% if tags1 %}
     <div class="tags-container">
+      Etiquetas con más frases
+      {% for tag in tags1 %}
+        <a class="tag button" href="/audios/client-record/{{ tag._id }}">{{ tag._id.upper() }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if tags2 %}
+    <div class="tags-container">
+      Etiquetas con más audios
+      {% for tag in tags2 %}
+        <a class="tag button" href="/audios/client-record/{{ tag._id }}">{{ tag._id.upper() }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if tags3 %}
+    <div class="tags-container">
+      Etiquetas aleatorias
+      {% for tag in tags3 %}
+        <a class="tag button" href="/audios/client-record/{{ tag._id }}">{{ tag._id.upper() }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if tags %}
+    <div class="tags-container">
+      Etiquetas encontradas:
       {% for tag in tags %}
         <a class="tag button" href="/audios/client-record/{{ tag._id }}">{{ tag._id.upper() }}</a>
       {% endfor %}
     </div>
+    {% endif %}
+
   </section>
 {% endblock %}
