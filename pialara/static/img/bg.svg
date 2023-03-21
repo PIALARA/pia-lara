@@ -1,1 +1,11 @@
-<svg id="visual" viewBox="0 0 900 600" width="900" height="600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"><rect x="0" y="0" width="900" height="600" fill="#001220"></rect><defs><linearGradient id="grad1_0" x1="33.3%" y1="0%" x2="100%" y2="100%"><stop offset="20%" stop-color="#001220" stop-opacity="1"></stop><stop offset="80%" stop-color="#001220" stop-opacity="1"></stop></linearGradient></defs><defs><linearGradient id="grad2_0" x1="0%" y1="0%" x2="66.7%" y2="100%"><stop offset="20%" stop-color="#001220" stop-opacity="1"></stop><stop offset="80%" stop-color="#001220" stop-opacity="1"></stop></linearGradient></defs><g transform="translate(900, 0)"><path d="M0 486.7C-49.8 441.8 -99.7 396.8 -155 374.2C-210.3 351.5 -271.2 351.3 -324.6 324.6C-378 297.9 -423.9 244.8 -449.7 186.3C-475.5 127.8 -481.1 63.9 -486.7 0L0 0Z" fill="#123e80"></path></g><g transform="translate(0, 600)"><path d="M0 -486.7C62.9 -479.5 125.8 -472.2 186.3 -449.7C246.8 -427.2 304.9 -389.6 339.4 -339.4C374 -289.3 385 -226.6 405.6 -168C426.2 -109.3 456.5 -54.7 486.7 0L0 0Z" fill="#123e80"></path></g></svg>
+<svg id="visual" viewBox="0 0 900 600" width="900" height="600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+<rect x="0" y="0" width="900" height="600" fill="#ffffff"></rect><defs>
+<linearGradient id="grad1_0" x1="33.3%" y1="0%" x2="100%" y2="100%">
+<stop offset="20%" stop-color="#001220" stop-opacity="1"></stop>
+<stop offset="80%" stop-color="#001220" stop-opacity="1"></stop>
+</linearGradient></defs><defs>
+<linearGradient id="grad2_0" x1="0%" y1="0%" x2="66.7%" y2="100%">
+<stop offset="20%" stop-color="#001220" stop-opacity="1"></stop>
+<stop offset="80%" stop-color="#001220" stop-opacity="1"></stop>
+</linearGradient></defs><g transform="translate(900, 0)">
+<path d="M0 486.7C-49.8 441.8 -99.7 396.8 -155 374.2C-210.3 351.5 -271.2 351.3 -324.6 324.6C-378 297.9 -423.9 244.8 -449.7 186.3C-475.5 127.8 -481.1 63.9 -486.7 0L0 0Z" fill="rgb(180,224,234)"></path></g><g transform="translate(0, 600)"><path d="M0 -486.7C62.9 -479.5 125.8 -472.2 186.3 -449.7C246.8 -427.2 304.9 -389.6 339.4 -339.4C374 -289.3 385 -226.6 405.6 -168C426.2 -109.3 456.5 -54.7 486.7 0L0 0Z" fill="rgb(180,224,234)"></path></g></svg>
