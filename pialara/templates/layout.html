@@ -25,28 +25,27 @@
   <div class="container-fluid">
     <div class="row">
 
-      <div class="col-2 col-md-2 col-xl-2 bg-secondary px-1">
+      <div class="col-sm-3 col-md-3 col-lg-2 col-xl-2 bg-secondary px-1">
         <div class="m-2">
           <button class="btn btn-secondary d-block d-sm-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#demo">
             <i class="bi bi-list"></i>
           </button>
         </div>
 
+        <!-- movil -->
         <div class="offcanvas offcanvas-start text-bg-secondary" id="demo">
           <a href="{{ url_for('auth.logout') }}" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-            <img src="{{ url_for('static',filename='img/logoLara.png') }}">
+            <img src="{{ url_for('static',filename='img/logoLara.png') }}" class="img-fluid">
           </a>
           <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-sm-start" id="menuMobile">
             {% if current_user.rol != "cliente" %}
             <li><a href="{{ url_for('users.index') }}" class="d-block text-light p-3 border-0"><i class="bi bi-person-circle lead m-2"></i>Usuarios</a></li>
             <li><a href="{{ url_for('syllabus.index') }}" class="d-block text-light p-3 border-0"><i class="bi bi-book m-2 lead"></i>Frases</a></li>
             {% endif %}
-            <li>Audios
-              <ul>
-                <li><a href="{{ url_for('audios.client_tag') }}" class="d-block text-light p-3 border-0" target="_blank"><i class="bi bi-file-earmark-music m-2 lead"></i>Ver etiquetas</a></li>
-                <li>Grabar mi audio</li>
-              </ul>
-            </li>
+            {% if current_user.rol == "cliente" %}
+            <li><a href="{{ url_for('audios.client_tag') }}" class="d-block text-light p-3 border-0" target="_blank"><i class="bi bi-book m-2 lead"></i>Ver etiquetas</a></li>
+            <li><a href="{{ url_for('audios.client_text') }}" class="d-block text-light p-3 border-0" target="_blank"><i class="bi bi-file-earmark-music m-2 lead"></i>Grabar mi audio</a></li>
+            {% endif %}
           </ul>
           <div class="pb-3 text-white text-decoration-none pt-5 text-center">
             <a href="#">
@@ -58,25 +57,30 @@
           </div>
         </div>
 
+        <!--  web -->
         <div class="d-none d-sm-block flex-column align-items-center align-items-sm-start px-3 pt-2">
           <a href="{{ url_for('auth.logout') }}" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-            <img src="{{ url_for('static',filename='img/logoLara.png') }}" width="200px">
+            <img src="{{ url_for('static',filename='img/logoLara.png') }}" class="img-fluid">
           </a>
           <ul class="nav nav-pills flex-column mb-sm-auto mb-0 pb-5 align-items-center align-items-sm-start" id="menuDesktop">
-           {% if current_user.rol != "cliente" %}
+            {% if current_user.rol != "cliente" %}
             <li><a href="{{ url_for('users.index') }}" class="d-block text-light p-3 border-0"><i class="bi bi-person-circle lead m-2"></i>Usuarios</a></li>
             <li><a href="{{ url_for('syllabus.index') }}" class="d-block text-light p-3 border-0"><i class="bi bi-book m-2 lead"></i>Frases</a></li>
             {% endif %}
-            <li><i class="bi bi-file-earmark-music m-2 lead"></i>Audios
+            {% if current_user.rol == "cliente" %}
+            <li>
               <ul class="nav nav-pills">
                 <li><a href="{{ url_for('audios.client_tag') }}" class="d-block text-light p-3 border-0">
-                    Ver etiquetas
-                    </a></li>
-                <li><a href="{{ url_for('audios.client_tag') }}" class="d-block text-light p-3 border-0">
-                    Grabar mi audio
-                    </a></li>
+                  <i class="bi bi-book m-2 lead"></i>
+                  Ver etiquetas
+                </a></li>
+                <li><a href="{{ url_for('audios.client_text') }}" class="d-block text-light p-3 border-0">
+                  <i class="bi bi-file-earmark-music m-2 lead"></i>
+                  Grabar mi audio
+                </a></li>
               </ul>
             </li>
+            {% endif %}
           </ul>
           <div class="pb-3 text-white text-decoration-none pt-5 text-center">
             <a href="{{ url_for('users.update',id=current_user.id) }}">
