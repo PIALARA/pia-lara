@@ -1,27 +1,29 @@
 .offcanvas {
     width : 50% !important;
-  }
-  a {
+}
+
+a {
     text-decoration: none;
 }
-.row
-{
-    height: 100vh !important;
+
+@media (min-width: 576px) {
+    .row {
+        height: 100vh !important;
+    }    
 }
 
 .tipo_admin{
     color:red
-
 }
 
 .tipo_cliente{
     color:green
-
 }
+
 .tipo_tecnico{
     color:blue
-
 }
+
 .swal-button{
     background-color: #0d6efd !important;
 }
