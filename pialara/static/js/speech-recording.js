@@ -52,13 +52,22 @@ recordButton.addEventListener('click', () => {
 $sendButton.on('click', () => {
     spinner.removeAttribute('hidden');
 
+    var text_id = document.getElementById('syllabus-id').innerHTML;
+    var text_text = document.getElementById('syllabus-text').innerHTML;
+    var text_tag = document.getElementById('syllabus-tag').innerHTML;
+    var text_type = document.getElementById('syllabus-type').innerHTML;
+
     var form = new FormData();
     form.append('file', generalBlob);
     $sendButton
         .attr('disabled', true)
         .text('espere...');
     form.append('duration', duration);
-    //Chrome inspector shows that the post data includes a file and a title.
+    form.append('text_id', text_id)
+    form.append('text_text', text_text)
+    form.append('text_tag', text_tag)
+    form.append('text_type', text_type)
+
     $.ajax({
         type: 'POST',
         url: '/audios/save-record',
@@ -92,9 +101,7 @@ $sendButton.on('click', () => {
             icon: 'error',
             text: 'Ha habido un error al subir el audio. Por favor, reinicie el navegador y reinténtlo de nuevo.',
         })
-
     });
-
 })
 
 function visualize(stream) {
