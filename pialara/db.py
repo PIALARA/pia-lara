@@ -16,7 +16,6 @@ def get_db():
     Método de configuración para obtener una instancia de db
     """
     db = getattr(g, "_database", None)
-    print('creating db singleton')
 
     PIALARA_DB_URI = current_app.config["PIALARA_DB_URI"]
     PIALARA_DB_DB_NAME = current_app.config["PIALARA_DB_NAME"]
