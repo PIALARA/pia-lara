@@ -223,15 +223,20 @@ def tag_search():
                 'path': '$tags'
             }
         }, {
-            '$group': {
-                '_id': '$tags',
-                'total': {
-                    '$sum': 1
-                }
-            }
-        }, {
             '$match': {
-                '_id': {'$regex': tag_name, '$options': 'i'}
+                '$or': [
+                    {
+                        'tags': {
+                            '$regex': tag_name, 
+                            '$options': 'i'
+                        }
+                    }, {
+                        'texto': {
+                            '$regex': tag_name, 
+                            '$options': 'i'
+                        }
+                    }
+                ]
             }
         }
     ]
