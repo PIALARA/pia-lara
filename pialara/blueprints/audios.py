@@ -238,7 +238,12 @@ def tag_search():
                     }
                 ]
             }
-        }
+        },
+        {
+            '$group': {
+                '_id': '$tags'
+            }
+        }        
     ]
 
     tags = syllabus.aggregate(pipeline)
