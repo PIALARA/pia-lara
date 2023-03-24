@@ -24,6 +24,9 @@ def tag():
     tag_name = request.form.get('tagName')
     syllabus = Syllabus()
 
+    # Guardamos el click
+    
+
     if tag_name == "":
         return render_template('syllabus/index.html', syllabus=syllabus.find(), tag_name=tag_name)
 
@@ -34,11 +37,22 @@ def tag():
             }
         }, {
             '$match': {
-                'tags': {'$regex': tag_name, '$options': 'i'}
+                '$or': [
+                    {
+                        'tags': {
+                            '$regex': tag_name, 
+                            '$options': 'i'
+                        }
+                    }, {
+                        'texto': {
+                            '$regex': tag_name, 
+                            '$options': 'i'
+                        }
+                    }
+                ]
             }
         }
     ]
-
     frases = syllabus.aggregate(pipeline)
 
     if not frases.alive:
