@@ -52,18 +52,31 @@ recordButton.addEventListener('click', () => {
 $sendButton.on('click', () => {
     spinner.removeAttribute('hidden');
 
-    var text_id = document.getElementById('syllabus-id').innerHTML;
-    var text_text = document.getElementById('syllabus-text').innerHTML;
-    var text_tag = document.getElementById('syllabus-tag').innerHTML;
-    var text_type = document.getElementById('syllabus-type').innerHTML;
-
     var form = new FormData();
     form.append('file', generalBlob);
     $sendButton
         .attr('disabled', true)
         .text('espere...');
     form.append('duration', duration);
-    form.append('text_id', text_id)
+
+    var text_id_element = document.getElementById('syllabus-id');
+    var text_text_element = document.getElementById('syllabus-text');
+    
+    var text_id, text_text;
+    if (text_id_element) {
+        // Cogemos el texto desde una etiqueta
+        text_id = text_id_element.innerHTML;
+        form.append('text_id', text_id);
+        // Recogemos el texto del párrafo
+        text_text = text_text_element.innerHTML
+    } else {
+        // Recogemos el texto del textarea, el usuario lo ha tecleado
+        text_text = text_text_element.value
+    }
+
+    var text_tag = document.getElementById('syllabus-tag').innerHTML;
+    var text_type = document.getElementById('syllabus-type').innerHTML;
+
     form.append('text_text', text_text)
     form.append('text_tag', text_tag)
     form.append('text_type', text_type)

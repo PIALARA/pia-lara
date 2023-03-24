@@ -2,20 +2,18 @@
 
 {% block content %}
     <header class="header">
-        <ul>
-            <li>
-                <h1>Grabar mi audio</h1>
-            </li>
-            <li class="header__empty"></li>
-        </ul>
+        <h1>Grabar mi audio</h1>
     </header>
 
     <section class="syllabus">
         <header class="syllabus__header">
-            <h2>Frase</h2>
+            <h2>Grabar mi audio</h2>
         </header>
+
         <section class="syllabus__text" id="syllabus-collapse">
-            <textarea id="syllabus-text" placeholder="Escribe aquí tu frase."></textarea>
+            <p class="hide-syllabus-text" id="syllabus-tag">{{ current_user.email }}</p>
+            <p class="hide-syllabus-text" id="syllabus-type">frase</p>
+            <textarea id="syllabus-text" placeholder="Escribe aquí tu frase"></textarea>
         </section>
     </section>
 

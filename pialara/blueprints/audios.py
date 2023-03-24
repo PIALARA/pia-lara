@@ -12,11 +12,11 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
 from pialara.models.Audios import Audios
+from pialara.models.Frases import Frases
 from pialara.models.Syllabus import Syllabus
 from datetime import datetime
 
 bp = Blueprint('audios', __name__, url_prefix='/audios')
-
 
 @bp.route('/client-tag')
 @login_required
@@ -110,6 +110,8 @@ def client_record(tag_name):
 
     syllabus = syllabus.aggregate(pipeline)
 
+    # Guardamos el click
+
     syllabus_list = [syllabus_item for syllabus_item in syllabus]
     random_syllabus = random.choice(syllabus_list)
 
@@ -147,30 +149,57 @@ def save_record():
 
     s3c.upload_fileobj(file, current_app.config["BUCKET_NAME"], filename)
 
-    # todo mandar tags
-    # todo mandar texto
+    text_id = request.form.get('text_id')
+    text_text = request.form.get('text_text')
+    text_tag = request.form.get('text_tag')
+    text_type = request.form.get('text_type')
 
-    # Guardado en Mongo
+    if text_id:
+        # es un texto que proviene de una etiqueta
+        print("Viene de una etiqueta")
+    else:
+        # si no tiene text_id, es un texto grabado por el usuario
+        # primero, guardamos el nuevo texto y obtenemos un id
+        fraseOb = {
+            "texto": text_text,
+            "tag": current_user.email,
+            "creador": {
+                "id": bson.objectid.ObjectId(text_id),
+                "mail": current_user.email,
+                "nombre": current_user.nombre
+            }
+        }
+
+        frase = Frases()
+        result = frase.insert_one(fraseOb)
+
+        text_id = result.inserted_id
+
+    textoOb = {
+        "id": bson.objectid.ObjectId(text_id),
+        "texto": text_text,
+        "tag": text_tag,
+        "tipo": text_type
+    }
+    usuarioOb = {
+        "id": current_user.id,
+        "mail": current_user.email, 
+        "nombre": current_user.nombre,
+        "parent": current_user.parent 
+    }
+    newAudio = {
+        "aws_object_id": filename,
+        "usuario": usuarioOb,
+        "fecha": datetime.now(),
+        "texto": textoOb,
+        "duracion": int(duration)
+    }
     audio = Audios()
-    textoOb = {"id": bson.objectid.ObjectId("638348e9b3ba0b56509dfa1b"),
-               "texto": "Esto es un ejemplo",
-               "tags": ["dislalia", "paralisis"]
-               }
-    newAudio = {"aws_object_id": filename,
-                "usuario": current_user.id,  # Falta el usuario como objeto
-                "fecha": datetime.now(),
-                "texto": textoOb,  # Falta como obtiene el texto el HTML
-                "duracion": int(duration)
-                }
     result = audio.insert_one(newAudio)
 
     print('*******************************************')
-    print('*******************************************')
-    print('*******************************************')
     print('result mongo db')
     print(result)
-    print('*******************************************')
-    print('*******************************************')
     print('*******************************************')
 
     data = {
@@ -178,7 +207,6 @@ def save_record():
         "message": "El audio ha sido almacenado correctamente."
     }
     return jsonify(data)
-
 
 @bp.route('/client-tag', methods=['POST'])
 @login_required
