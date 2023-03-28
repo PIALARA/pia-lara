@@ -4,11 +4,12 @@ from flask import (
     Blueprint, flash, redirect, render_template, request, url_for
 )
 from flask_login import current_user, login_required
+
 from pialara.models.Syllabus import Syllabus
 from pialara.models.Usuario import Usuario
+from pialara.models.Clicks import Clicks
 
 bp = Blueprint('syllabus', __name__, url_prefix='/syllabus')
-
 
 @bp.route('/')
 def index():
@@ -22,14 +23,11 @@ def index():
 @login_required
 def tag():
     tag_name = request.form.get('tagName')
-    syllabus = Syllabus()
-
-    # Guardamos el click
-    
 
     if tag_name == "":
         return render_template('syllabus/index.html', syllabus=syllabus.find(), tag_name=tag_name)
 
+    syllabus = Syllabus()
     pipeline = [
         {
             '$unwind': {
@@ -57,6 +55,17 @@ def tag():
 
     if not frases.alive:
         flash("No se han encontrado resultados de la etiqueta '" + tag_name + "'", "danger")
+ 
+    # Guardamos el click
+    clicks = Clicks()
+    click_doc = {
+        "class":"syllabus",
+        "method":"tag",
+        "tag": tag_name,
+        "usuario": current_user.email,
+        "timestamp": datetime.now()
+    }
+    clicks.insert_one(click_doc)    
 
     return render_template('syllabus/index.html', syllabus=frases, tag_name=tag_name)
 

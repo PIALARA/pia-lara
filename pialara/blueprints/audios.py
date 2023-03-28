@@ -14,7 +14,10 @@ from werkzeug.utils import secure_filename
 from pialara.models.Audios import Audios
 from pialara.models.Frases import Frases
 from pialara.models.Syllabus import Syllabus
+from pialara.models.Clicks import Clicks
+
 from datetime import datetime
+from random import sample
 
 bp = Blueprint('audios', __name__, url_prefix='/audios')
 
@@ -22,51 +25,7 @@ bp = Blueprint('audios', __name__, url_prefix='/audios')
 @login_required
 def client_tag():
     syllabus = Syllabus()
-    pipeline = [
-        {
-            '$unwind': {
-                'path': '$tags'
-            }
-        },
-        {
-            '$group': {
-                '_id': '$tags',
-                'total': {
-                    '$sum': 1
-                }
-            }
-        },
-        {
-            '$sort': {
-                'total': -1
-            }
-        },
-        { '$limit': 5 }
-    ]
-    tags_mas_frases = syllabus.aggregate(pipeline)
-
-    pipeline = [
-        {
-            '$unwind': {
-                'path': '$tags'
-            }
-        },
-        {
-            '$group': {
-                '_id': '$tags',
-                'total': {
-                    '$sum': 1
-                }
-            }
-        },
-        {
-            '$sort': {
-                'total': -1
-            }
-        },
-        { '$limit': 5 }
-    ]
-    tags_mas_grabadas = syllabus.aggregate(pipeline)
+    audio = Audios()
 
     pipeline = [
         {
@@ -82,20 +41,30 @@ def client_tag():
             }
         }, {
             '$sample': {
-                'size': 5
+                'size': 1
             }
         }
     ]
-    tags_aleatorio = syllabus.aggregate(pipeline)
+    tags_suerte = syllabus.aggregate(pipeline)
 
-    return render_template('audios/client_tag.html', tags1=tags_mas_frases, tags2=tags_mas_grabadas, tags3=tags_aleatorio)
+    # Es una chapuza ... rehacer en un futuro con una única consulta a MongoDB
+    todos_tags = syllabus.distinct("tags",{})
+    tags_audios_menos_grabadas = audio.distinct("texto.tag", {"texto.tipo": "syllabus"})
+    tags_menos_grabadas = list(set(todos_tags) - set(tags_audios_menos_grabadas))
+    if tags_menos_grabadas:
+        tags_menos_grabadas = sample(tags_menos_grabadas, 5)
+    else:
+        tags_menos_grabadas = sample(tags_audios_menos_grabadas, 5)
+
+    tags_aleatorio = sample(set(todos_tags),5)
+
+    return render_template('audios/client_tag.html', tags_suerte=tags_suerte, tags_menos=tags_menos_grabadas, tags3=tags_aleatorio)
 
 
 @bp.route('/client-record/<string:tag_name>')
 @login_required
 def client_record(tag_name):
     syllabus = Syllabus()
-
     pipeline = [
         {
             '$unwind': {
@@ -107,11 +76,20 @@ def client_record(tag_name):
             }
         }
     ]
-
     syllabus = syllabus.aggregate(pipeline)
 
     # Guardamos el click
+    clicks = Clicks()
+    click_doc = {
+        "class":"audios",
+        "method":"client_record",
+        "tag": tag_name,
+        "usuario": current_user.email,
+        "timestamp": datetime.now()
+    }
+    clicks.insert_one(click_doc)
 
+    # Obtenemos una frase del syllabus con la etiqueta recibida
     syllabus_list = [syllabus_item for syllabus_item in syllabus]
     random_syllabus = random.choice(syllabus_list)
 
