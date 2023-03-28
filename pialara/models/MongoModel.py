@@ -33,3 +33,6 @@ class MongoModel:
 
     def count_documents(self, values):
         return self.db[self.collection_name].count_documents(values)
+
+    def distinct(self, values, query):
+        return self.db[self.collection_name].distinct(values, query)
