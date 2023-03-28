@@ -23,7 +23,7 @@ body {
 
 .header {
   width: 100%;
-  max-width: 600px;
+  max-width: 700px;
   margin-inline: auto;
 }
 .header ul {
@@ -55,6 +55,7 @@ body {
   padding: 10px;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
 }
+
 .header__button svg, .header__button i::before {
   width: 20px;
   height: auto;
@@ -77,9 +78,9 @@ body {
   padding: 12px 28px;
   border-radius: 50px;
   transition: ease-in-out all 0.3s;
-  background-color: transparent;
   cursor: pointer;
 }
+
 .button:hover {
   border-color: #000;
 }
@@ -115,7 +116,6 @@ body {
 .tags-form__button {
   font-family: inherit;
   font-size: inherit;
-  background-color: white;
   padding: 0.8rem;
   padding-inline: 1.3rem 1.7rem;
   border-radius: 0 100px 100px 0;
