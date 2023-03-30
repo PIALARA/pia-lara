@@ -2,10 +2,13 @@
 
 {% block content %}
   <header class="header">
-    <h1>Grabar audio a partir de la etiqueta <strong>{{ tag }}</strong></h1>
+    <h1 class="text-center">Grabar audio a partir de la etiqueta <strong>{{ tag }}</strong></h1>
   </header>
+  <script>
+      const syllabusId = "{{ syllabus._id }}";
+  </script>
 
-  <section class="syllabus">
+  <section class="syllabus m-auto">
     <header class="syllabus__header">
       <h2 class="tag">Frase</h2>
     </header>
@@ -22,7 +25,7 @@
     </section>
 
     <section class="syllabus__text" id="syllabus-collapse">
-      <p class="hide-syllabus-text" id="syllabus-id">{{ syllabus._id }}</p>
+      <p class="hide-syllabus-text d-none" id="syllabus-id">{{ syllabus._id }}</p>
       <p class="hide-syllabus-text" id="syllabus-tag">{{ syllabus.tags }}</p>
       <p class="hide-syllabus-text" id="syllabus-text">{{ syllabus.texto }}</p>
       <p class="hide-syllabus-text" id="syllabus-type">syllabus</p>
