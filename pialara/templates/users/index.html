@@ -28,29 +28,37 @@
   <section class="container d-flex flex-wrap justify-content-center gap-3">
     {% for user in users %}
       <article class="card shadow-sm" style="width: 20rem">
-        <header class="card-header">
-          {% if user.rol == 0 %}
-            <i class="bi bi-gear me-2"></i>{{ 'Administrador' if user.sexo == 'H' else 'Administradora' }}
-          {% elif user.rol == 1 %}
-            <i class="bi bi-journals me-2"></i>{{ 'Técnico' if user.sexo == 'H' else 'Técnica' }}
-          {% elif user.rol == 2 %}
-            <i class="bi bi-person me-2"></i>Cliente
+        <header class="card-header">{{ user.nombre }} / 
+          {% if user.sexo == "H" %}
+          <i class="bi bi-gender-male me-2" title="Hombre"></i>
+          {% elif user.sexo == "M" %}
+          <i class="bi bi-gender-female me-2" title="Mujer"></i>
+          {% elif user.sexo == "A" %}
+          <i class="bi bi-gender-ambiguous me-2" title="Ambiguo"></i>
+          {% elif user.sexo == "T" %}
+          <i class="bi bi-gender-trans me-2" title="Trans"></i>
           {% endif %}
         </header>
         <section class="card-body d-flex flex-column">
-          <h5 class="card-title">{{ user.nombre }}</h5>
           <p class="card-text mb-1">
             <i class="bi bi-envelope-at me-2"></i>{{ user.mail }}
           </p>
-          {% if user.rol == 2 %}
+          {% if user.rol == "cliente" %}
             <p class="card-text mb-1">
               <i class="bi bi-geo-alt me-2"></i>{{ user.provincia }}
             </p>
+            {% if user.enfermedades %}
             <p class="card-text mb-1">
               <i class="bi bi-file-medical me-2"></i>{{ user.enfermedades|join(', ') }}
             </p>
+            {% endif %}
+            {% if user.dis %}
             <p class="card-text mb-1">
               <i class="bi bi-megaphone me-2"></i>{{ user.dis|join(', ') }}
+            </p>
+            {% endif %}
+            <p class="card-text mb-1">
+              <i class="bi bi-music-note me-2"></i>{{ user.cant_audios }}
             </p>
           {% endif %}
           <p class="card-text mb-1">
