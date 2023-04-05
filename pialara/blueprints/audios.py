@@ -13,6 +13,7 @@ from werkzeug.utils import secure_filename
 
 from pialara.models.Audios import Audios
 from pialara.models.Frases import Frases
+from pialara.models.Usuario import Usuario
 from pialara.models.Syllabus import Syllabus
 from pialara.models.Clicks import Clicks
 
@@ -173,12 +174,11 @@ def save_record():
         "duracion": int(duration)
     }
     audio = Audios()
-    result = audio.insert_one(newAudio)
+    resultAudio = audio.insert_one(newAudio)
 
-    print('*******************************************')
-    print('result mongo db')
-    print(result)
-    print('*******************************************')
+    # Incrementamos en 1 la cantidad de audios grabados
+    usuario = Usuario()
+    resultUsuario = usuario.update_one({"mail":current_user.email},{"$inc":{"cant_audios":1}})
 
     data = {
         "status": 'ok',
