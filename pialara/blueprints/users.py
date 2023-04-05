@@ -120,7 +120,7 @@ def create_post():
                    "fecha_nacimiento": fecha, "ultima_conexion": datetime.now(),
                    "sexo": sexoCliente, "provincia": provinciaCliente,
                    "enfermedades": enfermedadesCliente, "dis": disCliente,
-                   "parent": current_user.email}
+                   "parent": current_user.email, "cant_audios":0}
         result = user.insert_one(newUser)
 
 
