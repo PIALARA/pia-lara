@@ -16,25 +16,39 @@ Dentro del directorio del repositorio, crear el entorno virtual:
 python3 -m venv venv
 ```
 
-Y activar el entorno virtual (aquí ya cada uno según windows, linux o Mac tendrá que seguir el procedimiento que se explicó en clase)
+Y activar el entorno virtual (aquí ya cada uno según windows, linux o Mac tendrá que seguir el procedimiento que se explicó en clase), por ejemplo, para Linux/Mac haríamos:
 
-**Nota**: El directorio venv está puesto en el `.gitignore` para que no se suba al repositorio. Si lo llamáis de otra forma, agregadlo al `.gitignore`
+``` bash
+source venv/bin/activate
+```
+
+**Nota**: El directorio `venv` está puesto en el `.gitignore` para que no se suba al repositorio. Si lo llamáis de otra forma, agregadlo al `.gitignore`
 
 Instalamos los requerimientos
-```
+
+``` bash
 pip3 install -r requirements.txt
 ```
 
 Nota: Si cuando actualicemos *master* tenemos actualizaciones en los requerimientos, hay que actualizarlos:
 
-```python3
+``` bash
 pip3 install --upgrade --force-reinstall -r requirements.txt
 ```
 
-Ejecutamos
+Y finalmente ejecutamos Flask:
 
 ``` bash
 flask --app pialara --debug run
+```
+
+
+### Migraciones
+
+Para ejecutar las migraciones, una vez activado el entorno virtual, desde el raíz, ejecutaremos el script adecuado:
+
+``` python
+python3 migrations/sylabus_migration.py
 ```
 
 ## Preparación de las variables de entorno
