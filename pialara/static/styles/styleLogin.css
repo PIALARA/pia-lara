@@ -9,6 +9,17 @@ body{
     background-size: cover;
     height: 100%;
 }
+
+a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+
+a:hover {
+    color: lightblue;   
+}
+
 .inciarSesion{
     background-color: rgb(80, 150, 166) !important;
 }
