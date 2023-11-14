@@ -29,13 +29,64 @@ def index():
     url = 'users/index.html'
 
     if logged_rol == "admin":
-        users = u.find()
+        users_a = list(u.aggregate([
+        {
+        "$match": {
+            "rol": "admin"
+        }
+        },
+        {
+        "$addFields": {
+            "ultima_conexion": {
+                "$dateToString": {
+                    "format": "%d/%m/%Y - %H:%M",
+                    "date": "$ultima_conexion"
+                }
+            }
+        }
+        }
+        ]))
+        users_t = list(u.aggregate([
+        {
+        "$match": {
+            "rol": "tecnico"
+        }
+        },
+        {
+        "$addFields": {
+            "ultima_conexion": {
+                "$dateToString": {
+                    "format": "%d/%m/%Y - %H:%M",
+                    "date": "$ultima_conexion"
+                }
+            }
+        }
+        }
+        ]))
+        users_c = list(u.aggregate([
+        {
+        "$match": {
+            "rol": "cliente"
+        }
+        },
+        {
+        "$addFields": {
+            "ultima_conexion": {
+                "$dateToString": {
+                    "format": "%d/%m/%Y - %H:%M",
+                    "date": "$ultima_conexion"
+                }
+            }
+        }
+        }
+        ]))
+        users = [users_a, users_t, users_c]
     elif logged_rol == "tecnico":
         users = u.find({"rol": {"$eq": 'cliente'}, "parent": {"$eq": current_user.email}})
     else:
         return redirect(url_for('audios.client_tag'))
 
-    return render_template(url, users=users, user_name='')
+    return render_template(url, users=users, user_name='', logged_rol=logged_rol)
 
 
 @bp.route('/', methods=['POST'])
@@ -49,11 +100,14 @@ def search_user():
 
     url = 'users/index.html'
     if logged_rol == "admin":
-        users = u.find({'nombre': {"$regex": user_name, '$options': 'i'}})
+        users_a = u.find({'nombre': {"$regex": user_name, '$options': 'i'}, "rol": {"$eq": 'admin'}})
+        users_t = u.find({'nombre': {"$regex": user_name, '$options': 'i'}, "rol": {"$eq": 'tecnico'}})
+        users_c = u.find({'nombre': {"$regex": user_name, '$options': 'i'}, "rol": {"$eq": 'cliente'}})
+        users = [users_a, users_t, users_c]
     else:
         users = u.find({"rol": {"$eq": 'cliente'}, 'nombre': {"$regex": user_name, '$options': 'i'}, "parent": {"$eq": current_user.email}})
   
-    return render_template(url, users=users, user_name=user_name)
+    return render_template(url, users=users, user_name=user_name, logged_rol=logged_rol)
 
 @bp.route('/create')
 @login_required
