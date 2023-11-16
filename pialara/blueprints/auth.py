@@ -34,6 +34,7 @@ def login_post():
 
     # if user.rol == 'cliente':
     #     return redirect(url_for('audios.client_tag'))logged_rol = current_user.rol
+    session['font_size'] = user.font_size    
 
     return redirect(url_for('users.consent'))
 

@@ -65,7 +65,9 @@ def get_user(email):
                            password=usuario.get("password"),
                            rol=usuario.get("rol"),
                            ultima_conexion=usuario.get("ultima_conexion"),
-                           parent=usuario.get("parent"))
+                           parent=usuario.get("parent"),
+                           font_size=usuario.get("font_size"))
+
         print("Usuario objeto por email:", usuario_obj)
 
         return usuario_obj

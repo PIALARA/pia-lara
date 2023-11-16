@@ -156,10 +156,16 @@ def update_post(id):
     usu = Usuario()
     nombre = request.form.get('nombre')
     email = request.form.get('email')
+    font_size = request.form.get('font_size')
+    font_size_flota = float(font_size)
 
-    resultado = usu.update_one({'_id': ObjectId(id)}, {"$set": {'nombre': nombre, 'mail': email}})
+    if font_size_flota == session['font_size']:
+        resultado = usu.update_one({'_id': ObjectId(id)}, {"$set": {'nombre': nombre, 'mail': email}})
+    else:
+        resultado = usu.update_one({'_id': ObjectId(id)}, {"$set": {'nombre': nombre, 'mail': email, 'font_size': font_size_flota}})
 
     if resultado.acknowledged & resultado.modified_count == 1:
+        session['font_size'] = font_size_flota
         flash('Usuario actualizado correctamente', 'success')
         return redirect(url_for('users.index'))
     elif resultado.acknowledged & resultado.modified_count == 0:

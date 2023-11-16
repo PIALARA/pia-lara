@@ -12,3 +12,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
   });
   
+
+  function setFontSize(size) {
+    document.getElementById('font_size').value = size;
+    var textoEjemplo = document.getElementById("textoEjemplo");
+  textoEjemplo.style.fontSize = tamaño + "em";
+  }

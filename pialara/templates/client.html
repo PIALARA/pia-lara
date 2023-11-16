@@ -21,6 +21,19 @@
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/style_cliente.css') }}">
   
   <title>PIA FP Lara</title>
+
+  <script>
+        
+    document.addEventListener("DOMContentLoaded", function() {
+        // Obtener el valor de la variable de sesión 'font_size'
+        const fontSize = "{{ session['font_size'] }}em"; 
+
+        // Aplicar el tamaño de fuente al cuerpo (body)
+        document.body.style.fontSize = fontSize;
+    });
+
+</script>
+
 </head>
 
 <body>
