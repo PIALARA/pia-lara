@@ -146,3 +146,51 @@
   gap: 1rem;
   padding: 1rem;
 }
+
+// Variables de tamaños de texto para accesibilidad
+$font-size-small: 0.8em; // Menor tamaño de fuente
+$font-size-medium: 1em;  // Tamaño de fuente predeterminado
+$font-size-large: 1.2em; // Mayor tamaño de fuente
+
+// Clases de tamaño de texto
+.text-size-small {
+  font-size: $font-size-small;
+}
+
+.text-size-medium {
+  font-size: $font-size-medium;
+}
+
+.text-size-large {
+  font-size: $font-size-large;
+}
+
+// Aplica estilos de tamaño de texto a elementos específicos de la clase .syllabus
+.syllabus {
+  &.text-size-small {
+    font-size: $font-size-small;
+    
+    &__header, &__body, &__footer {
+      font-size: $font-size-small;
+    }
+    // Añade aquí más elementos anidados si es necesario
+  }
+
+  &.text-size-medium {
+    font-size: $font-size-medium;
+    
+    &__header, &__body, &__footer {
+      font-size: $font-size-medium;
+    }
+    // Añade aquí más elementos anidados si es necesario
+  }
+
+  &.text-size-large {
+    font-size: $font-size-large;
+    
+    &__header, &__body, &__footer {
+      font-size: $font-size-large;
+    }
+    // Añade aquí más elementos anidados si es necesario
+  }
+}

@@ -6,7 +6,7 @@ body {
 }
 
 body {
-  /*background-image: linear-gradient(to top, #fff 20%, #f3f2f1);*/
+  background-image: linear-gradient(to top, #fff 20%, #f3f2f1);
 }
 
 * {
@@ -55,7 +55,6 @@ body {
   padding: 10px;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
 }
-
 .header__button svg, .header__button i::before {
   width: 20px;
   height: auto;
@@ -78,9 +77,9 @@ body {
   padding: 12px 28px;
   border-radius: 50px;
   transition: ease-in-out all 0.3s;
+  background-color: transparent;
   cursor: pointer;
 }
-
 .button:hover {
   border-color: #000;
 }
@@ -98,9 +97,8 @@ body {
   opacity: 0.7;
 }
 
-/*Tipos de contrastes*/
 .contrast-default {
-  background-image: linear-gradient(to top, #fff 20%, #f3f2f1);
+  background-color: #fff;
   color: #000;
 }
 
@@ -127,7 +125,6 @@ body.contrast-3 button {
   border-color: inherit;
   color: inherit;
 }
-
 .tags-form {
   max-width: 30rem;
   margin-inline: auto;
@@ -140,16 +137,17 @@ body.contrast-3 button {
   font-size: inherit;
   padding: 0.8rem;
   border-radius: 100px 0 0 100px;
-  border: 1px solid #b7b7b7;
+  border: 1px solid rgb(183, 183, 183);
   border-right: none;
 }
 .tags-form__button {
   font-family: inherit;
   font-size: inherit;
+  background-color: rgb(255, 255, 255);
   padding: 0.8rem;
   padding-inline: 1.3rem 1.7rem;
   border-radius: 0 100px 100px 0;
-  border: 1px solid #b7b7b7;
+  border: 1px solid rgb(183, 183, 183);
   cursor: pointer;
 }
 
@@ -161,6 +159,36 @@ body.contrast-3 button {
   padding: 1rem;
 }
 
+.text-size-small {
+  font-size: 0.8em;
+}
+
+.text-size-medium {
+  font-size: 1em;
+}
+
+.text-size-large {
+  font-size: 1.2em;
+}
+
+.tags-form.text-size-small {
+  font-size: 0.8em;
+}
+.tags-form.text-size-small__input, .tags-form.text-size-small__button {
+  font-size: 0.8em;
+}
+.tags-form.text-size-medium {
+  font-size: 1em;
+}
+.tags-form.text-size-medium__input, .tags-form.text-size-medium__button {
+  font-size: 1em;
+}
+.tags-form.text-size-large {
+  font-size: 1.2em;
+}
+.tags-form.text-size-large__input, .tags-form.text-size-large__button {
+  font-size: 1.2em;
+}
 
 .syllabus {
   width: 50rem;
@@ -177,7 +205,7 @@ body.contrast-3 button {
 .syllabus__header {
   padding: 0.5rem 1rem;
   width: 100%;
-  border-bottom: 1px solid #d1d1d1;
+  border-bottom: 1px solid rgb(209, 209, 209);
   background-color: rgba(0, 0, 0, 0.05);
   border-radius: 1rem 1rem 0 0;
   text-align: center;
@@ -232,7 +260,6 @@ body.contrast-3 button {
   align-items: center;
   gap: 1.5rem;
 }
-
 .audio audio {
   height: 60px;
 }
@@ -271,7 +298,7 @@ body.contrast-3 button {
 }
 
 .send-button {
-  background-color: #f95160;
+  background-color: rgb(249, 81, 96);
   color: white;
 }
 
@@ -297,53 +324,33 @@ body.contrast-3 button {
   padding: 1rem;
 }
 
-.accessibility-bar button {
-  /* Estilos base para los botones */
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
-  /* Otros estilos que desees aplicar */
+.text-size-small {
+  font-size: 0.8em;
 }
 
-body.contrast-1 .button {
-    background-color: #ffff00;
-    color: #000;
-    border-color: #000;
-  }
-  
-body.contrast-1 .button:hover,
-.accessibility-bar button.contrast-3:hover {
-    background-color: #000;
-    color: #ffff00;
-    border-color: #ffff00;
-  }
+.text-size-medium {
+  font-size: 1em;
+}
 
-body.contrast-2 .button {
-    background-color: #0000ff;
-    color: #fff;
-    border-color: #fff;
-  }
-  
-body.contrast-2 .button:hover,
-.accessibility-bar button.contrast-2:hover {
-  background-color: #fff;
-  color: #0000ff;
-  border-color: #0000ff;
-  }
+.text-size-large {
+  font-size: 1.2em;
+}
 
-body.contrast-3 .button {
-  background-color: #00ff00;
-  color: #000;
-  border-color: #000;
-  }
-  
-body.contrast-3 .button:hover,
-.accessibility-bar button.contrast-3:hover {
-  background-color: #000;
-  color: #00ff00;
-  border-color: #00ff00;
-  }
-
-/*# sourceMappingURL=style_cliente.css.map */
+.syllabus.text-size-small {
+  font-size: 0.8em;
+}
+.syllabus.text-size-small__header, .syllabus.text-size-small__body, .syllabus.text-size-small__footer {
+  font-size: 0.8em;
+}
+.syllabus.text-size-medium {
+  font-size: 1em;
+}
+.syllabus.text-size-medium__header, .syllabus.text-size-medium__body, .syllabus.text-size-medium__footer {
+  font-size: 1em;
+}
+.syllabus.text-size-large {
+  font-size: 1.2em;
+}
+.syllabus.text-size-large__header, .syllabus.text-size-large__body, .syllabus.text-size-large__footer {
+  font-size: 1.2em;
+}/*# sourceMappingURL=style_cliente.css.map */
