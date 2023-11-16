@@ -14,6 +14,7 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', (event) => {
+    
     // Función para mostrar la tabla correspondiente
     function showTable(tableId) {
       // Oculta todas las tablas
@@ -47,12 +48,8 @@
       techs.classList.remove('active');
       admins.classList.remove('active');
     });
-
   });
-
-
-  
-  </script>
+</script>
   
 
 <h1 class="m-2 text-center">Lista de usuarios</h1>
@@ -76,133 +73,160 @@
 <div class="container">
   <ul class="nav nav-tabs justify-content-center">
     <li class="nav-item">
-      <a class="nav-link active" id="admin-tab" href="#">Administradores</a>
+      <a class="nav-link active" id="admin-tab" href="#"><i class="bi bi-gear"></i> Administradores</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" id="tech-tab" href="#">Técnicos</a>
+      <a class="nav-link" id="tech-tab" href="#"><i class="bi bi-journals"></i> Técnicos</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" id="client-tab" href="#">Clientes</a>
+      <a class="nav-link" id="client-tab" href="#"><i class="bi bi-person"></i> Clientes</a>
     </li>
   </ul>
 </div>
 {% endif %}
+
 <!-- Línea para todo el ancho de la página -->
 <div class="w-100" background-color: #dee2e6;"></div>
-
-
   <section class="container d-flex flex-wrap justify-content-center gap-3">
     <table class="table table-hover">
       <div class="container d-flex flex-wrap justify-content-center gap-3">
+        <!-- Rol Administradores -->
         {% if logged_rol == 'admin' %}
-        <!-- Tabla para Administradores -->
-        <table class="table table-hover" id="administradores-table">
-          <thead>
-            <tr>
-              <th scope="col">Nombre</th>
-              <th scope="col">Correo</th>
-              <th scope="col">Última conexión</th>
-            </tr>
-            
-          </thead>
-          <tbody>
+          <!-- Tabla para Administradores -->
+          <table class="table table-hover table-striped" id="administradores-table">
+            <thead>
+              <tr>
+                <th scope="col"><i class="bi bi-person-fill"></i> Nombre</th>
+                <th scope="col"><i class="bi bi-envelope-fill"></i> Correo</th>
+                <th scope="col"><i class="bi bi-clock-fill"></i> Última conexión</th>
+                <th scope="col"></th>
+                
+              </tr>
+            </thead>
+            <tbody>
+              {% if users[0]|length > 0 %}
+                {% for user in users[0] %}
+                  <tr>
+                    <td>{{ user.nombre }}</td>
+                    <td>{{ user.mail }}</td>
+                    <td>{{ user.ultima_conexion }}</td>
+                    <td>
+                      <a class="bi bi-pencil-fill" href="{{ url_for('users.update',id=user._id) }}"></a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="3" class="text-center">No hay ningún administrador que coincida con la búsqueda</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
 
-            {% for user in users[0] %}
-            <tr>
-              <td>{{user.nombre}}</td>
-              <td>{{user.mail}}</td>
-              <td>{{user.ultima_conexion}}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      
-        <!-- Tabla para Técnicos -->
-        <table class="table table-hover d-none" id="tecnicos-table">
-          <thead>
-            <tr>
-              <th scope="col">Nombre</th>
-              <th scope="col">Correo</th>
-              <th scope="col">Última conexión</th>
-            </tr>
-          </thead>
+          <!-- Tabla para Técnicos -->
+          <table class="table table-hover table-striped d-none" id="tecnicos-table">
+            <thead>
+              <tr>
+                <th scope="col"><i class="bi bi-person-fill"></i> Nombre</th>
+                <th scope="col"><i class="bi bi-envelope-fill"></i> Correo</th>
+                <th scope="col"><i class="bi bi-clock-fill"></i> Última conexión</th>
+                <th scope="col"></th>
 
-          <tbody>
+              </tr>
+            </thead>
+            <tbody>
+              {% if users[1]|length > 0 %}
+                {% for user in users[1] %}
+                  <tr>
+                    <td>{{ user.nombre }}</td>
+                    <td>{{ user.mail }}</td>
+                    <td>{{ user.ultima_conexion }}</td>
+                    <td>
+                      <a class="bi bi-pencil-fill" href="{{ url_for('users.update',id=user._id) }}"></a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="3" class="text-center">No hay ningún técnico que coincida con la búsqueda</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>  
+          <!-- Tabla para Clientes -->
+          <table class="table table-hover table-striped d-none" id="clientes-table">
+            <thead>
+              <tr>
+                <th scope="col"><i class="bi bi-person-fill"></i> Nombre</th>
+                <th scope="col"><i class="bi bi-envelope-fill"></i> Correo</th>
+                <th scope="col"><i class="bi bi-geo-alt-fill"></i> Provincia</th>
+                <th scope="col"><i class="bi bi-clipboard2-pulse-fill"></i> Enfermedades</th>
+                <th scope="col"><i class="bi bi-soundwave"></i> Disfonías</th>
+                <th scope="col"><i class="bi bi-mic-fill"></i> Número de audios</th>
+                <th scope="col"><i class="bi bi-clock-fill"></i> Última conexión</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+                {% if users[2]|length > 0 %}
+                  {% for user in users[2] %}
+                  <tr>
+                    <td>{{user.nombre}}</td>
+                    <td>{{user.mail}}</td>
+                    <td>{{user.provincia}}</td>
+                    <td>{{user.enfermedades|join(', ') }}</td>
+                    <td>{{user.dis|join(', ') }}</td>
+                    <td>{{user.cant_audios}}</td>
+                    <td>{{user.ultima_conexion}}</td>
+                    <td>
+                      <a class="bi bi-pencil-fill" href="{{ url_for('users.update',id=user._id) }}"></a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="7" class="text-center">No hay ningún cliente que coincida con la búsqueda</td>
+                  </tr>
+                {% endif %}
+            </tbody>
+          </table>
+        {%endif%}
 
-            {% for user in users[1] %}
-            <tr>
-              <td>{{user.nombre}}</td>
-              <td>{{user.mail}}</td>
-              <td>{{user.ultima_conexion}}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      
-        <!-- Tabla para Clientes -->
-        <table class="table table-hover d-none" id="clientes-table">
-          <thead>
-            <tr>
-              <th scope="col">Nombre</th>
-              <th scope="col">Correo</th>
-              <th scope="col">Provincia</th>
-              <th scope="col">Enfermedades</th>
-              <th scope="col">Disfonias</th>
-              <th scope="col">Número de audios</th>
-              <th scope="col">Última conexión</th>
-            </tr>
-          </thead>
-
-          <tbody>
-
-            {% for user in users[2] %}
-            <tr>
-              <td>{{user.nombre}}</td>
-              <td>{{user.mail}}</td>
-              <td>{{user.provincia}}</td>
-              <td>{{user.enfermedades|join(', ') }}</td>
-              <td>{{user.dis|join(', ') }}</td>
-              <td>{{user.cant_audios}}</td>
-              <td>{{user.ultima_conexion}}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      {%endif%}
+      <!-- Rol Técnico-->
       {% if logged_rol == 'tecnico' %}
-      <table class="table table-hover" id="clientes-tecnico-table">
-        <thead>
-          <tr>
-            <th scope="col">Nombre</th>
-            <th scope="col">Correo</th>
-            <th scope="col">Provincia</th>
-            <th scope="col">Enfermedades</th>
-            <th scope="col">Disfonias</th>
-            <th scope="col">Número de audios</th>
-            <th scope="col">Última conexión</th>
-          </tr>
-        </thead>
+        <table class="table table-hover table-striped id="clientes-tecnico-table">
+          <thead>
+            <tr>
+              <th scope="col"><i class="bi bi-person-fill"></i> Nombre</th>
+                <th scope="col"><i class="bi bi-envelope-fill"></i> Correo</th>
+                <th scope="col"><i class="bi bi-geo-alt-fill"></i> Provincia</th>
+                <th scope="col"><i class="bi bi-clipboard2-pulse-fill"></i> Enfermedades</th>
+                <th scope="col"><i class="bi bi-soundwave"></i> Disfonías</th>
+                <th scope="col"><i class="bi bi-mic-fill"></i> Número de audios</th>
+                <th scope="col"><i class="bi bi-clock-fill"></i> Última conexión</th>
+                <th scope="col"></th>
 
-        <tbody>
-
-          {% for user in users %}
-          <tr>
-            <td>{{user.nombre}}</td>
-            <td>{{user.mail}}</td>
-            <td>{{user.provincia}}</td>
-            <td>{{user.enfermedades|join(', ') }}</td>
-            <td>{{user.dis|join(', ') }}</td>
-            <td>{{user.cant_audios}}</td>
-            <td>{{user.ultima_conexion}}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+              <tr>
+                <td>{{user.nombre}}</td>
+                <td>{{user.mail}}</td>
+                <td>{{user.provincia}}</td>
+                <td>{{user.enfermedades|join(', ')}}</td>
+                <td>{{user.dis|join(', ')}}</td>
+                <td>{{user.cant_audios}}</td>
+                <td>{{user.ultima_conexion}}</td>
+                <td>
+                  <a class="bi bi-pencil-fill" href="{{ url_for('users.update',id=user._id) }}"></a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       {%endif%}
       </div>
-      
-      
-      
     </table>
   </section>
 

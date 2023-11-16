@@ -1,4 +1,7 @@
 from werkzeug.security import generate_password_hash
+from flask import jsonify
+from math import ceil
+
 
 from datetime import datetime
 from bson.objectid import ObjectId
@@ -23,6 +26,10 @@ bp = Blueprint('users', __name__, url_prefix='/users')
 @rol_required(['admin', 'tecnico', 'cliente'])
 def index():
     u = Usuario()
+
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    skip = (page - 1) * per_page
 
     users = []
     logged_rol = current_user.rol
@@ -82,7 +89,23 @@ def index():
         ]))
         users = [users_a, users_t, users_c]
     elif logged_rol == "tecnico":
-        users = u.find({"rol": {"$eq": 'cliente'}, "parent": {"$eq": current_user.email}})
+        users = list(u.aggregate([
+        {
+            "$match": {
+                "rol": "cliente",
+                "parent": current_user.email  # Añadido el filtro adicional aquí
+            }
+        },
+        {
+            "$addFields": {
+                "ultima_conexion": {
+                    "$dateToString": {
+                        "format": "%d/%m/%Y - %H:%M",
+                        "date": "$ultima_conexion"
+                    }
+                }
+            }
+        }]))
     else:
         return redirect(url_for('audios.client_tag'))
 
@@ -100,12 +123,47 @@ def search_user():
 
     url = 'users/index.html'
     if logged_rol == "admin":
-        users_a = u.find({'nombre': {"$regex": user_name, '$options': 'i'}, "rol": {"$eq": 'admin'}})
-        users_t = u.find({'nombre': {"$regex": user_name, '$options': 'i'}, "rol": {"$eq": 'tecnico'}})
-        users_c = u.find({'nombre': {"$regex": user_name, '$options': 'i'}, "rol": {"$eq": 'cliente'}})
+        # Consulta para 'admin'
+        users_a = list(u.aggregate([
+    {"$match": {'nombre': {"$regex": user_name, '$options': 'i'}, "rol": 'admin'}},
+    {"$addFields": {
+        "ultima_conexion": {
+            "$dateToString": {
+                "format": "%d/%m/%Y - %H:%M",
+                "date": "$ultima_conexion"
+            }
+        }
+    }}
+]))
+
+# Consulta para 'tecnico'
+        users_t = list(u.aggregate([
+    {"$match": {'nombre': {"$regex": user_name, '$options': 'i'}, "rol": 'tecnico'}},
+    {"$addFields": {
+        "ultima_conexion": {
+            "$dateToString": {
+                "format": "%d/%m/%Y - %H:%M",
+                "date": "$ultima_conexion"
+            }
+        }
+    }}
+]))
+
+# Consulta para 'cliente'
+        users_c = list(u.aggregate([
+    {"$match": {'nombre': {"$regex": user_name, '$options': 'i'}, "rol": 'cliente'}},
+    {"$addFields": {
+        "ultima_conexion": {
+            "$dateToString": {
+                "format": "%d/%m/%Y - %H:%M",
+                "date": "$ultima_conexion"
+            }
+        }
+    }}
+]))
         users = [users_a, users_t, users_c]
     else:
-        users = u.find({"rol": {"$eq": 'cliente'}, 'nombre': {"$regex": user_name, '$options': 'i'}, "parent": {"$eq": current_user.email}})
+        users = list(u.find({"rol": {"$eq": 'cliente'}, 'nombre': {"$regex": user_name, '$options': 'i'}, "parent": {"$eq": current_user.email}}))
   
     return render_template(url, users=users, user_name=user_name, logged_rol=logged_rol)
 
