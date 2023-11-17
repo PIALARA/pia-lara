@@ -11,7 +11,7 @@ def create_app():
     # create and configure the app
     app = Flask(__name__)
     config = configparser.ConfigParser()
-    # config.read(os.path.abspath(os.path.join(".ini")))
+    config.read(os.path.abspath(os.path.join(".ini")))
     config.read('/var/www/pia-lara/.ini')
 
     app.config['PIALARA_DB_URI'] = config['LOCAL']['PIALARA_DB_URI']
