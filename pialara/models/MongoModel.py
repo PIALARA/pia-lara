@@ -36,3 +36,5 @@ class MongoModel:
 
     def distinct(self, values, query):
         return self.db[self.collection_name].distinct(values, query)
+    def Count(self, pipeline):
+        return list(self.db[self.collection_name].aggregate(pipeline))

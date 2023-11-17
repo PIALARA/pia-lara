@@ -22,7 +22,7 @@
             <button class="btn btn-primary" type="submit" id="button-search"><i class="bi bi-search me-2"></i>Buscar</button>
         </div>
     </form>
-
+    
     <section class="container d-flex flex-wrap justify-content-center gap-3">
     {% for frase in syllabus %}
         <article class="card shadow-sm" style="width: 20rem">
@@ -37,6 +37,23 @@
         </article>
     {% endfor %}
    </section>
+
+   <table class="table">
+    <thead>
+        <tr>
+            <th>Etiqueta</th>
+            <th>Cantidad</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in aggregation_result %}
+            <tr>
+                <td>{{ item._id }}</td>
+                <td>{{ item.cantidad }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
     <!--
     <div class="card m-2">
