@@ -4,6 +4,7 @@ from flask import (
     Blueprint, flash, redirect, render_template, request, url_for
 )
 from flask_login import current_user, login_required
+from pialara.models.Audios import Audios
 
 from pialara.models.Syllabus import Syllabus
 from pialara.models.Usuario import Usuario
@@ -16,7 +17,32 @@ def index():
     syllabus = Syllabus()
     frases = syllabus.find()
 
-    return render_template('syllabus/index.html', syllabus=frases, tag_name='')
+
+ # Instancia la clase correspondiente, por ejemplo, Audios
+    audios_model = Audios()  # Asegúrate de que Audios sea la clase que hereda de MongoModel
+
+    # Define el pipeline de agregación
+    pipeline = [
+        {
+            '$group': {
+                '_id': '$texto.tag',
+                'cantidad': {
+                    '$sum': 1
+                }
+            }
+        },
+        {
+            '$sort': {
+                'cantidad': -1
+            }
+        }
+    ]
+
+    # Ejecuta la agregación
+    result = audios_model.aggregate(pipeline)
+
+
+    return render_template('syllabus/index.html', syllabus=frases,aggregation_result=result, tag_name='')
 
 
 @bp.route('/', methods=['POST'])

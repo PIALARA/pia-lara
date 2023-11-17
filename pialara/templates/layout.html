@@ -72,6 +72,8 @@
             {% if current_user.rol != "cliente" %}
             <li><a href="{{ url_for('users.index') }}" class="d-block text-light p-3 border-0"><i class="bi bi-person-circle lead m-2"></i>Usuarios</a></li>
             <li><a href="{{ url_for('syllabus.index') }}" class="d-block text-light p-3 border-0"><i class="bi bi-book m-2 lead"></i>Frases</a></li>
+            <li><a href="{{ url_for('logros.index') }}" class="d-block text-light p-3 border-0"><i class="bi bi-book m-2 lead"></i>Logros</a></li>
+           
             {% endif %}
             {% if current_user.rol == "cliente" %}
             <li>
@@ -86,6 +88,8 @@
                   <i class="bi bi-file-earmark-music m-2 lead"></i>
                   Grabar mi audio
                 </a></li>
+                <li><a href="{{ url_for('logros.index') }}" class="d-block text-light border-0 d-flex align-items-center gap-1 fs-5"><i class="bi bi-file-earmark-music m-2 lead"></i>Logros</a></li>
+           
               </ul>
             </li>
             {% endif %}
