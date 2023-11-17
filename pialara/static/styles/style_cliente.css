@@ -346,4 +346,22 @@ body.contrast-3 .button:hover,
   border-color: #00ff00;
   }
 
+/*botones audio*/
+.speed-buttons {
+  display: none; /* Ocultar los botones inicialmente */
+  /*margin-top: 10px; /* Ajustar según sea necesario */
+}
+
+.speed-button {
+  margin-right: 10px;
+  padding: 8px 12px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.speed-button:hover {
+  background-color: #45a049; 
+}
 /*# sourceMappingURL=style_cliente.css.map */
