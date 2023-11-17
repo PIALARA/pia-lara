@@ -53,6 +53,7 @@ def rec_password():
 @bp.route('/logout')
 @login_required
 def logout():
+    session.pop('font_size', None)
     logout_user()
     flash('Sesión cerrada con éxito', 'success')
     return redirect(url_for('auth.login'))
