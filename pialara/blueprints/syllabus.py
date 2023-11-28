@@ -1,4 +1,5 @@
 from datetime import datetime
+import math
 from bson.objectid import ObjectId
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
@@ -11,20 +12,13 @@ from pialara.models.Clicks import Clicks
 bp = Blueprint("syllabus", __name__, url_prefix="/syllabus")
 
 
-@bp.route("/")
-def index():
-    syllabus = Syllabus()
-    frases = syllabus.find()
-
-    return render_template("syllabus/index.html", syllabus=frases, tag_name="")
-
-
-@bp.route("/", methods=["POST"])
+@bp.route("/", methods=["GET"])
 @login_required
-def tag():
-    tag_name = request.form.get("tagName")
-    tag_date_since = request.form.get("tagDateSince")
-    tag_date_to = request.form.get("tagDateTo")
+def index():
+    tag_name = request.args.get("tagName") or ""
+    tag_date_since = request.args.get("tagDateSince") or ""
+    tag_date_to = request.args.get("tagDateTo") or ""
+    current_page = int(request.args.get("page") or 1)
 
     syllabus = Syllabus()
     match_filter = {}
@@ -38,10 +32,10 @@ def tag():
                 ]
             }
         )
-        
+
     # Agregamos un campo nuevo $expr para poder hacer un $and con los filtros de fecha
     match_filter.update({"$expr": {"$and": []}})
-    
+
     if tag_date_since != "":
         match_filter["$expr"]["$and"].append(
             {
@@ -72,14 +66,28 @@ def tag():
             }
         )
 
-    pipeline = [
-        {"$unwind": {"path": "$tags"}},
-        {"$match": match_filter},
-    ]
-    
-    frases = syllabus.aggregate(pipeline)
+    pipeline = [{"$unwind": {"path": "$tags"}}, {"$match": match_filter}]
 
-    if not frases.alive:
+    # Empieza modificacion
+    PER_PAGE = 9
+
+    total_pipeline = pipeline + [{"$count": "total"}]
+    try:
+        total = syllabus.aggregate(total_pipeline).next()["total"]
+    except StopIteration:
+        total = 0
+
+    print('total',total)
+    total_pages = math.ceil(total / PER_PAGE)
+    skip = (current_page - 1) * PER_PAGE
+
+    pipeline += [{"$skip": skip}, {"$limit": PER_PAGE}]
+    documentos = syllabus.aggregate(pipeline)
+
+    pages_min = max([1, current_page - 5])
+    pages_max = min([total_pages, pages_min + 10])
+
+    if not documentos.alive:
         flash(
             "No se han encontrado resultados",
             "danger",
@@ -100,8 +108,12 @@ def tag():
 
     return render_template(
         "syllabus/index.html",
-        syllabus=frases,
+        syllabus=documentos,
         tag_name=tag_name,
+        page=current_page,
+        pages_min=pages_min,
+        pages_max=pages_max,
+        total_pages=total_pages,
         tag_date_since=tag_date_since,
         tag_date_to=tag_date_to,
     )
