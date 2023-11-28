@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from bson.objectid import ObjectId
 from flask import (
     Blueprint, flash, redirect, render_template, request, url_for
@@ -15,14 +15,23 @@ bp = Blueprint('syllabus', __name__, url_prefix='/syllabus')
 def index():
     syllabus = Syllabus()
     frases = syllabus.find()
+    pipeline = [
+
+    ]
 
     return render_template('syllabus/index.html', syllabus=frases, tag_name='')
 
 
-@bp.route('/', methods=['POST'])
+@bp.route('/', methods=['GET','POST'])
 @login_required
 def tag():
+
     tag_name = request.form.get('tagName')
+    if(request.form.get('page')):
+        actual_page = int(request.form.get('page'))
+    else:
+        actual_page = 1
+    print(actual_page)
 
     if tag_name == "":
         return render_template('syllabus/index.html', syllabus=syllabus.find(), tag_name=tag_name)
@@ -51,9 +60,59 @@ def tag():
             }
         }
     ]
-    frases = syllabus.aggregate(pipeline)
 
-    if not frases.alive:
+    #frases = syllabus.aggregate(pipeline)
+    
+    #Empieza modificacion
+    total = syllabus.count_documents({'tags':tag_name})
+    
+    per_page = 10
+    if total is not None:
+        total_documentos = int(total)  # Asumiendo que 'total' es la clave usada en $count
+    else:
+        total_documentos = 0
+    total_pages = total_documentos // per_page + (1 if total_documentos % per_page > 0 else 0)
+
+    if (actual_page == 1):
+        skip = 0
+    else:
+        skip = (actual_page - 1) * 10
+
+    pipeline2 = [
+        {
+            '$unwind': {
+                'path': '$tags'
+            }
+        }, {
+            '$match': {
+                '$or': [
+                    {
+                        'tags': {
+                            '$regex': tag_name, 
+                            '$options': 'i'
+                        }
+                    }, {
+                        'texto': {
+                            '$regex': tag_name, 
+                            '$options': 'i'
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "$skip":skip
+        },
+        {
+            "$limit":10
+        }
+    ]
+    documentos = syllabus.aggregate(pipeline2)
+
+    #Termina modificacion
+
+    #if not frases.alive:
+    if not documentos.alive:
         flash("No se han encontrado resultados de la etiqueta '" + tag_name + "'", "danger")
  
     # Guardamos el click
@@ -65,10 +124,10 @@ def tag():
         "usuario": current_user.email,
         "timestamp": datetime.now()
     }
-    clicks.insert_one(click_doc)    
+    clicks.insert_one(click_doc) 
 
-    return render_template('syllabus/index.html', syllabus=frases, tag_name=tag_name)
-
+    return render_template('syllabus/index.html', syllabus=documentos, tag_name=tag_name, page=actual_page, total_pages=total_pages)
+#syllabus=frases, tag_name=tag_name, total=total_frases
 
 @bp.route('/create')
 @login_required

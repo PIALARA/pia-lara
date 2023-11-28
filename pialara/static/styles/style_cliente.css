@@ -265,4 +265,56 @@ body {
   padding: 1rem;
 }
 
+/* Estilo para el contenedor */
+div.pagination-container {
+  text-align: center; /* Centra los elementos */
+  margin: 10px 0; /* Agrega un poco de margen alrededor */
+}
+
+div.container-paginacion{
+  margin-top: 1%;
+}
+
+/* Estilo para los formularios y enlaces */
+.paginacion {
+  display: inline-block; /* Muestra los elementos en línea */
+  margin-right: 0.5%; /* Espaciado entre elementos */
+  margin-bottom: 0.5%;
+
+  width: 30px; /* Ancho del cuadrado */
+  height: 30px; /* Alto del cuadrado */
+  line-height: 30px; /* Centra el contenido verticalmente */
+  text-align: center; /* Centra el contenido horizontalmente */
+  border: 1px solid #ddd; /* Borde opcional */
+  border-radius: 20%;
+}
+
+.paginacion:hover {
+  background-color: grey; /* Color de fondo al hacer hover */
+}
+
+.pag-actual{
+  background-color: #333;
+}
+
+.b-actual{
+  color: white;
+}
+
+/* Estilo para los botones dentro de los formularios */
+#pagina {
+  background: none; /* Elimina el fondo predeterminado */
+  border: none; /* Elimina el borde predeterminado */
+  padding: 0; /* Elimina el relleno predeterminado */
+  margin: 0; /* Elimina los márgenes predeterminados */
+  font: inherit; /* Utiliza la fuente del elemento padre */
+  cursor: pointer; /* Cambia el cursor para indicar que es clickeable */
+}
+
+/* Estilo para los enlaces */
+.enl_pag {
+  text-decoration: none; /* Elimina el subrayado del enlace */
+  color: inherit; /* Usa el color de texto del elemento padre */
+}
+
 /*# sourceMappingURL=style_cliente.css.map */

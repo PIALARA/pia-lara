@@ -13,7 +13,7 @@
 
     <h1 class="text-center m-2">Frases</h1>
 
-    <form class="container pb-4" style="max-width: 25rem" method="post" action="{{ url_for("syllabus.tag") }}">
+    <form class="container pb-4" style="max-width: 25rem" method="post" action="{{ url_for('syllabus.tag') }}">
         <a href="/syllabus/create" class="btn btn-success m-2"><i class="bi bi-plus-square"></i>&nbsp;&nbsp;&nbsp;Añadir Frase</a>
         <div class="input-group">
             <input type="search" name="tagName" class="form-control" placeholder="Buscar etiqueta..."
@@ -37,6 +37,39 @@
         </article>
     {% endfor %}
    </section>
+   {% if page %}
+    <div class="container-paginacion">
+      <!--
+      {% if page > 1 %}
+          <a class="paginacion enl_pag" href="/?page={{ page - 1 }}">Anterior</a>
+      {% endif %}
+      -->
+
+      <!-- Generación de enlaces para cada página -->
+      {% for p in range(1, total_pages + 1) %}
+        {% if p == page %}
+          <form class="paginacion pag-actual" method="post" action="{{ url_for('syllabus.tag') }}">
+            <input type="hidden" name="page" value="{{ p }}">
+            <input type="hidden" name="tagName" value='{{ tag_name }}'>
+            <!-- Otros campos del formulario -->
+            <button id="pagina" type="submit" class="b-actual">{{p}}</button>
+          </form>
+        {% else %}
+          <form class="paginacion" method="post" action="{{ url_for('syllabus.tag') }}">
+            <input type="hidden" name="page" value="{{ p }}">
+            <input type="hidden" name="tagName" value='{{ tag_name }}'>
+            <!-- Otros campos del formulario -->
+            <button id="pagina" type="submit">{{p}}</button>
+          </form>
+        {% endif %}
+      {% endfor %}
+      <!--
+      {% if page < total_pages %}
+          <a href="/syllabus/tag?page={{ page + 1 }}">Siguiente</a>
+      {% endif %}
+      -->
+    </div>
+  {% endif %}
 
     <!--
     <div class="card m-2">
