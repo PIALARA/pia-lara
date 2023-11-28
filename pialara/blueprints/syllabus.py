@@ -76,15 +76,32 @@ def tag():
             }
         )
 
-    pipeline = [
-        {"$unwind": {"path": "$tags"}},
-        {"$match": match_filter},
-    ]
-    frases = syllabus.aggregate(pipeline)
+    pipeline = [{"$unwind": {"path": "$tags"}}, {"$match": match_filter}]
 
-    if not frases.alive:
-        flash("No se han encontrado resultados de la etiqueta '" + tag_name + "'", "danger")
- 
+    # Empieza modificacion
+    PER_PAGE = 9
+
+    total_pipeline = pipeline + [{"$count": "total"}]
+    try:
+        total = syllabus.aggregate(total_pipeline).next()["total"]
+    except StopIteration:
+        total = 0
+
+    total_pages = math.ceil(total / PER_PAGE)
+    skip = (current_page - 1) * PER_PAGE
+
+    pipeline += [{"$skip": skip}, {"$limit": PER_PAGE}]
+    documentos = syllabus.aggregate(pipeline)
+
+    pages_min = max([1, current_page - 3])
+    pages_max = min([total_pages, pages_min + 6])
+
+    if not documentos.alive:
+        flash(
+            "No se han encontrado resultados",
+            "danger",
+        )
+
     # Guardamos el click
     clicks = Clicks()
     click_doc = {
