@@ -18,9 +18,9 @@ def create_app():
     app.config['PIALARA_DB_NAME'] = config['LOCAL']['PIALARA_DB_NAME']
     app.config['SECRET_KEY'] = config['LOCAL']['SECRET_KEY']
 
-    app.config['AWS_ACCESS_KEY_ID'] = config['LOCAL']['AWS_ACCESS_KEY_ID']
-    app.config['AWS_SECRET_ACCESS_KEY'] = config['LOCAL']['AWS_SECRET_ACCESS_KEY']
-    app.config['BUCKET_NAME'] = config['LOCAL']['BUCKET_NAME']
+    #app.config['AWS_ACCESS_KEY_ID'] = config['LOCAL']['AWS_ACCESS_KEY_ID']
+    #app.config['AWS_SECRET_ACCESS_KEY'] = config['LOCAL']['AWS_SECRET_ACCESS_KEY']
+    #app.config['BUCKET_NAME'] = config['LOCAL']['BUCKET_NAME']
 
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
