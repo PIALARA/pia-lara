@@ -15,16 +15,20 @@ bp = Blueprint("syllabus", __name__, url_prefix="/syllabus")
 def index():
     syllabus = Syllabus()
     frases = syllabus.find()
+    pipeline = [
+
+    ]
 
     return render_template("syllabus/index.html", syllabus=frases, tag_name="")
 
 
-@bp.route("/", methods=["POST"])
+@bp.route('/', methods=['POST'])
 @login_required
 def tag():
-    tag_name = request.form.get("tagName")
-    tag_date_since = request.form.get("tagDateSince")
-    tag_date_to = request.form.get("tagDateTo")
+    tag_name = request.form.get('tagName')
+
+    if tag_name == "":
+        return render_template('syllabus/index.html', syllabus=syllabus.find(), tag_name=tag_name)
 
     syllabus = Syllabus()
     match_filter = {}
@@ -76,15 +80,11 @@ def tag():
         {"$unwind": {"path": "$tags"}},
         {"$match": match_filter},
     ]
-    
     frases = syllabus.aggregate(pipeline)
 
     if not frases.alive:
-        flash(
-            "No se han encontrado resultados",
-            "danger",
-        )
-
+        flash("No se han encontrado resultados de la etiqueta '" + tag_name + "'", "danger")
+ 
     # Guardamos el click
     clicks = Clicks()
     click_doc = {
@@ -96,15 +96,9 @@ def tag():
         "usuario": current_user.email,
         "timestamp": datetime.now(),
     }
-    clicks.insert_one(click_doc)
+    clicks.insert_one(click_doc)    
 
-    return render_template(
-        "syllabus/index.html",
-        syllabus=frases,
-        tag_name=tag_name,
-        tag_date_since=tag_date_since,
-        tag_date_to=tag_date_to,
-    )
+    return render_template('syllabus/index.html', syllabus=frases, tag_name=tag_name)
 
 
 @bp.route("/create")
