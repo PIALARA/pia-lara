@@ -23,22 +23,14 @@ def index():
 @login_required
 def tag():
     tag_name = request.form.get("tagName")
-    tag_date = request.form.get("tagDate")
+    tag_date_since = request.form.get("tagDateSince")
+    tag_date_to = request.form.get("tagDateTo")
 
     syllabus = Syllabus()
-
-    if tag_name == "" and tag_date == "":
-        return render_template(
-            "syllabus/index.html",
-            syllabus=syllabus.find(),
-            tag_name=tag_name,
-            tag_date=tag_date,
-        )
-
-    filter = {"match": {}}
+    match_filter = {}
 
     if tag_name != "":
-        filter["match"].update(
+        match_filter.update(
             {
                 "$or": [
                     {"tags": {"$regex": tag_name, "$options": "i"}},
@@ -46,36 +38,50 @@ def tag():
                 ]
             }
         )
-
-    if tag_date != "":
-        filter["match"].update(
+        
+    # Agregamos un campo nuevo $expr para poder hacer un $and con los filtros de fecha
+    match_filter.update({"$expr": {"$and": []}})
+    
+    if tag_date_since != "":
+        match_filter["$expr"]["$and"].append(
             {
-                "$expr": {
-                    "$eq": [
-                        tag_date,
-                        {
-                            "$dateToString": {
-                                "date": "$fecha_creacion",
-                                "format": "%Y-%m-%d",
-                            }
-                        },
-                    ]
-                }
+                "$lte": [
+                    tag_date_since,
+                    {
+                        "$dateToString": {
+                            "date": "$fecha_creacion",
+                            "format": "%Y-%m-%d",
+                        }
+                    },
+                ]
+            }
+        )
+
+    if tag_date_to != "":
+        match_filter["$expr"]["$and"].append(
+            {
+                "$gte": [
+                    tag_date_to,
+                    {
+                        "$dateToString": {
+                            "date": "$fecha_creacion",
+                            "format": "%Y-%m-%d",
+                        }
+                    },
+                ]
             }
         )
 
     pipeline = [
         {"$unwind": {"path": "$tags"}},
-        {"$match": filter["match"]},
+        {"$match": match_filter},
     ]
-
-    print(json.dumps(pipeline, indent=4))
-
+    
     frases = syllabus.aggregate(pipeline)
 
     if not frases.alive:
         flash(
-            "No se han encontrado resultados de la etiqueta '" + tag_name + "'",
+            "No se han encontrado resultados",
             "danger",
         )
 
@@ -85,14 +91,19 @@ def tag():
         "class": "syllabus",
         "method": "tag",
         "tag": tag_name,
-        "fecha": tag_date,
+        "dateSince": tag_date_since,
+        "dateTo": tag_date_to,
         "usuario": current_user.email,
         "timestamp": datetime.now(),
     }
     clicks.insert_one(click_doc)
 
     return render_template(
-        "syllabus/index.html", syllabus=frases, tag_name=tag_name, tag_date=tag_date
+        "syllabus/index.html",
+        syllabus=frases,
+        tag_name=tag_name,
+        tag_date_since=tag_date_since,
+        tag_date_to=tag_date_to,
     )
 
 
