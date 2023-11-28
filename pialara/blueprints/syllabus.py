@@ -77,15 +77,14 @@ def index():
     except StopIteration:
         total = 0
 
-    print('total',total)
     total_pages = math.ceil(total / PER_PAGE)
     skip = (current_page - 1) * PER_PAGE
 
     pipeline += [{"$skip": skip}, {"$limit": PER_PAGE}]
     documentos = syllabus.aggregate(pipeline)
 
-    pages_min = max([1, current_page - 5])
-    pages_max = min([total_pages, pages_min + 10])
+    pages_min = max([1, current_page - 3])
+    pages_max = min([total_pages, pages_min + 6])
 
     if not documentos.alive:
         flash(
