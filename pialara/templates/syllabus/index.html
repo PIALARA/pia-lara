@@ -41,10 +41,10 @@
     </article>
     {% endfor %}
 </section>
-{% if page %}
-<div class="container-paginacion">
+{% if pages_max > 1 %}
+<div class="container-paginacion position-fixed" style="bottom:1rem">
 
-    <a href="/syllabus?page=1&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}" class="paginacion"><<</a>
+    <a href="/syllabus?page=1&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}" class="paginacion">◀◀</a>
 
     <!-- Generación de enlaces para cada página -->
     {% for p in range(pages_min, pages_max+1) %}
@@ -56,43 +56,8 @@
         {% endif %}
     {% endfor %}
 
-    <a href="/syllabus?page={{total_pages}}&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}" class="paginacion">>></a>
+    <a href="/syllabus?page={{total_pages}}&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}" class="paginacion">▶▶</a>
 </div>
 {% endif %}
 
-<!--
-    <div class="card m-2">
-      <div class="card-header">
-        <a>Frase 1</a>
-      </div>
-      <div class="card-body">
-        <h5 class="card-title">Special title treatment</h5>
-        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-        <a href="#" class="btn btn-danger"><i class="bi bi-trash" /></a>
-        <a href="#" class="btn btn-warning"><i class="bi bi-ear" /></a>
-      </div>
-    </div>
-    <div class="card m-2">
-      <div class="card-header">
-        <a>Frase 1</a>
-      </div>
-      <div class="card-body">
-        <h5 class="card-title">Special title treatment</h5>
-        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-        <a href="#" class="btn btn-danger"><i class="bi bi-trash" /></a>
-        <a href="#" class="btn btn-warning"><i class="bi bi-ear" /></a>
-      </div>
-    </div>
-    <div class="card m-2">
-      <div class="card-header">
-        <a>Frase 1</a>
-      </div>
-      <div class="card-body">
-        <h5 class="card-title">Special title treatment</h5>
-        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-        <a href="#" class="btn btn-danger"><i class="bi bi-trash"></i></a>
-        <a href="#" class="btn btn-warning"><i class="bi bi-ear" /></a>
-      </div>
-    </div>
-    -->
 {% endblock %}
