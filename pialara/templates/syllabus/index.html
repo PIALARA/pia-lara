@@ -40,24 +40,28 @@
         </section>
     </article>
     {% endfor %}
-</section>
-{% if pages_max > 1 %}
-<div class="container-paginacion position-fixed" style="bottom:1rem">
 
-    <a href="/syllabus?page=1&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}" class="paginacion">◀◀</a>
+    {% if pages_max > 1 %}
+    <article class="container-paginacion mt-5 w-100">
+        <a href="/syllabus?page=1&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}"
+            class="paginacion">◀◀</a>
 
-    <!-- Generación de enlaces para cada página -->
-    {% for p in range(pages_min, pages_max+1) %}
+        <!-- Generación de enlaces para cada página -->
+        {% for p in range(pages_min, pages_max+1) %}
         {% if p == page %}
         <!-- Otros campos del formulario -->
-        <a href="/syllabus?page={{ p }}&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}" class="b-actual pag-actual paginacion">{{p}}</a>
+        <a href="/syllabus?page={{ p }}&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}"
+            class="b-actual pag-actual paginacion">{{p}}</a>
         {% else %}
-        <a href="/syllabus?page={{ p }}&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}" class="paginacion">{{p}}</a>
+        <a href="/syllabus?page={{ p }}&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}"
+            class="paginacion">{{p}}</a>
         {% endif %}
-    {% endfor %}
+        {% endfor %}
 
-    <a href="/syllabus?page={{total_pages}}&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}" class="paginacion">▶▶</a>
-</div>
-{% endif %}
+        <a href="/syllabus?page={{total_pages}}&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}"
+            class="paginacion">▶▶</a>
+    </article>
+    {% endif %}
+</section>
 
 {% endblock %}
