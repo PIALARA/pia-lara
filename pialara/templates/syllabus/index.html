@@ -1,76 +1,66 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
-                {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }}">
+    {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
 
-    <h1 class="text-center m-2">Frases</h1>
+<h1 class="text-center m-2">Frases</h1>
 
-    <form class="container pb-4" style="max-width: 25rem" method="post" action="{{ url_for("syllabus.tag") }}">
-        <a href="/syllabus/create" class="btn btn-success m-2"><i class="bi bi-plus-square"></i>&nbsp;&nbsp;&nbsp;Añadir Frase</a>
-        <div class="input-group">
-            <input type="search" name="tagName" class="form-control" placeholder="Buscar etiqueta..."
-                   aria-label="Buscar tag..."
-                   aria-describedby="button-search" value="{{ tag_name }}"/>
-            <button class="btn btn-primary" type="submit" id="button-search"><i class="bi bi-search me-2"></i>Buscar</button>
-        </div>
-    </form>
+<form class="container pb-4" style="max-width: 35rem" method="GET" action="{{ url_for('syllabus.index') }}">
+    <a href="/syllabus/create" class="btn btn-success m-2"><i class="bi bi-plus-square"></i>&nbsp;&nbsp;&nbsp;Añadir
+        Frase</a>
+    <div class="input-group">
+        <input type="search" name="tagName" class="form-control" placeholder="Buscar..." aria-label="Buscar tag..."
+            aria-describedby="button-search" value="{{ tag_name }}" />
+        <input type="date" name="tagDateSince" class="form-control" value="{{ tag_date_since }}">
+        <input type="date" name="tagDateTo" class="form-control" value="{{ tag_date_to }}">
+        <button class="btn btn-primary" type="submit" id="button-search"><i
+                class="bi bi-search me-2"></i>Buscar</button>
+    </div>
+</form>
 
-    <section class="container d-flex flex-wrap justify-content-center gap-3">
+<section class="container d-flex flex-wrap justify-content-center gap-3">
     {% for frase in syllabus %}
-        <article class="card shadow-sm" style="width: 20rem">
-            <section class="card-body d-flex flex-column">
-                <p class="card-text">{{ frase.texto }}</p>
-                <footer class="blockquote-footer"><cite title="Tags">Etiquetas: </cite>{{ frase.tags }} </footer>
-              </section>
-              <section class="card-footer">                
-                <a href="/syllabus/update/{{ frase._id }}" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
-                <a href="/syllabus/delete/{{ frase._id }}" class="btn btn-danger" title="borrar texto"><i class="bi bi-trash"></i></a>
-            </section>
-        </article>
+    <article class="card shadow-sm" style="width: 20rem">
+        <section class="card-body d-flex flex-column">
+            <p class="card-text">{{ frase.texto }}</p>
+            <footer class="blockquote-footer"><cite title="Tags">Etiquetas: </cite>{{ frase.tags }} </footer>
+        </section>
+        <section class="card-footer">
+            <a href="/syllabus/update/{{ frase._id }}" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+            <a href="/syllabus/delete/{{ frase._id }}" class="btn btn-danger" title="borrar texto"><i class="bi bi-trash"></i></a>
+        </section>
+    </article>
     {% endfor %}
-   </section>
 
-    <!--
-    <div class="card m-2">
-      <div class="card-header">
-        <a>Frase 1</a>
-      </div>
-      <div class="card-body">
-        <h5 class="card-title">Special title treatment</h5>
-        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-        <a href="#" class="btn btn-danger"><i class="bi bi-trash" /></a>
-        <a href="#" class="btn btn-warning"><i class="bi bi-ear" /></a>
-      </div>
-    </div>
-    <div class="card m-2">
-      <div class="card-header">
-        <a>Frase 1</a>
-      </div>
-      <div class="card-body">
-        <h5 class="card-title">Special title treatment</h5>
-        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-        <a href="#" class="btn btn-danger"><i class="bi bi-trash" /></a>
-        <a href="#" class="btn btn-warning"><i class="bi bi-ear" /></a>
-      </div>
-    </div>
-    <div class="card m-2">
-      <div class="card-header">
-        <a>Frase 1</a>
-      </div>
-      <div class="card-body">
-        <h5 class="card-title">Special title treatment</h5>
-        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-        <a href="#" class="btn btn-danger"><i class="bi bi-trash"></i></a>
-        <a href="#" class="btn btn-warning"><i class="bi bi-ear" /></a>
-      </div>
-    </div>
-    -->
+    {% if pages_max > 1 %}
+    <article class="container-paginacion mt-5 w-150">
+        <a href="/syllabus?page=1&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}"
+            class="paginacion">◀◀</a>
+
+        <!-- Generación de enlaces para cada página -->
+        {% for p in range(pages_min, pages_max+1) %}
+            {% if p == page %}
+            <!-- Otros campos del formulario -->
+            <a href="/syllabus?page={{ p }}&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}"
+                class="b-actual pag-actual paginacion">{{p}}</a>
+            {% else %}
+            <a href="/syllabus?page={{ p }}&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}"
+                class="paginacion">{{p}}</a>
+            {% endif %}
+        {% endfor %}
+
+        <a href="/syllabus?page={{total_pages}}&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}"
+            class="paginacion">▶▶</a>
+    </article>
+    {% endif %}
+</section>
+
 {% endblock %}

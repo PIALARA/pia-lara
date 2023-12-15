@@ -4,9 +4,6 @@ from pialara import db
 import os
 import configparser
 
-
-
-
 def create_app():
     # create and configure the app
     app = Flask(__name__)
@@ -37,10 +34,5 @@ def create_app():
     @login_manager.user_loader
     def load_user(user_id):
         return db.get_user_by_id(user_id)
-
-    # a simple page that says hello
-    # @app.route('/hello')
-    # def hello():
-    #     return 'Hello, World!'
 
     return app

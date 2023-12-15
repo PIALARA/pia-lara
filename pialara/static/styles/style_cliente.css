@@ -56,7 +56,8 @@ body {
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
 }
 
-.header__button svg, .header__button i::before {
+.header__button svg,
+.header__button i::before {
   width: 20px;
   height: auto;
   display: block;
@@ -263,6 +264,45 @@ body {
   justify-content: center;
   gap: 1rem;
   padding: 1rem;
+}
+
+/* Estilo para el contenedor */
+div.pagination-container {
+  text-align: center; /* Centra los elementos */
+  margin: 10px 0; /* Agrega un poco de margen alrededor */
+}
+
+div.container-paginacion {
+  text-align: center;
+  margin-top: 1%;
+}
+
+/* Estilo para los formularios y enlaces */
+.paginacion {
+  background-color: gainsboro;
+  color: black;
+  padding: .3rem .8rem;
+  text-align: center; /* Centra el contenido horizontalmente */
+  border-radius: 20%;
+}
+
+.paginacion:hover {
+  background-color: grey; /* Color de fondo al hacer hover */
+  color: inherit;
+}
+
+.pag-actual {
+  background-color: #333;
+}
+
+.b-actual {
+  color: white;
+}
+
+/* Estilo para los enlaces */
+.enl_pag {
+  text-decoration: none; /* Elimina el subrayado del enlace */
+  color: inherit; /* Usa el color de texto del elemento padre */
 }
 
 /*# sourceMappingURL=style_cliente.css.map */
