@@ -29,3 +29,7 @@ htmlcov/
 *.wav
 .ini
 static/.sass-cache
+migrations/users_gv.csv
+migrations/users_gv2324.csv
+migrations/users_vk2324.csv
+migrations/users_gv2324b.csv

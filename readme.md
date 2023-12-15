@@ -42,7 +42,6 @@ Y finalmente ejecutamos Flask:
 flask --app pialara --debug run
 ```
 
-
 ### Migraciones
 
 Para ejecutar las migraciones, una vez activado el entorno virtual, desde el raíz, ejecutaremos el script adecuado:
