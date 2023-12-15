@@ -94,7 +94,7 @@ def tag():
     documentos = syllabus.aggregate(pipeline)
 
     pages_min = max([1, current_page - 3])
-    pages_max = min([total_pages, pages_min + 6])
+    pages_max = min([total_pages, pages_min + 5])
 
     if not documentos.alive:
         flash(

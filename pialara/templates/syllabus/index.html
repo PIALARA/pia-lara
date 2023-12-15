@@ -35,27 +35,26 @@
         </section>
         <section class="card-footer">
             <a href="/syllabus/update/{{ frase._id }}" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
-            <a href="/syllabus/delete/{{ frase._id }}" class="btn btn-danger" title="borrar texto"><i
-                    class="bi bi-trash"></i></a>
+            <a href="/syllabus/delete/{{ frase._id }}" class="btn btn-danger" title="borrar texto"><i class="bi bi-trash"></i></a>
         </section>
     </article>
     {% endfor %}
 
     {% if pages_max > 1 %}
-    <article class="container-paginacion mt-5 w-100">
+    <article class="container-paginacion mt-5 w-150">
         <a href="/syllabus?page=1&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}"
             class="paginacion">◀◀</a>
 
         <!-- Generación de enlaces para cada página -->
         {% for p in range(pages_min, pages_max+1) %}
-        {% if p == page %}
-        <!-- Otros campos del formulario -->
-        <a href="/syllabus?page={{ p }}&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}"
-            class="b-actual pag-actual paginacion">{{p}}</a>
-        {% else %}
-        <a href="/syllabus?page={{ p }}&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}"
-            class="paginacion">{{p}}</a>
-        {% endif %}
+            {% if p == page %}
+            <!-- Otros campos del formulario -->
+            <a href="/syllabus?page={{ p }}&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}"
+                class="b-actual pag-actual paginacion">{{p}}</a>
+            {% else %}
+            <a href="/syllabus?page={{ p }}&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}"
+                class="paginacion">{{p}}</a>
+            {% endif %}
         {% endfor %}
 
         <a href="/syllabus?page={{total_pages}}&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}"

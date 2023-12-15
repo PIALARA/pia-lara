@@ -372,7 +372,8 @@ div.pagination-container {
   margin: 10px 0; /* Agrega un poco de margen alrededor */
 }
 
-div.container-paginacion{
+div.container-paginacion {
+  text-align: center;
   margin-top: 1%;
 }
 
