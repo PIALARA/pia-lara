@@ -57,7 +57,7 @@ def client_tag():
     else:
         tags_menos_grabadas = sample(tags_audios_menos_grabadas, 5)
 
-    tags_aleatorio = sample(list(set(todos_tags),5))
+    tags_aleatorio = sample(list(set(todos_tags)),5)
 
     return render_template('audios/client_tag.html', tags_suerte=tags_suerte, tags_menos=tags_menos_grabadas, tags3=tags_aleatorio)
 
