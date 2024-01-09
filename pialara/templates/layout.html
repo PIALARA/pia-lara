@@ -22,11 +22,9 @@
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/style_cliente.css') }}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" />
   
-
   <!-- LARA v240323 -->
   <title>PIA FP Lara</title>
   <script>
-
        document.addEventListener("DOMContentLoaded", function() {
             // Obtener el valor de la variable de sesión 'font_size'
             const fontSize = "{{ session['font_size'] }}em"; 
@@ -34,7 +32,6 @@
             // Aplicar el tamaño de fuente al cuerpo (body)
             document.body.style.fontSize = fontSize;
         });
-        
   </script>
 </head>
 
@@ -48,14 +45,6 @@
           <button class="btn btn-secondary d-block d-sm-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#demo">
             <i class="bi bi-list"></i>
           </button>
-        </div>
-
-        <div class="accessibility-bar">
-          <!-- Botones para cambiar el esquema de color -->
-          <button class="button default-scheme" onclick="changeColorScheme('contrast-default')" aria-label="Color por Defecto">R</button>
-          <button class="button contrast-1" onclick="changeColorScheme('contrast-1')" aria-label="Alto Contraste 1">A</button>
-          <button class="button contrast-2" onclick="changeColorScheme('contrast-2')" aria-label="Alto Contraste 2">A</button>
-          <button class="button contrast-3" onclick="changeColorScheme('contrast-3')" aria-label="Alto Contraste 3">A</button>
         </div>
 
         <!-- movil -->
@@ -79,6 +68,16 @@
             <a href="#">
               <h6 id="user" class="text-light">{{ current_user.nombre }} / <br /><i class="bi bi-person-fill"></i> <strong>{{ current_user.rol }}</strong> </h6>
             </a>
+
+            <div class="accessibility-bar">
+              <!-- Botones para cambiar el esquema de color -->
+              <button class="button default-scheme" onclick="changeColorScheme('contrast-default')" title="Color por defecto (Reset)" aria-label="Color por Defecto">R</button>
+              <button class="button contrast-1" onclick="changeColorScheme('contrast-1')" title="Alto Contraste 1" aria-label="Alto Contraste 1">A</button>
+              <button class="button contrast-2" onclick="changeColorScheme('contrast-2')" title="Alto Contraste 2" aria-label="Alto Contraste 2">A</button>
+              <button class="button contrast-3" onclick="changeColorScheme('contrast-3')" title="Alto Contraste 3" aria-label="Alto Contraste 3">A</button>
+              <br /><br />
+            </div>
+
             <a href="{{ url_for('auth.logout') }}">
               <h5 id="logout" class="text-light"><i class="bi bi-box-arrow-left"></i> Salir</h5>
             </a>
@@ -114,9 +113,20 @@
             {% endif %}
           </ul>
           <div class="pb-3 text-white text-decoration-none pt-5 text-center">
+
+            <div class="accessibility-bar">
+              <!-- Botones para cambiar el esquema de color -->
+              <button class="button default-scheme" onclick="changeColorScheme('contrast-default')" title="Color por defecto (Reset)" aria-label="Color por Defecto">R</button>
+              <button class="button contrast-1" onclick="changeColorScheme('contrast-1')" title="Alto Contraste 1" aria-label="Alto Contraste 1">A</button>
+              <button class="button contrast-2" onclick="changeColorScheme('contrast-2')" title="Alto Contraste 2" aria-label="Alto Contraste 2">A</button>
+              <button class="button contrast-3" onclick="changeColorScheme('contrast-3')" title="Alto Contraste 3" aria-label="Alto Contraste 3">A</button>
+              <br /><br />
+            </div>
+
             <a href="{{ url_for('users.update',id=current_user.id) }}">
               <h6 id="user" class="text-light">{{ current_user.nombre }} /<br /><i class="bi bi-person-fill"></i> <strong>{{ current_user.rol }}</strong> </h6>
             </a>
+
             <a href="{{ url_for('auth.logout') }}">
               <h5 id="logout" class="text-light"><i class="bi bi-box-arrow-left"></i> Salir</h5>
             </a>
