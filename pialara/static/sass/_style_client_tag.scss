@@ -33,3 +33,51 @@
   gap: 1rem;
   padding: 1rem;
 }
+
+// Tamaños de fuente para accesibilidad
+$font-size-small: 0.8em; // 80% del tamaño de fuente predeterminado
+$font-size-medium: 1em;  // 100% del tamaño de fuente predeterminado
+$font-size-large: 1.2em; // 120% del tamaño de fuente predeterminado
+
+// Clases de tamaño de texto
+.text-size-small {
+  font-size: $font-size-small;
+}
+
+.text-size-medium {
+  font-size: $font-size-medium;
+}
+
+.text-size-large {
+  font-size: $font-size-large;
+}
+
+// Aplica los estilos de tamaño de texto a los elementos relevantes
+.tags-form {
+  &.text-size-small {
+    font-size: $font-size-small;
+    
+    &__input,
+    &__button {
+      font-size: $font-size-small;
+    }
+  }
+
+  &.text-size-medium {
+    font-size: $font-size-medium;
+    
+    &__input,
+    &__button {
+      font-size: $font-size-medium;
+    }
+  }
+
+  &.text-size-large {
+    font-size: $font-size-large;
+    
+    &__input,
+    &__button {
+      font-size: $font-size-large;
+    }
+  }
+}

@@ -34,6 +34,7 @@ def login_post():
 
     # if user.rol == 'cliente':
     #     return redirect(url_for('audios.client_tag'))logged_rol = current_user.rol
+    session['font_size'] = user.font_size    
 
     return redirect(url_for('users.consent'))
 
@@ -52,6 +53,7 @@ def rec_password():
 @bp.route('/logout')
 @login_required
 def logout():
+    session.pop('font_size', None)
     logout_user()
     flash('Sesión cerrada con éxito', 'success')
     return redirect(url_for('auth.login'))

@@ -22,14 +22,14 @@ db = MongoClient(
 
 users = []
 
-with open('migrations/users_vk2324.csv') as csv_file:
-    csv_reader = csv.reader(csv_file, delimiter=';')
+with open('migrations/users_gv2324b.csv') as csv_file:
+    csv_reader = csv.reader(csv_file, delimiter=',')
     for fila in csv_reader:
 
         linea = {
             "fecha_nacimiento": datetime(2000, 1, 1),
             "mail": fila[0],
-            "password": generate_password_hash("vk.com", method='sha256'),
+            "password": generate_password_hash("gv.com", method='sha256'),
             "rol": "tecnico",
             "nombre": fila[1],
             "sexo": fila[2],

@@ -1,8 +1,15 @@
+document.addEventListener('DOMContentLoaded', () => {
+
 const recordButton = document.querySelector('.record-button');
 const recordedAudio = document.querySelector('#recorded-audio');
 const spinner = document.querySelector('#spinner');
 const canvas = document.querySelector('.visualizer');
 const $sendButton = $("#send-button");
+
+//botones audio
+const speedButtonsContainer = document.querySelector('.speed-buttons');
+const speedButtons = document.querySelectorAll('.speed-button');
+//fin botones audio
 
 let audioChunks = [];
 let generalBlob = '';
@@ -25,6 +32,16 @@ function handlerFunction(stream) {
             recordedAudio.controls = true;
             recordedAudio.src = url;
             generalBlob = blob;
+
+            //botones audio //Mostrar los botones una vez se grabe el audio y funcionen
+            speedButtonsContainer.style.display = 'flex';
+            speedButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const speedFactor = parseFloat(button.dataset.speed); // Obtener la velocidad desde el atributo 'data-speed'
+                    recordedAudio.playbackRate = speedFactor;
+                  });
+            })
+            //fin botones audio
         }
     });
 }
@@ -170,3 +187,4 @@ function visualize(stream) {
         canvasCtx.stroke();
     }
 }
+})

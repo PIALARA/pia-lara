@@ -70,9 +70,13 @@ aws_secret_access_key=secret_aws
 aws_session_token=token_aws
 ```
 
+!!! caution "Cuidado"
+    Revisar versión de Python y librería BSON.
+    PyMongo instala su propia versión de BSON que evita los errores.
+
 ## Estructura de la aplicación
 
-El código principal de la aplicación está en el directorio pialara.
+El código principal de la aplicación está en el directorio `pialara`.
 
 ### Blueprints
 

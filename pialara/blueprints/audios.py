@@ -57,7 +57,7 @@ def client_tag():
     else:
         tags_menos_grabadas = sample(tags_audios_menos_grabadas, 5)
 
-    tags_aleatorio = sample(set(todos_tags),5)
+    tags_aleatorio = sample(list(set(todos_tags),5))
 
     return render_template('audios/client_tag.html', tags_suerte=tags_suerte, tags_menos=tags_menos_grabadas, tags3=tags_aleatorio)
 
@@ -118,7 +118,7 @@ def save_record():
     filename = str(current_user.id) + '_' + str(timestamp) + '.wav'
 
     # # Guardado en S3
-    s3c = boto3.client(
+    """s3c = boto3.client(
         's3',
         region_name='eu-south-2',
         aws_access_key_id=current_app.config["AWS_ACCESS_KEY_ID"],
@@ -126,7 +126,7 @@ def save_record():
         # aws_session_token=current_app.config["AWS_SESSION_TOKEN"]
     )
 
-    s3c.upload_fileobj(file, current_app.config["BUCKET_NAME"], filename)
+    s3c.upload_fileobj(file, current_app.config["BUCKET_NAME"], filename)"""
 
     text_id = request.form.get('text_id')
     text_text = request.form.get('text_text')

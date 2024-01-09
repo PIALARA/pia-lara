@@ -6,7 +6,7 @@ body {
 }
 
 body {
-  background-image: linear-gradient(to top, #fff 20%, #f3f2f1);
+  /*background-image: linear-gradient(to top, #fff 20%, #f3f2f1);*/
 }
 
 * {
@@ -23,7 +23,7 @@ body {
 
 .header {
   width: 100%;
-  max-width: 700px;
+  max-width: 600px;
   margin-inline: auto;
 }
 .header ul {
@@ -99,6 +99,36 @@ body {
   opacity: 0.7;
 }
 
+/*Tipos de contrastes*/
+.contrast-default {
+  background-image: linear-gradient(to top, #fff 20%, #f3f2f1);
+  color: #000;
+}
+
+.contrast-1 {
+  background-color: #000;
+  color: #ffff00;
+}
+
+.contrast-2 {
+  background-color: #fff;
+  color: #0000ff;
+}
+
+.contrast-3 {
+  background-color: #000;
+  color: #00ff00;
+}
+
+body.contrast-1 a, body.contrast-1 button,
+body.contrast-2 a,
+body.contrast-2 button,
+body.contrast-3 a,
+body.contrast-3 button {
+  border-color: inherit;
+  color: inherit;
+}
+
 .tags-form {
   max-width: 30rem;
   margin-inline: auto;
@@ -131,6 +161,7 @@ body {
   gap: 1rem;
   padding: 1rem;
 }
+
 
 .syllabus {
   width: 50rem;
@@ -202,6 +233,7 @@ body {
   align-items: center;
   gap: 1.5rem;
 }
+
 .audio audio {
   height: 60px;
 }
@@ -278,14 +310,6 @@ div.container-paginacion {
 }
 
 /* Estilo para los formularios y enlaces */
-.paginacion {
-  background-color: gainsboro;
-  color: black;
-  padding: .3rem .8rem;
-  text-align: center; /* Centra el contenido horizontalmente */
-  border-radius: 20%;
-}
-
 .paginacion:hover {
   background-color: grey; /* Color de fondo al hacer hover */
   color: inherit;
@@ -297,6 +321,127 @@ div.container-paginacion {
 
 .b-actual {
   color: white;
+}
+
+/* Estilo para los enlaces */
+.enl_pag {
+  text-decoration: none; /* Elimina el subrayado del enlace */
+  color: inherit; /* Usa el color de texto del elemento padre */
+}
+
+.accessibility-bar button {
+  /* Estilos base para los botones */
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  /* Otros estilos que desees aplicar */
+}
+
+body.contrast-1 .button {
+    background-color: #ffff00;
+    color: #000;
+    border-color: #000;
+  }
+  
+body.contrast-1 .button:hover,
+.accessibility-bar button.contrast-3:hover {
+    background-color: #000;
+    color: #ffff00;
+    border-color: #ffff00;
+  }
+
+body.contrast-2 .button {
+    background-color: #0000ff;
+    color: #fff;
+    border-color: #fff;
+  }
+  
+body.contrast-2 .button:hover,
+.accessibility-bar button.contrast-2:hover {
+  background-color: #fff;
+  color: #0000ff;
+  border-color: #0000ff;
+  }
+
+body.contrast-3 .button {
+  background-color: #00ff00;
+  color: #000;
+  border-color: #000;
+  }
+  
+body.contrast-3 .button:hover,
+.accessibility-bar button.contrast-3:hover {
+  background-color: #000;
+  color: #00ff00;
+  border-color: #00ff00;
+  }
+
+/*botones audio*/
+.speed-buttons {
+  display: none; /* Ocultar los botones inicialmente */
+  /*margin-top: 10px; /* Ajustar según sea necesario */
+}
+
+.speed-button {
+  margin-right: 10px;
+  padding: 8px 12px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.speed-button:hover {
+  background-color: #45a049; 
+}
+
+/* Estilo para el contenedor */
+div.pagination-container {
+  text-align: center; /* Centra los elementos */
+  margin: 10px 0; /* Agrega un poco de margen alrededor */
+}
+
+div.container-paginacion {
+  text-align: center;
+  margin-top: 1%;
+}
+
+/* Estilo para los formularios y enlaces */
+.paginacion {
+  display: inline-block; /* Muestra los elementos en línea */
+  margin-right: 0.5%; /* Espaciado entre elementos */
+  margin-bottom: 0.5%;
+
+  width: 30px; /* Ancho del cuadrado */
+  height: 30px; /* Alto del cuadrado */
+  line-height: 30px; /* Centra el contenido verticalmente */
+  text-align: center; /* Centra el contenido horizontalmente */
+  border: 1px solid #ddd; /* Borde opcional */
+  border-radius: 20%;
+}
+
+.paginacion:hover {
+  background-color: grey; /* Color de fondo al hacer hover */
+}
+
+.pag-actual{
+  background-color: #333;
+}
+
+.b-actual{
+  color: white;
+}
+
+/* Estilo para los botones dentro de los formularios */
+#pagina {
+  background: none; /* Elimina el fondo predeterminado */
+  border: none; /* Elimina el borde predeterminado */
+  padding: 0; /* Elimina el relleno predeterminado */
+  margin: 0; /* Elimina los márgenes predeterminados */
+  font: inherit; /* Utiliza la fuente del elemento padre */
+  cursor: pointer; /* Cambia el cursor para indicar que es clickeable */
 }
 
 /* Estilo para los enlaces */

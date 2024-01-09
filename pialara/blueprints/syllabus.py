@@ -1,5 +1,4 @@
 from datetime import datetime
-import math
 from bson.objectid import ObjectId
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
@@ -12,13 +11,24 @@ from pialara.models.Clicks import Clicks
 bp = Blueprint("syllabus", __name__, url_prefix="/syllabus")
 
 
-@bp.route("/", methods=["GET"])
-@login_required
+@bp.route("/")
 def index():
-    tag_name = request.args.get("tagName") or ""
-    tag_date_since = request.args.get("tagDateSince") or ""
-    tag_date_to = request.args.get("tagDateTo") or ""
-    current_page = int(request.args.get("page") or 1)
+    syllabus = Syllabus()
+    frases = syllabus.find()
+    pipeline = [
+
+    ]
+
+    return render_template("syllabus/index.html", syllabus=frases, tag_name="")
+
+
+@bp.route('/', methods=['POST'])
+@login_required
+def tag():
+    tag_name = request.form.get('tagName')
+
+    if tag_name == "":
+        return render_template('syllabus/index.html', syllabus=syllabus.find(), tag_name=tag_name)
 
     syllabus = Syllabus()
     match_filter = {}
@@ -32,10 +42,10 @@ def index():
                 ]
             }
         )
-
+        
     # Agregamos un campo nuevo $expr para poder hacer un $and con los filtros de fecha
     match_filter.update({"$expr": {"$and": []}})
-
+    
     if tag_date_since != "":
         match_filter["$expr"]["$and"].append(
             {
@@ -103,19 +113,9 @@ def index():
         "usuario": current_user.email,
         "timestamp": datetime.now(),
     }
-    clicks.insert_one(click_doc)
+    clicks.insert_one(click_doc)    
 
-    return render_template(
-        "syllabus/index.html",
-        syllabus=documentos,
-        tag_name=tag_name,
-        page=current_page,
-        pages_min=pages_min,
-        pages_max=pages_max,
-        total_pages=total_pages,
-        tag_date_since=tag_date_since,
-        tag_date_to=tag_date_to,
-    )
+    return render_template('syllabus/index.html', syllabus=frases, tag_name=tag_name)
 
 
 @bp.route("/create")
