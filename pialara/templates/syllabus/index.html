@@ -39,7 +39,9 @@
         </section>
     </article>
     {% endfor %}
+</section>
 
+<div class="container-paginacion">
     {% if pages_max > 1 %}
     <article class="container-paginacion mt-5 w-150">
         <a href="/syllabus?page=1&tagName={{tag_name}}&tagDateSince={{tag_date_since}}&tagDateTo={{tag_date_to}}"
@@ -61,6 +63,6 @@
             class="paginacion">▶▶</a>
     </article>
     {% endif %}
-</section>
+</div>
 
 {% endblock %}

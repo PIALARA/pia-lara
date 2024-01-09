@@ -310,6 +310,14 @@ div.container-paginacion {
 }
 
 /* Estilo para los formularios y enlaces */
+.paginacion {
+  background-color: gainsboro;
+  color: black;
+  padding: .3rem .8rem;
+  text-align: center; /* Centra el contenido horizontalmente */
+  border-radius: 20%;
+}
+
 .paginacion:hover {
   background-color: grey; /* Color de fondo al hacer hover */
   color: inherit;
@@ -424,6 +432,7 @@ div.container-paginacion {
 
 .paginacion:hover {
   background-color: grey; /* Color de fondo al hacer hover */
+  color: 
 }
 
 .pag-actual{
