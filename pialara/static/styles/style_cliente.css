@@ -80,6 +80,8 @@ body {
   border-radius: 50px;
   transition: ease-in-out all 0.3s;
   cursor: pointer;
+  margin-right: 10px;
+  margin-bottom: 10px;
 }
 
 .button:hover {

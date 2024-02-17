@@ -1,6 +1,7 @@
 import os.path
 import boto3
 import random
+from flask import json
 
 import bson.objectid
 from flask import current_app
@@ -21,6 +22,7 @@ from datetime import datetime
 from random import sample
 
 bp = Blueprint('audios', __name__, url_prefix='/audios')
+
 
 @bp.route('/client-tag')
 @login_required
@@ -230,3 +232,30 @@ def tag_search():
         flash("No se han encontrado resultados de la etiqueta '" + tag_name + "'", "danger")
 
     return render_template('audios/client_tag.html', tags=tags, tag_name=tag_name)
+
+
+@bp.route('/client-my-records')
+@login_required
+def client_my_records():
+    user_id = current_user.id
+    audio = Audios()
+
+    pipeline = [
+    # Filtrar documentos por el id del usuario si es necesario
+    {'$match': {'usuario.id': user_id}},
+    # Agrupar documentos por el campo 'tag'
+    {'$group': {
+        '_id': '$texto.tag',  # Campo por el cual agrupar
+        'count': {'$sum': 1}  # Contar las ocurrencias de cada grupo
+    }},
+    # Proyectar el resultado en el formato deseado
+    {'$project': {
+        '_id': 1,
+        'count': 1
+    }}
+    ]
+
+    # Ejecutar la consulta de agregación
+    results = list(audio.aggregate(pipeline))
+
+    return render_template('audios/client_my_records.html', results=results)

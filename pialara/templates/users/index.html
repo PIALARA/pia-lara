@@ -12,11 +12,52 @@
   {% endif %}
 {% endwith %}
 
+<script>
+  document.addEventListener('DOMContentLoaded', (event) => {
+    
+    // Función para mostrar la tabla correspondiente
+    function showTable(tableId) {
+      // Oculta todas las tablas
+      document.querySelectorAll('.table').forEach(table => {
+        table.classList.add('d-none');
+      });
+      // Muestra la tabla seleccionada
+      document.getElementById(tableId).classList.remove('d-none');
+    }
+
+    let admins = document.getElementById('admin-tab');
+    let techs = document.getElementById('tech-tab');
+    let clients = document.getElementById('client-tab');
+  
+    // Asigna eventos de clic a las pestañas
+    admins.addEventListener('click', () => {
+      showTable('administradores-table');
+      admins.classList.add('active');
+      techs.classList.remove('active');
+      clients.classList.remove('active');
+    });
+    techs.addEventListener('click', () => {
+      showTable('tecnicos-table');
+      techs.classList.add('active');
+      admins.classList.remove('active');
+      clients.classList.remove('active');
+    });
+    clients.addEventListener('click', () => {
+      showTable('clientes-table');
+      clients.classList.add('active');
+      techs.classList.remove('active');
+      admins.classList.remove('active');
+    });
+  });
+</script>
+  
+
 <h1 class="m-2 text-center">Lista de usuarios</h1>
 
-<a href="/users/create" class="btn btn-success m-2">
+<a href="/users/create" class="btn btn-success">
   <i class="bi bi-plus-square"></i>&nbsp;&nbsp;&nbsp;Añadir Usuario</a>
 
+  {% if logged_rol == 'admin' %}
   <form class="container pb-4" style="max-width: 25rem" method="post">
     <div class="input-group">
       <input type="search" name="userName" class="form-control" placeholder="Buscar usuarios..." aria-label="Buscar usuarios..."
@@ -24,54 +65,169 @@
       <button class="btn btn-primary" type="submit" id="button-search"><i class="bi bi-search me-2"></i>Buscar</button>
     </div>
   </form>
+  {% endif %}
+  
 
+<!-- Contenedor de los tabs -->
+{%if logged_rol != 'tecnico'%}
+<div class="container">
+  <ul class="nav nav-tabs justify-content-center">
+    <li class="nav-item">
+      <a class="nav-link active" id="admin-tab" href="#"><i class="bi bi-gear"></i> Administradores</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="tech-tab" href="#"><i class="bi bi-journals"></i> Técnicos</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="client-tab" href="#"><i class="bi bi-person"></i> Clientes</a>
+    </li>
+  </ul>
+</div>
+{% endif %}
+
+<!-- Línea para todo el ancho de la página -->
+<div class="w-100" background-color: #dee2e6;"></div>
   <section class="container d-flex flex-wrap justify-content-center gap-3">
-    {% for user in users %}
-      <article class="card shadow-sm" style="width: 20rem">
-        <header class="card-header">{{ user.nombre }} / 
-          {% if user.sexo == "H" %}
-          <i class="bi bi-gender-male me-2" title="Hombre"></i>
-          {% elif user.sexo == "M" %}
-          <i class="bi bi-gender-female me-2" title="Mujer"></i>
-          {% elif user.sexo == "A" %}
-          <i class="bi bi-gender-ambiguous me-2" title="Ambiguo"></i>
-          {% elif user.sexo == "T" %}
-          <i class="bi bi-gender-trans me-2" title="Trans"></i>
-          {% endif %}
-        </header>
-        <section class="card-body d-flex flex-column">
-          <p class="card-text mb-1">
-            <i class="bi bi-envelope-at me-2"></i>{{ user.mail }}
-          </p>
-          {% if user.rol == "cliente" %}
-            <p class="card-text mb-1">
-              <i class="bi bi-geo-alt me-2"></i>{{ user.provincia }}
-            </p>
-            {% if user.enfermedades %}
-            <p class="card-text mb-1">
-              <i class="bi bi-file-medical me-2"></i>{{ user.enfermedades|join(', ') }}
-            </p>
-            {% endif %}
-            {% if user.dis %}
-            <p class="card-text mb-1">
-              <i class="bi bi-megaphone me-2"></i>{{ user.dis|join(', ') }}
-            </p>
-            {% endif %}
-            <p class="card-text mb-1">
-              <i class="bi bi-music-note me-2"></i>{{ user.cant_audios }}
-            </p>
-          {% endif %}
-          <p class="card-text mb-1">
-            <i class="bi bi-clock me-2"></i>{{ user.ultima_conexion.strftime('%d/%m/%Y - %H:%M') }}
-          </p>
-            <p class = "card-text mb-3 tipo_{{ user.rol }}" >
-                <i class="bi bi-person"></i>  {{ user.rol }}
-            </p>
-          <a href="{{ url_for('users.update',id=user._id) }}" class="btn btn-primary align-self-start mt-auto">
-            <i class="bi bi-pencil me-2"></i>Editar
-          </a>
-        </section>
-      </article>
-    {% endfor %}
+    <table class="table table-hover">
+      <div class="container d-flex flex-wrap justify-content-center gap-3">
+        <!-- Rol Administradores -->
+        {% if logged_rol == 'admin' %}
+          <!-- Tabla para Administradores -->
+          <table class="table table-hover table-striped" id="administradores-table">
+            <thead>
+              <tr>
+                <th scope="col"><i class="bi bi-person-fill"></i> Nombre</th>
+                <th scope="col"><i class="bi bi-envelope-fill"></i> Correo</th>
+                <th scope="col"><i class="bi bi-clock-fill"></i> Última conexión</th>
+                <th scope="col"></th>
+                
+              </tr>
+            </thead>
+            <tbody>
+              {% if users[0]|length > 0 %}
+                {% for user in users[0] %}
+                  <tr>
+                    <td>{{ user.nombre }}</td>
+                    <td>{{ user.mail }}</td>
+                    <td>{{ user.ultima_conexion }}</td>
+                    <td>
+                      <a class="bi bi-pencil-fill" href="{{ url_for('users.update',id=user._id) }}"></a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="3" class="text-center">No hay ningún administrador que coincida con la búsqueda</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+
+          <!-- Tabla para Técnicos -->
+          <table class="table table-hover table-striped d-none" id="tecnicos-table">
+            <thead>
+              <tr>
+                <th scope="col"><i class="bi bi-person-fill"></i> Nombre</th>
+                <th scope="col"><i class="bi bi-envelope-fill"></i> Correo</th>
+                <th scope="col"><i class="bi bi-clock-fill"></i> Última conexión</th>
+                <th scope="col"></th>
+
+              </tr>
+            </thead>
+            <tbody>
+              {% if users[1]|length > 0 %}
+                {% for user in users[1] %}
+                  <tr>
+                    <td>{{ user.nombre }}</td>
+                    <td>{{ user.mail }}</td>
+                    <td>{{ user.ultima_conexion }}</td>
+                    <td>
+                      <a class="bi bi-pencil-fill" href="{{ url_for('users.update',id=user._id) }}"></a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="3" class="text-center">No hay ningún técnico que coincida con la búsqueda</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>  
+          <!-- Tabla para Clientes -->
+          <table class="table table-hover table-striped d-none" id="clientes-table">
+            <thead>
+              <tr>
+                <th scope="col"><i class="bi bi-person-fill"></i> Nombre</th>
+                <th scope="col"><i class="bi bi-envelope-fill"></i> Correo</th>
+                <th scope="col"><i class="bi bi-geo-alt-fill"></i> Provincia</th>
+                <th scope="col"><i class="bi bi-clipboard2-pulse-fill"></i> Enfermedades</th>
+                <th scope="col"><i class="bi bi-soundwave"></i> Disfonías</th>
+                <th scope="col"><i class="bi bi-mic-fill"></i> Número de audios</th>
+                <th scope="col"><i class="bi bi-clock-fill"></i> Última conexión</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+                {% if users[2]|length > 0 %}
+                  {% for user in users[2] %}
+                  <tr>
+                    <td>{{user.nombre}}</td>
+                    <td>{{user.mail}}</td>
+                    <td>{{user.provincia}}</td>
+                    <td>{{user.enfermedades|join(', ') }}</td>
+                    <td>{{user.dis|join(', ') }}</td>
+                    <td>{{user.cant_audios}}</td>
+                    <td>{{user.ultima_conexion}}</td>
+                    <td>
+                      <a class="bi bi-pencil-fill" href="{{ url_for('users.update',id=user._id) }}"></a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="7" class="text-center">No hay ningún cliente que coincida con la búsqueda</td>
+                  </tr>
+                {% endif %}
+            </tbody>
+          </table>
+        {%endif%}
+
+      <!-- Rol Técnico-->
+      {% if logged_rol == 'tecnico' %}
+        <table class="table table-hover table-striped id="clientes-tecnico-table">
+          <thead>
+            <tr>
+              <th scope="col"><i class="bi bi-person-fill"></i> Nombre</th>
+                <th scope="col"><i class="bi bi-envelope-fill"></i> Correo</th>
+                <th scope="col"><i class="bi bi-geo-alt-fill"></i> Provincia</th>
+                <th scope="col"><i class="bi bi-clipboard2-pulse-fill"></i> Enfermedades</th>
+                <th scope="col"><i class="bi bi-soundwave"></i> Disfonías</th>
+                <th scope="col"><i class="bi bi-mic-fill"></i> Número de audios</th>
+                <th scope="col"><i class="bi bi-clock-fill"></i> Última conexión</th>
+                <th scope="col"></th>
+
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+              <tr>
+                <td>{{user.nombre}}</td>
+                <td>{{user.mail}}</td>
+                <td>{{user.provincia}}</td>
+                <td>{{user.enfermedades|join(', ')}}</td>
+                <td>{{user.dis|join(', ')}}</td>
+                <td>{{user.cant_audios}}</td>
+                <td>{{user.ultima_conexion}}</td>
+                <td>
+                  <a class="bi bi-pencil-fill" href="{{ url_for('users.update',id=user._id) }}"></a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {%endif%}
+      </div>
+    </table>
   </section>
+
 {% endblock %}

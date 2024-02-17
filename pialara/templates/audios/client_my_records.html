@@ -1,0 +1,53 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+
+  <header class="header">
+    <h1 class="text-center">Mis grabaciones por etiqueta</h1>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <section>
+    
+
+    {% if results %}
+    <div class="container d-flex justify-content-center gap-3">
+      <fieldset>
+        <table class="table table-hover table-striped table-bordered" style="margin-top: 50px; text-align: center;" id="tag-table">
+            <thead>
+              <tr>
+                <th scope="col"><i class="bi bi-tag-fill"></i> Tag</th>
+                <th scope="col"><i class="bi bi-mic-fill"></i> Audios grabados</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% if results|length > 0 %}
+              {% for tag in results %}
+                  <tr>
+                    <td>{{ tag._id }}</td>
+                    <td>{{ tag.count }}</td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                    <td colspan="2" class="text-center">No hay ninguna grabación</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+      </fieldset>
+    </div>
+    {% endif %}
+
+  </section>
+{% endblock %}
