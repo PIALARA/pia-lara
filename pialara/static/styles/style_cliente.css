@@ -318,10 +318,6 @@ div.container-paginacion {
   border-radius: 20%;
 }
 
-.paginacion:hover {
-  background-color: grey; /* Color de fondo al hacer hover */
-  color: inherit;
-}
 
 .pag-actual {
   background-color: #333;
@@ -418,7 +414,6 @@ div.container-paginacion {
 
 /* Estilo para los formularios y enlaces */
 .paginacion {
-  display: inline-block; /* Muestra los elementos en línea */
   margin-right: 0.5%; /* Espaciado entre elementos */
   margin-bottom: 0.5%;
 
@@ -431,8 +426,7 @@ div.container-paginacion {
 }
 
 .paginacion:hover {
-  background-color: grey; /* Color de fondo al hacer hover */
-  color: 
+  background-color: grey; /* Color de fondo al hacer hover */ 
 }
 
 .pag-actual{
