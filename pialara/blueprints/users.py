@@ -12,6 +12,7 @@ from flask import (
 from flask_login import login_required, current_user
 from pialara.decorators import rol_required
 from pialara.models.Usuario import Usuario
+from pialara.models.grapyAudioUser import AudioModel
 from pialara.models.Enfermedades import Enfermedades
 from pialara.models.Disfonias import Disfonias
 from pialara.decorators import rol_required
@@ -24,6 +25,7 @@ bp = Blueprint('users', __name__, url_prefix='/users')
 def index():
     u = Usuario()
 
+    audio_results_model=[]
     users = []
     logged_rol = current_user.rol
     url = 'users/index.html'
@@ -32,10 +34,15 @@ def index():
         users = u.find()
     elif logged_rol == "tecnico":
         users = u.find({"rol": {"$eq": 'cliente'}, "parent": {"$eq": current_user.email}})
+        audio_results_model = AudioModel.execute_aggregation()
+        for user in users:
+            if user.id=='6458fe5a06270c878ce1e68a':
+                user.audios=[3,20,50]
+            
     else:
         return redirect(url_for('audios.client_tag'))
 
-    return render_template(url, users=users, user_name='')
+    return render_template(url, users=users, audio_results_model=audio_results_model ,user_name='')
 
 
 @bp.route('/', methods=['POST'])
