@@ -1,5 +1,5 @@
 import certifi as certifi
-from bson.objectid import ObjectId
+#from bson.objectid import ObjectId
 from flask import current_app, g
 from pymongo import ASCENDING
 from pymongo import MongoClient
