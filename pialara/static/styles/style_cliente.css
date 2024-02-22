@@ -4,11 +4,6 @@ body {
   margin: 0;
   font-family: "Zilla Slab", serif;
 }
-
-body {
-  /*background-image: linear-gradient(to top, #fff 20%, #f3f2f1);*/
-}
-
 * {
   box-sizing: border-box;
 }
