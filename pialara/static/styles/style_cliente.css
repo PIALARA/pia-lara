@@ -448,4 +448,10 @@ div.container-paginacion {
   color: inherit; /* Usa el color de texto del elemento padre */
 }
 
+.accordion{
+  max-width: 50%;
+  margin: 0 auto;
+  margin-bottom: 50px ;
+}
+
 /*# sourceMappingURL=style_cliente.css.map */
