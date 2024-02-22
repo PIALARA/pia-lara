@@ -17,6 +17,81 @@
 <a href="/users/create" class="btn btn-success m-2">
   <i class="bi bi-plus-square"></i>&nbsp;&nbsp;&nbsp;Añadir Usuario</a>
 
+
+  <div class="accordion" id="chartsAccordion">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingOne">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+          Conexiones por día <span style="margin-left: 10px;">(Hoy: {{ conexiones_hoy }})</span>
+        </button>
+      </h2>
+      <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#chartsAccordion">
+        <div class="accordion-body">
+          <canvas id="myChart"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingTwo">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          Distribución de Roles
+        </button>
+      </h2>
+      <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#chartsAccordion">
+        <div class="accordion-body" style="width:300px; height:300px; margin:auto;">
+          <canvas id="rolesChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          var ctx = document.getElementById('myChart').getContext('2d');
+          var labels = JSON.parse('{{ labels | safe }}');
+          var data = JSON.parse('{{ data | safe }}');
+          var myChart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                  labels: labels,
+                  datasets: [{
+                      label: 'Conexiones por día',
+                      data: data,
+                      backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                      borderColor: 'rgba(255, 99, 132, 1)',
+                      borderWidth: 1
+                  }]
+              },
+              options: {
+                  scales: {
+                      yAxes: [{
+                          ticks: {
+                              beginAtZero: true
+                          }
+                      }]
+                  }
+              }
+          });
+      });
+
+
+      var ctxRoles = document.getElementById('rolesChart').getContext('2d');
+      var labelsRoles = JSON.parse('{{ labels_roles | safe }}');
+      var dataRoles = JSON.parse('{{ data_roles | safe }}');
+      var rolesChart = new Chart(ctxRoles, {
+          type: 'pie',
+          data: {
+              labels: labelsRoles,
+              datasets: [{
+                  data: dataRoles,
+              }]
+          },
+          options: {}
+      });
+</script>
+
+
+
   <form class="container pb-4" style="max-width: 25rem" method="post">
     <div class="input-group">
       <input type="search" name="userName" class="form-control" placeholder="Buscar usuarios..." aria-label="Buscar usuarios..."

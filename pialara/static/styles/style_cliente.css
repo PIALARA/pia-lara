@@ -4,11 +4,6 @@ body {
   margin: 0;
   font-family: "Zilla Slab", serif;
 }
-
-body {
-  /*background-image: linear-gradient(to top, #fff 20%, #f3f2f1);*/
-}
-
 * {
   box-sizing: border-box;
 }
@@ -451,6 +446,12 @@ div.container-paginacion {
 .enl_pag {
   text-decoration: none; /* Elimina el subrayado del enlace */
   color: inherit; /* Usa el color de texto del elemento padre */
+}
+
+.accordion{
+  max-width: 50%;
+  margin: 0 auto;
+  margin-bottom: 50px ;
 }
 
 /*# sourceMappingURL=style_cliente.css.map */

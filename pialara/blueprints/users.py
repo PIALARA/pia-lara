@@ -1,9 +1,11 @@
 from werkzeug.security import generate_password_hash
+from datetime import datetime, timedelta
 
 from datetime import datetime
 from bson.objectid import ObjectId
 from flask import Blueprint, render_template, request
 from urllib import request
+import json
 
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
@@ -34,8 +36,78 @@ def index():
         users = u.find({"rol": {"$eq": 'cliente'}, "parent": {"$eq": current_user.email}})
     else:
         return redirect(url_for('audios.client_tag'))
+    
+    # Filtramos por los ultimo 600 dias, en el caso de tener mas conexiones, bajaremos el nú
+    fecha_inicio = datetime.now() - timedelta(days=600)
 
-    return render_template(url, users=users, user_name='')
+    pipeline = [
+    {
+        "$match": {
+            "ultima_conexion": {"$gte": fecha_inicio}
+        }
+    },
+    {
+        "$addFields": {
+            "fechaUltimaConexion": {
+                "$dateToString": {"format": "%Y-%m-%d", "date": "$ultima_conexion"}
+            }
+        }
+    },
+    {
+        "$group": {
+            "_id": "$fechaUltimaConexion",
+            "totalConexiones": {"$sum": 1},
+            "ultimaConexion": {"$last": "$ultima_conexion"}
+        }
+    },
+    {"$sort": {"ultimaConexion": -1}}
+]
+       
+    resultados = list(u.aggregate(pipeline)) 
+      
+    pipeline_roles = [
+        {
+            "$group": {
+                "_id": "$rol",
+                "count": {"$sum": 1}
+            }
+        }
+    ]
+    resultados_roles = list(u.aggregate(pipeline_roles))
+    labels_roles = [resultado["_id"] for resultado in resultados_roles]
+    data_roles = [resultado["count"] for resultado in resultados_roles]    
+    
+    inicio_del_dia = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+
+    pipeline_hoy = [
+    {
+        "$match": {
+            "ultima_conexion": {"$gte": inicio_del_dia}
+        }
+    },
+    {
+        "$count": "conexiones_hoy"
+    }
+]
+    resultados_hoy = list(u.aggregate(pipeline_hoy))
+    conexiones_hoy = resultados_hoy[0].get('conexiones_hoy', 0) if resultados_hoy else 0
+
+
+    # Convertir los resultados a un formato adecuado para Chart.js
+    labels = [resultado["_id"] for resultado in resultados]
+    data = [resultado["totalConexiones"] for resultado in resultados]
+
+    # Convertir a JSON
+    labels_json = json.dumps(labels)
+    data_json = json.dumps(data)
+
+    labels_roles_json = json.dumps(labels_roles)
+    data_roles_json = json.dumps(data_roles)
+    
+    
+    count_con_hoy = json.dumps(resultados_hoy)
+    # Pasar los datos a la plantilla
+    return render_template(url, users=users, user_name='', labels=labels_json, data=data_json,labels_roles=labels_roles_json, data_roles=data_roles_json, conexiones_hoy=conexiones_hoy)
 
 
 @bp.route('/', methods=['POST'])
@@ -185,3 +257,42 @@ def consent():
     #    login_url = url_for('audios.client_tag')
 
     return render_template('users/consent.html', login_url=login_url)
+
+
+from flask import jsonify
+
+@bp.route('/dashboard')
+@login_required
+@rol_required(['admin', 'tecnico'])
+def dashboard():
+    u = Usuario()  # Asume esto te da acceso a tu colección de MongoDB
+
+    pipeline = [
+        {
+            "$addFields": {
+                "fechaUltimaConexion": {
+                    "$dateToString": {"format": "%Y-%m-%d", "date": "$ultima_conexion"}
+                }
+            }
+        },
+        {
+            "$group": {
+                "_id": "$fechaUltimaConexion",
+                "totalConexiones": {"$sum": 1},
+                "ultimaConexion": {"$last": "$ultima_conexion"}
+            }
+        },
+        {"$sort": {"ultimaConexion": -1}}
+    ]
+    
+    resultados = list(u.aggregate(pipeline))
+
+    # Convertir los resultados a un formato adecuado para Chart.js
+    labels = [resultado["_id"] for resultado in resultados]
+    data = [resultado["totalConexiones"] for resultado in resultados]
+
+    # Utiliza jsonify para asegurarse de que los datos están correctamente formateados como JSON
+    labels_json = jsonify(labels).get_data(as_text=True)
+    data_json = jsonify(data).get_data(as_text=True)
+
+    return render_template('users/dashboard.html', labels=labels_json, data=data_json)
