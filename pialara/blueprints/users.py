@@ -38,7 +38,6 @@ def index():
         users = u.find({"rol": {"$eq": 'cliente'}, "parent": {"$eq": current_user.email}})
          
         audio = AudioModel.execute_aggregation(current_user.email)
-        print(audio[1].user_id,audio[1].total_audios)
     else:
         return redirect(url_for('audios.client_tag'))
 
