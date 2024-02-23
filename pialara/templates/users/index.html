@@ -67,19 +67,16 @@
             <p class = "card-text mb-3 tipo_{{ user.rol }}" >
                 <i class="bi bi-person"></i>  {{ user.rol }}
             </p>
+            {{ user._id }}
             <div style="width:80%;">
               <canvas id="audioChart_{{ user._id }}"></canvas>
           </div>
             <script>
               // Generate random data for 4 weeks
-              var weeks = ['Week 1', 'Week 2', 'Week 3'];
+              var weeks = ['Mes 1', 'Mes 2', 'Mes 3'];
               var audioData = [
-                        {% if user.audios %}
-                              {user.audios}
-                        {% else %}
-                            1,5,10
-                        {% endif %}
-                    ]
+                      {{ audio[user._id] }}
+           ]
 
       
               // Create a new Chart

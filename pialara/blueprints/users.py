@@ -25,7 +25,7 @@ bp = Blueprint('users', __name__, url_prefix='/users')
 def index():
     u = Usuario()
 
-    audio_results_model=[]
+    audio={}
     users = []
     logged_rol = current_user.rol
     url = 'users/index.html'
@@ -34,15 +34,11 @@ def index():
         users = u.find()
     elif logged_rol == "tecnico":
         users = u.find({"rol": {"$eq": 'cliente'}, "parent": {"$eq": current_user.email}})
-        audio_results_model = AudioModel.execute_aggregation()
-        for user in users:
-            if user.id=='6458fe5a06270c878ce1e68a':
-                user.audios=[3,20,50]
-            
+        audio = AudioModel.execute_aggregation()
     else:
         return redirect(url_for('audios.client_tag'))
-
-    return render_template(url, users=users, audio_results_model=audio_results_model ,user_name='')
+       
+    return render_template(url, users=users,audio=audio,user_name='')
 
 
 @bp.route('/', methods=['POST'])

@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+import numpy as np
 from bson import ObjectId
 from datetime import datetime, timedelta
 
@@ -10,11 +11,18 @@ class AudioModel:
 
     @classmethod
     def from_dict(cls, data):
-        return cls(
-            user_id=data['_id'],
-            month=None,  # Set to appropriate value based on your data structure
-            total_audios=data['audiosPorMes']
-        )
+        user_id = data['usuarioId']
+        month = []
+        audios = []
+
+        for i in range(len(data['audiosPorMes'])):
+            month.append(int(data['audiosPorMes'][i]["month"]))
+            audios.append(int(data['audiosPorMes'][i]["totalAudios"]))
+
+        month_array = np.array(month)
+        audios_array = ",".join(map(str, audios)) 
+
+        return cls(user_id, month_array, audios_array)
 
     def to_dict(self):
         return {
@@ -35,7 +43,8 @@ class AudioModel:
             {
                 "$match": {
                     "fecha": {
-                        "$gte": ninety_days_ago
+                        "$gte": ninety_days_ago,
+                        "$lte": datetime.now()
                     }
                 }
             },
@@ -98,15 +107,22 @@ class AudioModel:
         ]
 
         result = list(audios_collection.aggregate(pipeline))
+        print(result)
+        dataUsers={}
+        for data in result:
+            wow= AudioModel.from_dict(data)
+            dataUsers[wow.user_id]=wow.total_audios
+     
+# Ahora audio_results es un diccionario donde las claves son los ObjectIds convertidos a cadena
+# y los valores son listas asociativas con la información que necesitas.
 
-        audio_results = [sum(entry['totalAudios'] for entry in data['audiosPorMes']) for data in result]
 
 
 
 
 
 
-        return audio_results
+        return dataUsers
 
 
 
