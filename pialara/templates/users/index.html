@@ -26,6 +26,8 @@
   </form>
 
   <section class="container d-flex flex-wrap justify-content-center gap-3">
+    
+    
     {% for user in users %}
       <article class="card shadow-sm" style="width: 20rem">
         <header class="card-header">{{ user.nombre }} / 
@@ -67,11 +69,82 @@
             <p class = "card-text mb-3 tipo_{{ user.rol }}" >
                 <i class="bi bi-person"></i>  {{ user.rol }}
             </p>
+
+
+            <div style="width:80%;">
+              <canvas id="audioChart_{{ user._id }}"></canvas>
+          </div>
+          {% for a in audio %}
+            <script>
+             // Generate random data for 4 weeks
+    var weeks = ['Anterior', 'Pasado', 'Este Mes'];
+    var audioData = 
+    
+        {% if user._id==a.user_id %}
+              [{{a.total_audios}}]
+        {% endif %}
+
+   
+              // Create a new Chart
+              var ctx = document.getElementById('audioChart_{{ user._id }}').getContext('2d');
+              var audioChart = new Chart(ctx, {
+                  type: 'bar',
+                  data: {
+                      labels: weeks,
+                      datasets: [{
+                          label: 'Audios del usuario en el mes',
+                          data: audioData,
+                          fill: false,
+                          borderColor: 'rgba(54, 162, 235, 1)',
+                          borderWidth: 2,
+                          pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                          pointRadius: 3,
+                          pointHoverRadius: 7
+                      }]
+                  },
+                  options: {
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero: true,
+                      suggestedMin: 0, // Establecer el mínimo sugerido
+                      stepSize: 1
+                  }
+              }]
+          },
+          transitions: {
+            show: {
+              animations: {
+                x: {
+                  from: 0
+                },
+                y: {
+                  from: 0
+                }
+              }
+            },
+            hide: {
+              animations: {
+                x: {
+                  to: 0
+                },
+                y: {
+                  to: 0
+                }
+              }
+            }
+          }
+      }
+      
+              });
+          </script>
+          {% endfor %}
           <a href="{{ url_for('users.update',id=user._id) }}" class="btn btn-primary align-self-start mt-auto">
             <i class="bi bi-pencil me-2"></i>Editar
           </a>
         </section>
       </article>
+      
     {% endfor %}
   </section>
 {% endblock %}
