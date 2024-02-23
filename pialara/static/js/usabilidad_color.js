@@ -22,5 +22,21 @@ function changeColorScheme(scheme) {
     });
   });
   
+  function changeColorScheme(scheme) {
+    const colorClasses = ['contrast-default', 'contrast-1', 'contrast-2', 'contrast-3'];
+    
+    const elements = document.querySelectorAll('.card, .btn:not(.accessibility-bar button), .tags-form__button, .syllabus, .speed-button, .tag');
+    
+    elements.forEach(element => {
+        colorClasses.forEach(colorClass => {
+            element.classList.remove(colorClass); // Elimina las clases de contraste existentes
+        });
+        element.classList.add(scheme); // Añade la nueva clase de esquema de color a cada elemento
+    });
+    
+    localStorage.setItem('preferredColorScheme', scheme);
+  }
+  
+
 
   
