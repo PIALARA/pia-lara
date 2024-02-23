@@ -112,12 +112,73 @@ $color-text-default: #000;
 
 $color-background-contrast-1: #000;
 $color-text-contrast-1: #ffff00; // Amarillo sobre negro
+$color-border-contrast-1:#ffff00;
 
 $color-background-contrast-2: #fff;
 $color-text-contrast-2: #0000ff; // Azul sobre blanco
+$color-border-contrast-1:#0000ff;
 
 $color-background-contrast-3: #000;
 $color-text-contrast-3: #00ff00; // Verde sobre negro
+$color-border-contrast-1:#00ff00;
+
+// Clases de esquemas de color
+.contrast-default, .contrast-1, .contrast-2, .contrast-3 {
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.contrast-default {
+  background-color: $color-background-default;
+  color: $color-text-default;
+}
+
+.contrast-1 {
+  background-color: $color-background-contrast-1;
+  color: $color-text-contrast-1;
+  border-color: $color-border-contrast-1;
+  
+  // Especificaciones para hover
+  &:hover, .btn-success:hover, #send-button:hover {
+    background-color: $color-text-contrast-1;
+    color: $color-background-contrast-1;
+    border-color: $color-border-contrast-1;
+  }
+}
+
+.contrast-2 {
+  background-color: $color-background-contrast-2;
+  color: $color-text-contrast-2;
+  border-color: $color-border-contrast-2;
+  
+  &:hover, .btn-success:hover, #send-button:hover {
+    background-color: $color-text-contrast-2;
+    color: $color-background-contrast-2;
+    border-color: $color-border-contrast-2;
+  }
+}
+
+.contrast-3 {
+  background-color: $color-background-contrast-3;
+  color: $color-text-contrast-3;
+  border-color: $color-border-contrast-3;
+  
+  &:hover, .btn-success:hover, #send-button:hover {
+    background-color: $color-text-contrast-3;
+    color: $color-background-contrast-3;
+    border-color: $color-border-contrast-3;
+  }
+}
+
+// Uso de & para aplicar estilos dentro de los contextos de esquema específico
+body {
+  &.contrast-1, &.contrast-2, &.contrast-3 {
+    // Aplicación de estilos específicos para elementos bajo cada esquema de contraste
+    a, button {
+      border-color: inherit;
+      color: inherit;
+    }
+  }
+}
 
 // Clases de esquemas de color
 .contrast-default {
@@ -128,42 +189,21 @@ $color-text-contrast-3: #00ff00; // Verde sobre negro
 .contrast-1 {
   background-color: $color-background-contrast-1;
   color: $color-text-contrast-1;
+  border-color: $color-border-contrast-1;
 }
 
 .contrast-2 {
   background-color: $color-background-contrast-2;
   color: $color-text-contrast-2;
+  border-color: $color-border-contrast-2;
 }
 
 .contrast-3 {
   background-color: $color-background-contrast-3;
   color: $color-text-contrast-3;
+  border-color: $color-border-contrast-3;
 }
 
-// Aplica los estilos de esquema de color a los elementos relevantes
-body.contrast-1,
-body.contrast-2,
-body.contrast-3 {
-  // Aquí puedes sobrescribir estilos específicos para elementos cuando se aplique el esquema de color
-  // Ejemplo:
-  a, button {
-    border-color: inherit;
-    color: inherit;
-  }
-
-  // También puedes incluir estilos específicos que solo se aplican a ciertos esquemas
-  &.contrast-1 {
-    // Estilos específicos para el esquema de contraste 1
-  }
-
-  &.contrast-2 {
-    // Estilos específicos para el esquema de contraste 2
-  }
-
-  &.contrast-3 {
-    // Estilos específicos para el esquema de contraste 3
-  }
-}
 
 @import "style_client_tag";
 @import "style_client_audio";

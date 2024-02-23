@@ -81,47 +81,31 @@ body {
   border-color: #000;
 }
 
-#send-button {
+/*#send-button {
   background: #0d6efd !important;
   border-color: #0d6efd !important;
   color: #fff !important;
   font-weight: bold;
   display: none;
+}*/
+
+/*#send-button:disabled {
+  background: #ccc !important;
+  opacity: 0.7;
+}*/
+
+/* Prueba Modifacando la maxima prioridad !important*/
+#send-button {
+  background: #0d6efd;
+  border-color: #0d6efd;
+  color: #fff;
+  font-weight: bold;
+  display: none;
 }
 
 #send-button:disabled {
-  background: #ccc !important;
+  background: #ccc;
   opacity: 0.7;
-}
-
-/*Tipos de contrastes*/
-.contrast-default {
-  background-image: linear-gradient(to top, #fff 20%, #f3f2f1);
-  color: #000;
-}
-
-.contrast-1 {
-  background-color: #000;
-  color: #ffff00;
-}
-
-.contrast-2 {
-  background-color: #fff;
-  color: #0000ff;
-}
-
-.contrast-3 {
-  background-color: #000;
-  color: #00ff00;
-}
-
-body.contrast-1 a, body.contrast-1 button,
-body.contrast-2 a,
-body.contrast-2 button,
-body.contrast-3 a,
-body.contrast-3 button {
-  border-color: inherit;
-  color: inherit;
 }
 
 .tags-form {
@@ -337,45 +321,27 @@ div.container-paginacion {
   transition: background-color 0.3s, color 0.3s;
   /* Otros estilos que desees aplicar */
 }
+/* Estilos para los botones de accesibilidad */
+.scheme-default {
+  background-color: #f0f0f0;
+  color: #000;
+}
 
-body.contrast-1 .button {
-    background-color: #ffff00;
-    color: #000;
-    border-color: #000;
-  }
-  
-body.contrast-1 .button:hover,
-.accessibility-bar button.contrast-3:hover {
-    background-color: #000;
-    color: #ffff00;
-    border-color: #ffff00;
-  }
+.scheme-1 {
+  background-color: #000;
+  color: #ffff00;
+}
 
-body.contrast-2 .button {
-    background-color: #0000ff;
-    color: #fff;
-    border-color: #fff;
-  }
-  
-body.contrast-2 .button:hover,
-.accessibility-bar button.contrast-2:hover {
+.scheme-2 {
   background-color: #fff;
   color: #0000ff;
-  border-color: #0000ff;
-  }
+}
 
-body.contrast-3 .button {
-  background-color: #00ff00;
-  color: #000;
-  border-color: #000;
-  }
-  
-body.contrast-3 .button:hover,
-.accessibility-bar button.contrast-3:hover {
+.scheme-3 {
   background-color: #000;
   color: #00ff00;
-  border-color: #00ff00;
-  }
+}
+
 
 /*botones audio*/
 .speed-buttons {
@@ -452,6 +418,75 @@ div.container-paginacion {
   max-width: 50%;
   margin: 0 auto;
   margin-bottom: 50px ;
+}
+
+
+/* ESTILOS DE CONTRASTE*/
+.contrast-default {
+  background-image: linear-gradient(to top, #fff 20%, #f3f2f1);
+  color: #000;
+  border-color:#000;
+}
+
+.contrast-1, .contrast-2, .contrast-3 {
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.contrast-1 {
+  background-color: #000;
+  color: #ffff00;
+  border-color: #ffff00;
+}
+
+.contrast-2 {
+  background-color: #fff;
+  color: #0000ff;
+  border-color: #0000ff;
+}
+
+.contrast-3 {
+  background-color: #000;
+  color: #00ff00;
+  border-color: #00ff00;
+}
+
+/*Inversión de los colores del Header y Botones con el fondo de la tarjeta(.card)*/
+.contrast-1 .button, .contrast-1 .card-header, .contrast-1 .btn,.contrast-1 .tag{
+  background-color: #ffff00; 
+  color: #000;
+  border-color: #ffff00;
+}
+
+.contrast-2 .button, .contrast-2 .btn, .contrast-2 .card-header{
+  background-color: #0000ff;
+  color: #fff;
+  border-color: #0000ff;
+}
+
+.contrast-3 .button, .contrast-3 .btn, .contrast-3 .card-header {
+  background-color: #00ff00;
+  color: #000;
+  border-color: #00ff00;
+}
+
+/*Inversión de los colores de los Botones al hacer hover*/
+
+.contrast-1 .button:hover, .contrast-1 .btn:hover, .contrast-1 .tag {
+  background-color: #000; /* Fondo invertido */
+  color: #ffff00; /* Texto invertido */
+  border-color: #ffff00; /* Borde igual al color de texto */
+}
+
+.contrast-2 .button:hover,.contrast-2 .btn:hover, .contrast-2 .speed-button:hover {
+  background-color: #fff;
+  color: #0000ff;
+  border-color: #0000ff;
+}
+
+.contrast-3 .button:hover, .contrast-3 .btn:hover, .contrast-3 .speed-button:hover {
+  background-color: #000; 
+  color: #00ff00;
+  border-color: #00ff00;
 }
 
 /*# sourceMappingURL=style_cliente.css.map */
