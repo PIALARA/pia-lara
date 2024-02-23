@@ -11,16 +11,36 @@ class AudioModel:
 
     @classmethod
     def from_dict(cls, data):
-        user_id = data['usuarioId']
+        user_id = data['_id']
+        month = []
+        audios = []
+        fecha_hace_90_dias = datetime.now() - timedelta(days=90)
+        # Obtener el mes y el año actuales
+        mes_actual = datetime.now().month
+        año_actual = datetime.now().year
+
+        # Inicializar listas para almacenar los datos
         month = []
         audios = []
 
-        for i in range(len(data['audiosPorMes'])):
-            month.append(int(data['audiosPorMes'][i]["month"]))
-            audios.append(int(data['audiosPorMes'][i]["totalAudios"]))
+        # Iterar sobre cada elemento en data['countsByMonth']
+        for item in data['countsByMonth']:
+            # Extraer el mes y el año del registro
+            mes_registro, año_registro = map(int, item["monthYear"].split('-'))
 
+            # Verificar si el mes y el año corresponden al mes actual, al mes anterior o al año anterior al mes actual
+            if (año_registro == año_actual and mes_registro == mes_actual) or \
+            (año_registro == año_actual and mes_registro == mes_actual - 1) or \
+            (año_registro == año_actual - 1 and mes_registro == 12):
+                # Si coincide, añadir el registro al array de meses y el número de audios al array de audios
+                month.append(item["monthYear"])
+                print("itemcount",item["count"])
+                audios.append(item["count"])
+
+        # Convertir a numpy array
         month_array = np.array(month)
-        audios_array = ",".join(map(str, audios)) 
+        print("month array:", month_array)
+        audios_array = ",".join(map(str, audios))
 
         return cls(user_id, month_array, audios_array)
 
@@ -31,97 +51,69 @@ class AudioModel:
             'totalAudios': self.total_audios
         }
     @classmethod
-    def execute_aggregation(cls):
+    def execute_aggregation(cls,id_user):
         client = MongoClient('mongodb://localhost:27017/pialara')
         db = client.pialara  # Change 'pialara' to your actual database name
         audios_collection = db.audios 
 
         # Calculate the date 90 days ago
-        ninety_days_ago = datetime.utcnow() - timedelta(days=90)
 
-        pipeline = [
-            {
-                "$match": {
-                    "fecha": {
-                        "$gte": ninety_days_ago,
-                        "$lte": datetime.now()
-                    }
-                }
-            },
-            {
-                "$group": {
-                    "_id": {
-                        "usuarioId": "$usuario.id",
-                        "month": { "$month": "$fecha" }
-                    },
-                    "totalAudios": { "$sum": 1 }
-                }
-            },
-            {
-                "$group": {
-                    "_id": "$_id.usuarioId",
-                    "audiosPorMes": {
-                        "$push": {
-                            "month": "$_id.month",
-                            "totalAudios": "$totalAudios"
+        pipeline  = [
+                    {
+                        "$match": {
+                            "usuario.parent": id_user  # Filtras por el ID de usuario proporcionado
                         }
-                    }
-                }
-            },
-            {
-                "$project": {
-                    "_id": 0,
-                    "usuarioId": "$_id",
-                    "audiosPorMes": {
-                        "$concatArrays": [
-                            { "$filter": { "input": "$audiosPorMes", "as": "audios", "cond": { "$eq": ["$$audios.month", 1] } } },
-                            { "$filter": { "input": "$audiosPorMes", "as": "audios", "cond": { "$eq": ["$$audios.month", 2] } } },
-                            { "$filter": { "input": "$audiosPorMes", "as": "audios", "cond": { "$eq": ["$$audios.month", 3] } } }
-                        ]
-                    }
-                }
-            },
-            {
-                "$project": {
-                    "usuarioId": 1,
-                    "audiosPorMes": {
-                        "$map": {
-                            "input": [1, 2, 3],
-                            "as": "month",
-                            "in": {
-                                "month": "$$month",
-                                "totalAudios": {
-                                    "$sum": {
-                                        "$map": {
-                                            "input": { "$ifNull": [{ "$filter": { "input": "$audiosPorMes", "as": "audios", "cond": { "$eq": ["$$audios.month", "$$month"] } } }, []] },
-                                            "as": "audio",
-                                            "in": "$$audio.totalAudios"
-                                        }
-                                    }
+                    },
+                    {
+                        "$group": {
+                            "_id": {
+                                "month": {"$month": "$fecha"},  # Agrupas por mes
+                                "year": {"$year": "$fecha"},    # y año
+                                "userId": "$usuario.id"         # y el ID de usuario
+                            },
+                            "count": {"$sum": 1}  # Cuentas los registros en cada grupo
+                        }
+                    },
+                    {
+                        "$project": {
+                            "_id": 0,
+                            "userId": "$_id.userId",
+                            "monthYear": {
+                                "$concat": [
+                                    {"$toString": "$_id.month"},  # Convertimos el mes a string
+                                    "-",                          # Agregamos un guión para separar
+                                    {"$toString": "$_id.year"}    # Convertimos el año a string
+                                ]
+                            },
+                            "count": 1
+                        }
+                    },
+                    {
+                        "$group": {
+                            "_id": "$userId",  # Agrupas por ID de usuario
+                            "countsByMonth": {
+                                "$push": {
+                                    "monthYear": "$monthYear",  # Guardas el mes y el año concatenados
+                                    "count": "$count"           # y el conteo
                                 }
                             }
                         }
                     }
-                }
-            }
-        ]
+                ]
+
+
 
         result = list(audios_collection.aggregate(pipeline))
-        print(result)
-        dataUsers={}
+        
+        dataUsers=[]
         for data in result:
+            
             wow= AudioModel.from_dict(data)
-            dataUsers[wow.user_id]=wow.total_audios
+            print("mont",wow.month,"count",wow.total_audios)
+            dataUsers.append(wow)
      
 # Ahora audio_results es un diccionario donde las claves son los ObjectIds convertidos a cadena
 # y los valores son listas asociativas con la información que necesitas.
-
-
-
-
-
-
-
         return dataUsers
 
 
