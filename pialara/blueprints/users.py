@@ -1,6 +1,7 @@
 from werkzeug.security import generate_password_hash
 
-from datetime import datetime
+from datetime import datetime, timedelta
+import json
 from bson.objectid import ObjectId
 from flask import Blueprint, render_template, request
 from urllib import request
@@ -12,6 +13,10 @@ from flask import (
 from flask_login import login_required, current_user
 from pialara.decorators import rol_required
 from pialara.models.Usuario import Usuario
+# Cambios grafica ---
+# Importamos el modelo de Audios
+from pialara.models.Audios import Audios
+# ---
 from pialara.models.Enfermedades import Enfermedades
 from pialara.models.Disfonias import Disfonias
 from pialara.decorators import rol_required
@@ -23,19 +28,111 @@ bp = Blueprint('users', __name__, url_prefix='/users')
 @rol_required(['admin', 'tecnico', 'cliente'])
 def index():
     u = Usuario()
-
+    # Cambios grafica ---
+    # Creamos un objeto audios para poder hacer un find sobre los mismos.
+    a = Audios()
+    # ---
     users = []
+    audios = []
     logged_rol = current_user.rol
     url = 'users/index.html'
+
+    # Obtener la fecha actual
+    fecha_actual = datetime.now().date()
+
+    # Restar 6 semanas a la fecha actual
+    fecha_6_semanas_atras = fecha_actual - timedelta(weeks=6)
+
+    from_dt = datetime.strptime('2023-01-01','%Y-%m-%d')
+    to_dt = datetime.strptime('2024-01-01','%Y-%m-%d')
+
+
+    #"$gte": fecha_6_semanas_atras,
+    #"$lte": fecha_actual
 
     if logged_rol == "admin":
         users = u.find()
     elif logged_rol == "tecnico":
         users = u.find({"rol": {"$eq": 'cliente'}, "parent": {"$eq": current_user.email}})
+        #AGREGACION PARA CONSULTAR TODOS LOS AUDIOS DE UN CLIENTE.
+
+        audios = a.aggregate([{"$match": { "usuario.parent": current_user.email }},
+                              { "$group": { "_id": "$usuario.mail", "cantidad_audios": { "$sum": 1 }
+                               }
+                              }
+                            ])
+
+        #AGREGACION PARA CONSULTA DE 6 SEMANAS ATRÁS
+        # audios = a.aggregate([
+        #                         {
+        #                             "$match": {
+        #                                 "fecha": {
+        #                                     "$gte": from_dt,
+        #                                     "$lte": to_dt
+        #                                 }
+        #                             }
+        #                         },
+        #                         {
+        #                             "$group": {
+        #                                 "_id": {
+        #                                     "week": { "$week": "$fecha" },
+        #                                     "usuario": "$usuario.mail"
+        #                                 },
+        #                                 "cantidad_audios": { "$sum": 1 }
+        #                             }
+        #                         },
+        #                         {
+        #                             "$group": {
+        #                                 "_id": "$_id.usuario",
+        #                                 "audios_por_semana": {
+        #                                     "$push": {
+        #                                         "semana": "$_id.week",
+        #                                         "cantidad_audios": "$cantidad_audios"
+        #                                     }
+        #                                 }
+        #                             }
+        #                         },
+        #                         {
+        #                             "$sort": {
+        #                                 "_id": 1
+        #                             }
+        #                         }
+        #                     ])
+
+        #COMO TRATAR LA INFORMACION DE LA CONSULTA DE 6 SEMANAS ATRAS
+        # audios_data = []
+
+        # grafica = {}
+        
+        # for audio in audios:
+        #     audios_data.append(audio)
+
+        # for audio in audios_data:
+        #     id_usuario = audio['_id']
+        #     cantidades = {}
+        #     for semana in audio['audios_por_semana']:
+                
+        #         cantidades[semana['semana']]=semana['cantidad_audios']
+                
+        #     grafica[id_usuario]=cantidades
+        
+        # semanas_label = []
+        # data_grafico = []
+        # id_usuario_label = grafica
+
+        # print("terminamos audios_data")
+        audios_data = list(audios)
+        usuarios = []
+        cantidad = []
+        for audio in audios_data:
+            usuarios.append(str(audio['_id']))
+            cantidad.append(int(audio['cantidad_audios']))
+        usuarios_json = json.dumps(usuarios)
+        cantidad_json = json.dumps(cantidad)        
     else:
         return redirect(url_for('audios.client_tag'))
 
-    return render_template(url, users=users, user_name='')
+    return render_template(url, users=users, usuarios=usuarios_json, cant=cantidad_json, user_name='')
 
 
 @bp.route('/', methods=['POST'])

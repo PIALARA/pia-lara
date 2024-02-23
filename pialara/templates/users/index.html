@@ -14,6 +14,92 @@
 
 <h1 class="m-2 text-center">Lista de usuarios</h1>
 
+<!--
+
+  Cambios a realizar en los gráficos.
+
+-->
+
+<canvas id="myGrafico" width="400" height="100"></canvas>
+
+<script>
+  var ctx = document.getElementById('myGrafico');
+  var usuarios = JSON.parse('{{ usuarios | safe }}');
+  console.log(usuarios)
+  var cantidad = JSON.parse('{{ cant | safe }}');
+
+  var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: usuarios,
+      datasets: [{
+        label: 'Cantidad de audios',
+        data: cantidad,
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+          scales: {
+              y: {
+                  beginAtZero: true
+              }
+          }          
+      }
+  });
+</script>
+<!--Script multibarras de gpt-->
+<!--
+<script>
+  var usuarios = '{{usuarios | safe}}';
+  var cantidad = '{{cant | safe}}';
+  console.log(usuarios);
+  const data = {
+    labels: usuarios,
+    datasets: [{
+      label: 'Dataset 1',
+      data: [12, 19, 3, 5, 2, 3],
+      backgroundColor: 'rgba(255, 99, 132, 0.5)'
+    }, {
+      label: 'Dataset 2',
+      data: [8, 15, 7, 12, 10, 5],
+      backgroundColor: 'rgba(54, 162, 235, 0.5)'
+    }, {
+      label: 'Dataset 3',
+      data: [5, 10, 15, 20, 25, 30],
+      backgroundColor: 'rgba(75, 192, 192, 0.5)'
+    }]
+  };
+
+  const config = {
+    type: 'bar',
+    data: data,
+    options: {
+      plugins: {
+        title: {
+          display: true,
+          text: 'Stacked Bar Chart Example'
+        }
+      },
+      scales: {
+        x: {
+          stacked: true,
+        },
+        y: {
+          stacked: true
+        }
+      }
+    },
+  };
+
+  var myChart = new Chart(
+    document.getElementById('miGrafico'),
+    config
+  );
+</script>
+-->
+
 <a href="/users/create" class="btn btn-success m-2">
   <i class="bi bi-plus-square"></i>&nbsp;&nbsp;&nbsp;Añadir Usuario</a>
 
@@ -24,6 +110,12 @@
       <button class="btn btn-primary" type="submit" id="button-search"><i class="bi bi-search me-2"></i>Buscar</button>
     </div>
   </form>
+
+  <script>
+    console.log("{{audios}}")
+  </script>
+
+  
 
   <section class="container d-flex flex-wrap justify-content-center gap-3">
     {% for user in users %}
