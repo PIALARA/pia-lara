@@ -3,14 +3,12 @@ import math
 from bson.objectid import ObjectId
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
-import json
 
 from pialara.models.Syllabus import Syllabus
 from pialara.models.Usuario import Usuario
 from pialara.models.Clicks import Clicks
 
 bp = Blueprint("syllabus", __name__, url_prefix="/syllabus")
-
 
 @bp.route("/", methods=["GET"])
 @login_required
@@ -149,7 +147,7 @@ def create_post():
             "rol": user.get("rol"),
         },
         "tags": tagsArray,
-        "fecha_creacion": datetime.datetime.now(),
+        "fecha_creacion": datetime.now(),
     }
     result = texto.insert_one(aux)
 
