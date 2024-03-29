@@ -48,11 +48,12 @@ def client_tag():
     ]
     tags_suerte = syllabus.aggregate(pipeline)
 
-    # Es una chapuza ... rehacer en un futuro con una única consulta a MongoDB
+    # TODO - Es una chapuza ... rehacer en un futuro con una única consulta a MongoDB
     todos_tags = syllabus.distinct("tags",{})
     tags_audios_menos_grabadas = audio.distinct("texto.tag", {"texto.tipo": "syllabus"})
     tags_menos_grabadas = list(set(todos_tags) - set(tags_audios_menos_grabadas))
-    if tags_menos_grabadas:
+
+    if tags_menos_grabadas and len(tags_menos_grabadas) >= 5:
         tags_menos_grabadas = sample(tags_menos_grabadas, 5)
     else:
         tags_menos_grabadas = sample(tags_audios_menos_grabadas, 5)
