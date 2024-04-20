@@ -1,15 +1,6 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-{% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}
-{% for category, message in messages %}
-<div class="alert alert-{{ category }}">
-    {{ message }}
-</div>
-{% endfor %}
-{% endif %}
-{% endwith %}
 
 <h1 class="text-center m-2">Frases</h1>
 
@@ -25,6 +16,16 @@
                 class="bi bi-search me-2"></i>Buscar</button>
     </div>
 </form>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }}">
+    {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
 
 <section class="container d-flex flex-wrap justify-content-center gap-3">
     {% for frase in syllabus %}

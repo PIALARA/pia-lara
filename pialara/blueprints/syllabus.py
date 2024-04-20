@@ -25,7 +25,7 @@ def index():
         match_filter.update(
             {
                 "$or": [
-                    {"tags": {"$regex": tag_name, "$options": "i"}},
+                    {"tags": tag_name},
                     {"texto": {"$regex": tag_name, "$options": "i"}},
                 ]
             }
@@ -64,7 +64,7 @@ def index():
             }
         )
 
-    pipeline = [{"$unwind": {"path": "$tags"}}, {"$match": match_filter}]
+    pipeline = [{"$match": match_filter}]
 
     # Empieza modificacion
     PER_PAGE = 9
@@ -79,6 +79,7 @@ def index():
     skip = (current_page - 1) * PER_PAGE
 
     pipeline += [{"$skip": skip}, {"$limit": PER_PAGE}]
+    print(pipeline)
     documentos = syllabus.aggregate(pipeline)
 
     pages_min = max([1, current_page - 3])
