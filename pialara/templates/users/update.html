@@ -23,6 +23,15 @@
           <label for="email" class="form-label">Email</label>
           <input type="email" class="form-control" id="email" name="email" required value="{{model.mail}}"/>
         </div>
+        <div class="mb-3">
+          <label for="sexo" class="form-label">Sexo</label>
+          <select class="form-select" id="cliente-sexo" name="sexo" required>
+            <option value="H" {% if model.sexo == "H" %} selected {% endif %}>Hombre</option>
+            <option value="M" {% if model.sexo == "M" %} selected {% endif %}>Mujer</option>
+            <option value="A" {% if model.sexo == "A" %} selected {% endif %}>Ambiguo</option>
+            <option value="T" {% if model.sexo == "T" %} selected {% endif %}>Trans</option>
+          </select>
+        </div>
 
         <hr>
         <label for="email" class="form-label">Tamaño de texto</label>

@@ -156,13 +156,15 @@ def update_post(id):
     usu = Usuario()
     nombre = request.form.get('nombre')
     email = request.form.get('email')
+    sexo = request.form.get('sexo')
     font_size = request.form.get('font_size')
     font_size_flota = float(font_size)
 
-    if font_size_flota == session['font_size']:
-        resultado = usu.update_one({'_id': ObjectId(id)}, {"$set": {'nombre': nombre, 'mail': email}})
-    else:
-        resultado = usu.update_one({'_id': ObjectId(id)}, {"$set": {'nombre': nombre, 'mail': email, 'font_size': font_size_flota}})
+    mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo}}
+    if font_size_flota != session['font_size']:
+        mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo, 'font_size': font_size_flota}}
+    print("MONGO_SET", mongo_set)
+    resultado = usu.update_one({'_id': ObjectId(id)}, mongo_set)
 
     if resultado.acknowledged & resultado.modified_count == 1:
         session['font_size'] = font_size_flota
