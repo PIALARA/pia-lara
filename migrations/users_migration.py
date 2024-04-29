@@ -180,7 +180,9 @@ userValidator = {
                 "bsonType": 'string',
                 'enum': [
                     'M',
-                    'H'
+                    'H',
+                    'A',
+                    'T'
                 ]
             }
         }
