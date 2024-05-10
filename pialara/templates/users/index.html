@@ -61,12 +61,17 @@
               <i class="bi bi-music-note me-2"></i>{{ user.cant_audios }}
             </p>
           {% endif %}
+          {% if user.entidad %}
+          <p class="card-text mb-1">
+            <i class="bi bi-shop me-2"></i>{{ user.entidad }}
+          </p>
+          {% endif %}
           <p class="card-text mb-1">
             <i class="bi bi-clock me-2"></i>{{ user.ultima_conexion.strftime('%d/%m/%Y - %H:%M') }}
           </p>
-            <p class = "card-text mb-3 tipo_{{ user.rol }}" >
-                <i class="bi bi-person"></i>  {{ user.rol }}
-            </p>
+          <p class = "card-text mb-3 tipo_{{ user.rol }}" >
+              <i class="bi bi-person"></i>  {{ user.rol }}
+          </p>
           <a href="{{ url_for('users.update',id=user._id) }}" class="btn btn-primary align-self-start mt-auto">
             <i class="bi bi-pencil me-2"></i>Editar
           </a>

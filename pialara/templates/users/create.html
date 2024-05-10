@@ -70,7 +70,7 @@
             <option value="A">Ambiguo</option>
             <option value="T">Trans</option>
           </select>
-        </div>
+        </div>  
         <div class="mb-3">
           <label for="cliente-provincia" class="form-label">Provincia</label>
           <select class="form-select" id="cliente-provincia" name="provincia_cliente" required>
@@ -80,6 +80,10 @@
             <option value="Murcia">Murcia</option>
           </select>
         </div>
+        <div class="mb-3">
+          <label for="cliente-entidad" class="form-label">Entidad / Asociación</label>
+          <input type="text" class="form-control" id="cliente-entidad" name="entidad_cliente" />
+        </div>      
         <fieldset class="mb-3">
           <legend class="fs-6">Enfermedades</legend>
           {% for enfermedad in enfermedades %}

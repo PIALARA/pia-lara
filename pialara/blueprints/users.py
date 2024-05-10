@@ -88,6 +88,7 @@ def create_post():
     fNacCliente = request.form.get('fnac_cliente')
     sexoCliente = request.form.get('sexo_cliente')
     provinciaCliente = request.form.get('provincia_cliente')
+    entidadCliente = request.form.get('entidad_cliente')
     enfermedadesCliente = request.form.getlist('enfermedades')
     disCliente = request.form.getlist('dis')
 
@@ -96,7 +97,6 @@ def create_post():
     if pass1 != pass2:
         flash("Las contraseñas no son iguales", 'danger')
         return render_template('users/create.html')
-
 
     result = None
 
@@ -118,11 +118,10 @@ def create_post():
         newUser = {"nombre": nombreCliente, "mail": emailCliente, "rol": "cliente",
                    "password": generate_password_hash(pass1, method='sha256'),
                    "fecha_nacimiento": fecha, "ultima_conexion": datetime.now(),
-                   "sexo": sexoCliente, "provincia": provinciaCliente,
+                   "sexo": sexoCliente, "provincia": provinciaCliente, "entidad": entidadCliente,
                    "enfermedades": enfermedadesCliente, "dis": disCliente,
                    "parent": current_user.email, "cant_audios":0}
         result = user.insert_one(newUser)
-
 
     # Comprobar el resultado y mostrar mensaje
     if not result == None and result.acknowledged:
@@ -157,12 +156,13 @@ def update_post(id):
     nombre = request.form.get('nombre')
     email = request.form.get('email')
     sexo = request.form.get('sexo')
+    entidad = request.form.get('entidad')
     font_size = request.form.get('font_size')
     font_size_flota = float(font_size)
 
-    mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo}}
+    mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo, 'entidad': entidad}}
     if font_size_flota != session['font_size']:
-        mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo, 'font_size': font_size_flota}}
+        mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo, 'entidad': entidad, 'font_size': font_size_flota}}
     print("MONGO_SET", mongo_set)
     resultado = usu.update_one({'_id': ObjectId(id)}, mongo_set)
 
