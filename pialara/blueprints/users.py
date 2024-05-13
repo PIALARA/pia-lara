@@ -2,6 +2,7 @@ from werkzeug.security import generate_password_hash
 
 from datetime import datetime
 from bson.objectid import ObjectId
+import pymongo
 from flask import Blueprint, render_template, request
 from urllib import request
 
@@ -29,7 +30,7 @@ def index():
     url = 'users/index.html'
 
     if logged_rol == "admin":
-        users = u.find()
+        users = u.find().sort([("rol", pymongo.ASCENDING),("nombre", pymongo.ASCENDING)])
     elif logged_rol == "tecnico":
         users = u.find({"rol": {"$eq": 'cliente'}, "parent": {"$eq": current_user.email}})
     else:
@@ -89,6 +90,7 @@ def create_post():
     sexoCliente = request.form.get('sexo_cliente')
     provinciaCliente = request.form.get('provincia_cliente')
     entidadCliente = request.form.get('entidad_cliente')
+    observacionesCliente = request.form.get('observaciones_cliente')
     enfermedadesCliente = request.form.getlist('enfermedades')
     disCliente = request.form.getlist('dis')
 
@@ -119,6 +121,7 @@ def create_post():
                    "password": generate_password_hash(pass1, method='sha256'),
                    "fecha_nacimiento": fecha, "ultima_conexion": datetime.now(),
                    "sexo": sexoCliente, "provincia": provinciaCliente, "entidad": entidadCliente,
+                   "observaciones": observacionesCliente,
                    "enfermedades": enfermedadesCliente, "dis": disCliente,
                    "parent": current_user.email, "cant_audios":0}
         result = user.insert_one(newUser)
@@ -157,12 +160,21 @@ def update_post(id):
     email = request.form.get('email')
     sexo = request.form.get('sexo')
     entidad = request.form.get('entidad')
-    font_size = request.form.get('font_size')
+    fnac = request.form.get('fnac')
+    observaciones = request.form.get('observaciones')
+    font_size = request.form.get('font_size',1)
+
+    fecha = datetime.strptime(fnac, '%Y-%m-%d')
+
+    mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo, 'entidad': entidad, 'observaciones': observaciones, 'fecha_nacimiento': fecha}}
+
+    if font_size == "":
+        font_size = 1
     font_size_flota = float(font_size)
 
-    mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo, 'entidad': entidad}}
     if font_size_flota != session['font_size']:
-        mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo, 'entidad': entidad, 'font_size': font_size_flota}}
+        mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo, 'entidad': entidad, 'observaciones': observaciones, 'fecha_nacimiento': fecha, 'font_size': font_size_flota}}
+
     print("MONGO_SET", mongo_set)
     resultado = usu.update_one({'_id': ObjectId(id)}, mongo_set)
 

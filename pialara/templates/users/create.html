@@ -39,7 +39,7 @@
   <div class="tab-content py-4" id="nav-tabContent">
 
     <section class="tab-pane fade show active" id="nav-cliente" role="tabpanel" aria-labelledby="nav-cliente-tab" tabindex="0">
-      <form class="container js-form" style="max-width: 20rem" method="post">
+      <form class="container js-form" style="max-width: 24rem" method="post">
         <div class="mb-3">
           <label for="cliente-nombre" class="form-label">Nombre</label>
           <input type="text" class="form-control" id="cliente-nombre" name="nombre_cliente" required />
@@ -99,13 +99,17 @@
           <legend class="fs-6">Dis</legend>
           {% for disfonia in disfonias %}
           {% if disfonia.visible == 1 %}
-              <div class="form-check">
+              <div class="form-check form-check-inline">
                 <input class="form-check-input" type="checkbox" name="dis" value="{{disfonia.nombre}}" id="dis-{{disfonia.nombre}}" />
                 <label class="form-check-label" for="dis-{{disfonia.nombre}}">{{disfonia.nombre}}</label>
               </div>
           {% endif %}
           {% endfor %}
         </fieldset>
+        <div class="mb-3">
+          <label for="cliente-observaciones" class="form-label">Observaciones</label>
+          <textarea class="form-control" id="cliente-observaciones" name="observaciones_cliente"></textarea>
+        </div>         
         <div class="mb-3">
           <button class="btn btn-primary w-100 shadow" type="submit">
             <i class="bi bi-plus-square me-2"></i>Crear cliente

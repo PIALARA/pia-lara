@@ -33,11 +33,22 @@
           </select>
         </div>
 
+        {% set fnac = model.fecha_nacimiento.strftime('%Y-%m-%d') %}
         <div class="mb-3">
-          <label for="nombre" class="form-label">Entidad / Asociación</label>
+          <label for="fecha_nacimiento" class="form-label">Fecha de nacimiento</label>
+          <input type="date" class="form-control" id="fecha_nacimiento" name="fnac" value="{{fnac}}"/>
+        </div>
+
+        <div class="mb-3">
+          <label for="entidad" class="form-label">Entidad / Asociación</label>
           <input type="text" class="form-control" id="entidad" name="entidad" value="{{model.entidad}}" />
         </div>
-        
+
+        <div class="mb-3">
+          <label for="observaciones" class="form-label">Observaciones</label>
+          <textarea class="form-control" id="observaciones" name="observaciones">{{model.observaciones}}</textarea>
+        </div>
+
         <hr>
         <label for="email" class="form-label">Tamaño de texto</label>
         <div>         
