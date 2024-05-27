@@ -19,17 +19,20 @@ def create_app():
     app.config['AWS_SECRET_ACCESS_KEY'] = config['LOCAL']['AWS_SECRET_ACCESS_KEY']
     app.config['BUCKET_NAME'] = config['LOCAL']['BUCKET_NAME']
 
+    app.config['GRADIO_URL'] = config['LOCAL']['GRADIO_URL']
+
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
 
     # Blueprints
-    from pialara.blueprints import auth, syllabus, users, audios, main
+    from pialara.blueprints import auth, syllabus, users, audios, main, lara
     app.register_blueprint(auth.bp)
     app.register_blueprint(syllabus.bp)
     app.register_blueprint(users.bp)
     app.register_blueprint(audios.bp)
     app.register_blueprint(main.bp)
+    app.register_blueprint(lara.bp)
 
     @login_manager.user_loader
     def load_user(user_id):
