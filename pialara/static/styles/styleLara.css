@@ -1,0 +1,30 @@
+body{
+    margin: 0;
+    padding: 0;
+    background: #ffe359;
+    background: url("../img/bg.svg") no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: 100%;
+}
+
+.card {
+    background-color: rgba(255, 255, 255, 0.8); 
+}
+
+.transcription-box {
+    border: 1px solid #ccc; 
+    padding: 10px; 
+    background-color: #f9f9f9; 
+    border-radius: 5px;
+    margin-top: 10px; 
+    height: 100px; 
+    overflow-y: auto; 
+}
+
+
+.iniciarGrabar{
+    background-color: rgb(80, 150, 166) !important;
+}

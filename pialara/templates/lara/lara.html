@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grabador de Audio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static',filename='styles/styleLara.css') }}" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+
+</head>
+<body>
+
+    
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+        <div class="card text-center" style="width: 60rem; height: 38rem;">
+            <div class="card-body">
+                <div class="text-center">
+                    <img src="{{ url_for('static',filename='img/logoLara.png') }}" alt="Logo de Lara">
+                </div>
+                <h1 class="card-title">Habla con Lara</h1>
+                
+                <button id="startRecording" class="btn btn-primary mb-2 iniciarGrabar">Comenzar Grabación</button>
+                <button id="stopRecording" class="btn btn-danger mb-2" disabled>Detener Grabación</button>
+                
+                <div class="mb-3 d-flex justify-content-center">
+                    <select class="form-select w-50 m-3" id="modelSelect">
+                        <option selected>Selecciona un modelo</option>
+                        <option value="1">Modelo 1</option>
+                        <option value="2">Modelo 2</option>
+                        <option value="3">Modelo 3</option>
+                    </select>
+                </div>
+
+                <button id="sendRecording" class="btn btn-success mb-2">Enviar</button> 
+
+                <p id="status" class="card-text"></p>
+                <h3 class="card-title">Transcripción:</h3>
+
+                <div class="transcription-box">
+                    <span id="transcription"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js"></script>
+        <script src="{{ url_for('static', filename='js/lara.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='js/lara.js') }}"></script>
+</body>
+</html>
