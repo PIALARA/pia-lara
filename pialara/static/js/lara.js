@@ -64,6 +64,10 @@ function drawVisualizer() {
 }
 
 recordButton.addEventListener('click', () => {
+    const messageElement = document.getElementById('response-message');
+    const transcripcion = document.getElementById('transcription');
+    transcripcion.textContent = '';
+    messageElement.textContent = '';
     if (!isRecording) {
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then(stream => {
@@ -116,7 +120,7 @@ sendButton.addEventListener('click', () => {
         showStatus("Por favor, selecciona un modelo antes de enviar.", 'danger');
         return;
     }
-
+    
     transcriptionDisplay.textContent = ""; 
     spinner.style.display = "block"; 
 
@@ -137,11 +141,75 @@ sendButton.addEventListener('click', () => {
             transcriptionDisplay.textContent = data.text;
             showStatus("Transcripción completada", 'success');
         }
+        enableButtons()
     })
+
     .catch(error => {
         spinner.style.display = "none";
         showStatus(`Error: ${error}`, 'danger');
     });
 
     showStatus("Grabación enviada para transcripción", 'info');
+   
 });
+
+function enableButtons() {
+    document.getElementById('happyBtn').removeAttribute('disabled');
+    document.getElementById('neutralBtn').removeAttribute('disabled');
+    document.getElementById('sadBtn').removeAttribute('disabled');
+}
+
+function disabledButtons(){
+    document.getElementById('happyBtn').setAttribute('disabled', 'disabled');
+    document.getElementById('neutralBtn').setAttribute('disabled', 'disabled');
+    document.getElementById('sadBtn').setAttribute('disabled', 'disabled');
+
+}
+
+function submitFeedback(emotion) {
+    const messageElement = document.getElementById('response-message');
+    
+    switch(emotion) {
+        case 'happy':
+            messageElement.textContent = '¡Gracias por tu feedback positivo!';
+            messageElement.style.color = 'green';
+            disabledButtons()
+            sendSurvey("Bien")
+            break;
+        case 'neutral':
+            messageElement.textContent = 'Gracias por tu feedback.';
+            messageElement.style.color = 'orange';
+            disabledButtons()
+            sendSurvey("Normal")
+            break;
+        case 'sad':
+            messageElement.textContent = 'Lamentamos que tu experiencia no haya sido buena.';
+            messageElement.style.color = 'red';
+            disabledButtons()
+            sendSurvey("Mal")
+            break;
+        default:
+            messageElement.textContent = '';
+            break;
+    }
+}
+
+
+function sendSurvey(emotion){
+
+    fetch('/lara/send_survey', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ emotion: emotion }) // Envía la emoción seleccionada al servidor
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Aquí puedes manejar la respuesta del servidor si es necesario
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}

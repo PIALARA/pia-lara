@@ -101,3 +101,40 @@ canvas {
     height: 100%;
     background-color: transparent;
 }
+
+.survey-container {
+    text-align: center;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.buttons-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.emotion-button {
+    font-size: 2rem;
+    background: none;
+    border: none;
+    margin: 0 10px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.emotion-button:focus {
+    outline: none;
+}
+
+.emotion-button:hover {
+    transform: scale(1.2);
+}
+
+#response-message {
+    font-size: 1.2rem;
+    color: #333;
+}
+
