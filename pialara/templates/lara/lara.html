@@ -3,15 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grabador de Audio</title>
+    <title>Lara</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static',filename='styles/styleLara.css') }}" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
 </head>
 <body>
-    <h1>Habla con Lara</h1>
-    <button id="startRecording">Comenzar Grabación</button>
-    <button id="stopRecording" disabled>Detener Grabación</button>
-    <p id="status"></p>
-    <p>Transcripción: <span id="transcription"></span></p>
+    <div class="card text-center">
+        <div class="card-body">
+            <div class="text-center mb-4">
+                <img src="{{ url_for('static',filename='img/logoLara.png') }}" alt="Logo de Lara" style="width: 150px;">
+            </div>
+            <h1 class="card-title mb-4">Habla con Lara</h1>
+            
+            <button id="recordButton" class="btn btn-custom mb-3">Comenzar Grabación</button>
+            <div id="visualizer">
+                <canvas id="canvas"></canvas>
+            </div>
+            <div class="mb-4 d-flex justify-content-center">
+                <select class="form-select w-50" id="modelSelect">
+                    <option value="" selected>Selecciona un modelo</option>
+                    <option value="1">Modelo 1</option>
+                    <option value="2">Modelo 2</option>
+                    <option value="3">Modelo 3</option>
+                </select>
+            </div>
 
+            <div class="d-flex justify-content-center align-items-center mb-4">
+                <button id="sendRecording" class="btn btn-success btn-custom mb-2" disabled>Enviar</button>
+                <div id="spinner" class="spinner-border text-primary ms-3" role="status" style="display: none;">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+            </div>
+
+            <div id="statusContainer">
+                <div id="status" class="alert alert-info w-40 text-center" role="alert" style="display: none;padding: 10px;"></div>
+            </div>
+            <h3 class="card-title mb-2" style="margin-top: 5px;">Transcripción:</h3>
+
+            <div class="transcription-box">
+                <span id="transcription" style="font-size: 25px;"></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js"></script>
     <script src="{{ url_for('static', filename='js/lara.js') }}"></script>
 </body>
 </html>

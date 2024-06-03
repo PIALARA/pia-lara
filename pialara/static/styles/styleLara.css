@@ -1,0 +1,103 @@
+body {
+    padding: 0;
+    background: #ffe359;
+    background: url("../img/bg.svg") no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.card {
+    width: 60rem;
+    background-color: rgba(255, 255, 255, 0.8); 
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.transcription-box {
+    margin-top: 10px; 
+    height: 100px; 
+    overflow-y: auto; 
+
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 1rem;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.card-title {
+    color: #343a40;
+    font-weight: bold;
+}
+
+.btn-custom {
+    background-color: rgb(80, 150, 166) !important;
+    border-color: rgb(80, 150, 166) !important;
+    color: white;
+    border-radius: 25px;
+}
+.btn-custom:hover {
+    background-color: rgb(60, 130, 146) !important;
+    border-color: rgb(60, 130, 146) !important;
+}
+
+.spinner-border {
+    width: 2rem;
+    height: 2rem;
+}
+
+.form-select {
+    border-radius: 10px;
+    padding: 10px;
+    width: 50%;
+}
+
+#recordButton, #sendRecording {
+    width: 200px;
+}
+
+#sendRecording:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+.modal-custom-size {
+    max-width: 500px; /* Ajusta este valor según sea necesario */
+}
+.modal-content {
+    padding: 20px; /* Opcional: Ajusta el padding si es necesario */
+}
+#statusContainer {
+    height: 45px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#visualizer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    height: 30px;
+    margin-bottom: 10px;
+}
+canvas {
+    width: 50%;
+    height: 100%;
+    background-color: transparent;
+}
