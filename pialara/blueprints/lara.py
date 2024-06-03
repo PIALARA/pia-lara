@@ -14,6 +14,7 @@ def login():
 def save_record():
 
     audio_file = request.files['audio_data']
+    modelo = request.json.get("model")
     print(audio_file)
 
     name_audio = str(uuid.uuid4()) + '.wav'
@@ -26,9 +27,19 @@ def save_record():
     client = Client(GRADIO_URL, ssl_verify=False)
     transcription = client.predict(
             audio=file(RUTA_AUDIO + "/" + name_audio),
-            modelo="base",
+            modelo=modelo,
             api_name="/predict"
     )
 
     return {'status': 'ok', 'text': transcription}
 
+
+@bp.route('/lara/send_survey', methods=['POST'])
+def send_survey():
+    data = request.json
+    emotion = data.get('emotion')
+    
+    # Añade un registro en la colección 'survey' en MongoDB
+    # survey_collection.insert_one({'emotion': emotion})
+    
+    return{'status': 'ok'}
