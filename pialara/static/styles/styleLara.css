@@ -1,7 +1,7 @@
 body {
     padding: 0;
     background: #ffe359;
-    background: url("../img/bg.svg") no-repeat center center fixed; 
+    background: url("../img/bg.svg") no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
@@ -17,16 +17,16 @@ body {
 
 .card {
     width: 60rem;
-    background-color: rgba(255, 255, 255, 0.8); 
+    background-color: rgba(255, 255, 255, 0.8);
     border-radius: 15px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     overflow: hidden;
 }
 
 .transcription-box {
-    margin-top: 10px; 
-    height: 100px; 
-    overflow-y: auto; 
+    margin-top: 10px;
+    max-height: 100%; /* Elimina la altura fija */
+    overflow-y: auto;
 
     border: 1px solid #dee2e6;
     border-radius: 10px;
@@ -42,6 +42,7 @@ body {
 .card-title {
     color: #343a40;
     font-weight: bold;
+    margin-top: 5px;
 }
 
 .btn-custom {
@@ -50,6 +51,7 @@ body {
     color: white;
     border-radius: 25px;
 }
+
 .btn-custom:hover {
     background-color: rgb(60, 130, 146) !important;
     border-color: rgb(60, 130, 146) !important;
@@ -78,11 +80,13 @@ body {
 .modal-custom-size {
     max-width: 500px; /* Ajusta este valor según sea necesario */
 }
+
 .modal-content {
     padding: 20px; /* Opcional: Ajusta el padding si es necesario */
 }
+
 #statusContainer {
-    height: 45px; 
+    height: 45px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -96,10 +100,31 @@ body {
     height: 30px;
     margin-bottom: 10px;
 }
+
 canvas {
     width: 50%;
     height: 100%;
     background-color: transparent;
+}
+
+/* AÑADIR PARTE NUEVA */
+.form-select {
+    width: 100%;
+    max-width: 300px;
+    padding: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .form-select {
+        width: 90%;
+        font-size: 1.2rem;
+    }
+}
+
+.select-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
 }
 
 .survey-container {
@@ -137,4 +162,3 @@ canvas {
     font-size: 1.2rem;
     color: #333;
 }
-

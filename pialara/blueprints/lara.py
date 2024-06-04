@@ -1,8 +1,13 @@
 import os, uuid
+from datetime import datetime
+
 from flask import (
     Blueprint, render_template, request, current_app
 )
+
 from gradio_client import Client, file
+
+from pialara.models.Survey import Survey
 
 bp = Blueprint('lara', __name__)
 
@@ -14,7 +19,7 @@ def login():
 def save_record():
 
     audio_file = request.files['audio_data']
-    modelo = request.json.get("model")
+    modelo = request.form.get("model")
     print(audio_file)
 
     name_audio = str(uuid.uuid4()) + '.wav'
@@ -36,10 +41,13 @@ def save_record():
 
 @bp.route('/lara/send_survey', methods=['POST'])
 def send_survey():
+    survey = Survey()
     data = request.json
     emotion = data.get('emotion')
     
-    # Añade un registro en la colección 'survey' en MongoDB
-    # survey_collection.insert_one({'emotion': emotion})
+    newSurvey = {'emotion': emotion, 
+                 "fecha": datetime.now()}
+
+    survey.insert_one(newSurvey)
     
     return{'status': 'ok'}
