@@ -143,6 +143,30 @@ def existeCorreo(email):
 
     return False
 
+@bp.route('/update-tech/<id>', methods=['GET'])
+@login_required
+def update_tech(id):
+    u = Usuario()
+    model = u.find_one({'_id': ObjectId(id)})
+    tecnicos = u.find({'rol': 'tecnico'})
+
+
+    return render_template('users/update-tech.html', user=model, tecnicos=tecnicos)
+
+@bp.route('/update-tech/<id>', methods=['POST'])
+@login_required
+def update_tech_post(id):
+    u = Usuario()
+   
+    tecnico = request.form.get('tecnico')
+    model_tec = u.find_one({'_id': ObjectId(tecnico)})
+    print(model_tec)
+
+    model = u.find_one({'_id': ObjectId(id)})
+    tecnicos = u.find({'rol': 'tecnico'})
+
+    return render_template('users/update-tech.html', user=model, tecnicos=tecnicos)
+
 @bp.route('/update/<id>', methods=['GET'])
 @login_required
 def update(id):
