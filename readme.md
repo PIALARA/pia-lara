@@ -16,7 +16,7 @@ Dentro del directorio del repositorio, crear el entorno virtual:
 python3 -m venv venv
 ```
 
-Y activar el entorno virtual (aquí ya cada uno según windows, linux o Mac tendrá que seguir el procedimiento que se explicó en clase), por ejemplo, para Linux/Mac haríamos:
+Y activar el entorno virtual (aquí ya cada uno según Windows, Linux o Mac tendrá que seguir el procedimiento que se explicó en clase), por ejemplo, para Linux/Mac haríamos:
 
 ``` bash
 source venv/bin/activate
@@ -52,27 +52,29 @@ python3 migrations/sylabus_migration.py
 
 ## Preparación de las variables de entorno
 
-En el raíz del repositorio tenemos el archivo `.ini.sample`, el cual debemos renombrar a `.ini` y configurar las variables de entorno:
+Hay que crear en el raíz del repositorio un archivo nombrado `.ini` y configurar las variables de entorno:
 
 ``` title=".ini"
 [PROD]
 SECRET_KEY = eac5e91171438960ddec0c9c469a4c3dd42e96aea462afc5ab830f78527ad80e
 PIALARA_DB_URI = mongodb+srv://usuario:contraseña@host
 PIALARA_DB_NAME = pialara
+BUCKET_NAME = pialara
+GRADIO_URL = http://localhost:8080/gradio
 
 [LOCAL]
 SECRET_KEY = eac5e91171438960ddec0c9c469a4c3dd42e96aea462afc5ab830f78527ad80e
 PIALARA_DB_URI = localhost
-PIALARA_DB_NAME = pialara
+PIALARA_DB_NAME = prelara
+BUCKET_NAME = prelara
+GRADIO_URL = http://localhost:8080/gradio
 
 aws_access_key_id=clave_aws
 aws_secret_access_key=secret_aws
 aws_session_token=token_aws
 ```
 
-!!! caution "Cuidado"
-    Revisar versión de Python y librería BSON.
-    PyMongo instala su propia versión de BSON que evita los errores.
+Si da algún error con *Python* y la librería BSON, se recomienda actualizar (*upgrade*) la versión de PyMongo, la cual instala su propia versión de BSON que evita los errores.
 
 ## Estructura de la aplicación
 
@@ -88,7 +90,7 @@ Cuando se crea un blueprint, es necesario agregarlo en ```__init__.py``` para qu
 
 Cada *Blueprint* va a tener asociado un directorio con su mismo nombre dentro del directorio templates que contendrá sus vistas.
 
-Por ejemplo, el *Blueprint* auth va a tener el directorio `templates/auth` para guardar sus vistas.
+Por ejemplo, el *Blueprint* `auth` va a tener el directorio `templates/auth` para guardar sus vistas.
 
 ### Modelos
 
