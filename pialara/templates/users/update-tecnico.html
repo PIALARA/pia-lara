@@ -12,10 +12,10 @@
   {% endif %}
 {% endwith %}
 
-  <div class="text-center p-3">
-    <img src="/static/img/microfono.svg" alt="Descripción del SVG" width="150" height="150" class="mb-3">
-    <h1>Actualizar usuario</h1>
-  </div>
+<div class="text-center p-3">
+  <img src="/static/img/auricular.svg" alt="Descripción del SVG" width="150" height="150" class="mb-3">
+  <h1>Actualizar técnico</h1>
+</div>
 
   <div class="tab-content py-4" id="nav-tabContent">
       <form class="container" method="POST" style="max-width: 20rem">
@@ -52,7 +52,7 @@
           <label for="observaciones" class="form-label">Observaciones</label>
           <textarea class="form-control" id="observaciones" name="observaciones">{{model.observaciones}}</textarea>
         </div>
-        
+
         <div class="mb-3">
           <label for="cliente-password" class="form-label">Contraseña</label>
           <input type="password" class="form-control js-password" id="cliente-password" name="pass1" required />
@@ -80,6 +80,7 @@
             <i class="bi bi-plus-square me-2"></i>Actualizar
           </button>
         </div>
+
       </form>
   </div>
   <script src="{{ url_for('static', filename='js/font_size.js') }}"></script>
