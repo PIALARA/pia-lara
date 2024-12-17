@@ -170,7 +170,7 @@ def update_tech_post(id):
     # Comprobamos si existe el id recogido en el formulario
     if model_tec:
 
-        # Si funciona, guardamos su mail
+        # Si funciona, guardamos su correo
         mail = model_tec.get('mail')
     else:
 
