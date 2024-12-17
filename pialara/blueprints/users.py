@@ -148,6 +148,8 @@ def existeCorreo(email):
 def update_tech(id):
     u = Usuario()
     model = u.find_one({'_id': ObjectId(id)})
+
+    # Guardamos todos los tecnicos
     tecnicos = u.find({'rol': 'tecnico'})
 
 
@@ -156,16 +158,34 @@ def update_tech(id):
 @bp.route('/update-tech/<id>', methods=['POST'])
 @login_required
 def update_tech_post(id):
-    u = Usuario()
-   
+    usu = Usuario()
     tecnico = request.form.get('tecnico')
-    model_tec = u.find_one({'_id': ObjectId(tecnico)})
-    print(model_tec)
 
-    model = u.find_one({'_id': ObjectId(id)})
-    tecnicos = u.find({'rol': 'tecnico'})
+    # Guardamos en model_tec el tecnico seleccionado
+    model_tec = usu.find_one({'_id': ObjectId(tecnico)})
 
-    return render_template('users/update-tech.html', user=model, tecnicos=tecnicos)
+    # Creamos la variable mail para guardar el correo del tecnico
+    mail = ""
+
+    # Comprobamos si existe el id recogido en el formulario
+    if model_tec:
+
+        # Si funciona, guardamos su mail
+        mail = model_tec.get('mail')
+    else:
+
+        # Si no lo encuentra, cancelamos la operacion y avisamos del error
+        flash('Error localizando al técnico seleccionado', 'danger')
+        return redirect(url_for('users.index'))
+
+
+    mongo_set = {"$set": {'parent': mail}}
+
+    print("MONGO_SET", mongo_set)
+    resultado = usu.update_one({'_id': ObjectId(id)}, mongo_set)
+
+    flash('Tecnico migrado con exito', 'success')
+    return redirect(url_for('users.index'))
 
 @bp.route('/update/<id>', methods=['GET'])
 @login_required
