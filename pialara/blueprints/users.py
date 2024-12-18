@@ -17,6 +17,9 @@ from pialara.models.Enfermedades import Enfermedades
 from pialara.models.Disfonias import Disfonias
 from pialara.decorators import rol_required
 
+from werkzeug.security import check_password_hash
+from pialara import db
+
 bp = Blueprint('users', __name__, url_prefix='/users')
 
 
@@ -179,23 +182,8 @@ def update_post(id):
 
     fecha = datetime.strptime(fnac, '%Y-%m-%d')
 
-    # Añadir Password
-    pass1 = request.form.get('pass1')
-    pass2 = request.form.get('pass2')
-
-    # Comprobar Password
-    if pass1 != pass2:
-        flash("Las contraseñas no son iguales", 'danger')
-        model = usu.find_one({'_id': ObjectId(id)})
-        if model['rol'] == 'tecnico':
-            url = 'users/update-tecnico.html'
-        else:
-            url = 'users/update.html'
-        return render_template(url, model=model)
-
     mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo, 'entidad': entidad,
-                          'observaciones': observaciones, 'fecha_nacimiento': fecha,
-                          'password': generate_password_hash(pass1, method='sha256')}}
+                          'observaciones': observaciones, 'fecha_nacimiento': fecha }}
 
     if font_size == "":
         font_size = 1
@@ -203,8 +191,7 @@ def update_post(id):
 
     if font_size_flota != session['font_size']:
         mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo, 'entidad': entidad,
-                              'observaciones': observaciones, 'fecha_nacimiento': fecha,'font_size': font_size_flota,
-                              'password': generate_password_hash(pass1, method='sha256')}}
+                              'observaciones': observaciones, 'fecha_nacimiento': fecha,'font_size': font_size_flota }}
 
     print("MONGO_SET", mongo_set)
     resultado = usu.update_one({'_id': ObjectId(id)}, mongo_set)
@@ -219,6 +206,61 @@ def update_post(id):
     else:
         flash('La usuario no se ha actualizado. Error genérico', 'danger')
         return redirect(url_for('users.index'))
+
+
+# Actualizar Contraseña - GET
+@bp.route('/update-pass/<id>', methods=['GET'])
+@login_required
+def update_pass_get(id):
+    u = Usuario()
+    model = u.find_one({'_id': ObjectId(id)})
+
+    return render_template('users/update-pass.html', model=model)
+
+
+# Actualizar Contraseña - POST
+@bp.route('/update-pass/<id>', methods=['POST'])
+@login_required
+def update_pass_post(id):
+    usu = Usuario()
+    model = usu.find_one({'_id': ObjectId(id)})
+
+    user_pass = request.form.get('pass')
+    new_pass = request.form.get('new-pass')
+    repeat_pass = request.form.get('repeat-pass')
+
+    # Comprobar Password usuario
+    if not check_password_hash(model['password'], user_pass):
+        flash("Su contraseña no es correcta", 'danger')
+
+        return render_template('users/update-pass.html', model=model)
+    
+    # Comprobar nueva Password
+    if new_pass != repeat_pass:
+        flash("Las contraseñas no son iguales", 'danger')
+        model = usu.find_one({'_id': ObjectId(id)})
+        
+        return render_template('users/update-pass.html', model=model)
+
+    mongo_set = {"$set": {'password': generate_password_hash(new_pass, method='sha256')}}
+
+    font_size = 1
+    font_size_flota = float(font_size)
+
+    print("MONGO_SET", mongo_set)
+    resultado = usu.update_one({'_id': ObjectId(id)}, mongo_set)
+
+    # Mensajes de salida
+    if resultado.acknowledged & resultado.modified_count == 1:
+        session['font_size'] = font_size_flota
+        flash('Constraseña actualizada correctamente', 'success')
+    elif resultado.acknowledged & resultado.modified_count == 0:
+        flash('Error al actualizar la constraseña, inténtelo de nuevo...', 'danger')
+    else:
+        flash('La contaseña no se ha actualizado. Error genérico', 'danger')
+     
+    return redirect(url_for('users.update_pass_post', id=id))
+    
 
 
 @bp.route('/consent')

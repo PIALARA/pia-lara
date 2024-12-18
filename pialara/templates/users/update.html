@@ -53,16 +53,10 @@
           <textarea class="form-control" id="observaciones" name="observaciones">{{model.observaciones}}</textarea>
         </div>
         
-        <div class="mb-3">
-          <label for="cliente-password" class="form-label">Contraseña</label>
-          <input type="password" class="form-control js-password" id="cliente-password" name="pass1" required />
-          <div class="invalid-feedback">Introduce la contraseña.</div>
-        </div>
-
-        <div class="mb-3">
-          <label for="cliente-password-repeat" class="form-label">Repetir contraseña</label>
-          <input type="password" class="form-control js-password-repeat" id="cliente-password-repeat" name="pass2" required />
-          <div class="invalid-feedback">Las contraseñas deben coincidir.</div>
+        <div class="text-center mt-3">
+          <a href="{{ url_for('users.update_pass_get',id=current_user.id) }}" class="btn btn-success">
+              <i class="bi bi-plus-square"></i>&nbsp;&nbsp;&nbsp;Cambiar Contraseña
+          </a>
         </div>
 
         <hr>
