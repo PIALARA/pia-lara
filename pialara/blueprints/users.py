@@ -161,6 +161,10 @@ def update_tech_post(id):
     usu = Usuario()
     tecnico = request.form.get('tecnico')
 
+    if len(tecnico) != 24:
+        flash('Error localizando al técnico. Id inexistente.', 'danger')
+        return redirect(url_for('users.index'))
+
     # Guardamos en model_tec el tecnico seleccionado
     model_tec = usu.find_one({'_id': ObjectId(tecnico)})
 
