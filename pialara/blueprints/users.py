@@ -36,7 +36,7 @@ def index():
     else:
         return redirect(url_for('audios.client_tag'))
 
-    return render_template(url, users=users, user_name='')
+    return render_template(url, users=users, user_name='', logged_rol=logged_rol)
 
 
 @bp.route('/', methods=['POST'])
