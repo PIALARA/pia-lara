@@ -117,10 +117,13 @@ def index():
     )
 
 
+
 @bp.route("/create")
 @login_required
 def create():
     return render_template("syllabus/create.html")
+
+
 
 
 @bp.route("/create", methods=["POST"])
@@ -160,6 +163,82 @@ def create_post():
         flash("La frase no se ha creado. Error genérico", "danger")
         return redirect(url_for("syllabus.create"))
 
+@bp.route("/create_iterable")
+@login_required
+def create_iterable():
+    return render_template("syllabus/create_iterable.html")
+
+@bp.route("/create_iterable", methods=["POST"])
+@login_required
+def create_iterable_post():
+    # Obtener los datos del formulario
+    tags = request.form.get("ftags")
+    qtyPhrases = request.form.get("qtyPhrases")
+
+    # Recogemos todas las frases del formulario
+    lista_frases = []
+    for i in range(int(qtyPhrases)):
+        lista_frases.append(request.form.get(f"ftext{i + 1}"))
+
+    if not any("" == frase for frase in lista_frases) and qtyPhrases != 'Seleccionar':
+
+        # Obtener los datos del usuario
+        usuario = Usuario()
+        params = {"mail": current_user.email}
+        user = usuario.find_one(params)
+
+        # Convertir el array de los tags
+        tagsArray = tags.split(", ")
+        texto = Syllabus()
+        
+        # Iteramos la lista de frases al reves
+        for index ,text in enumerate(reversed(lista_frases)):
+            if index == 0:
+                print(f'Reversed lista {index}', text)
+                # Crear el texto en la base de datos
+                aux = {
+                    "texto": text,
+                    "creador": {
+                        "id": user.get("_id"),
+                        "nombre": user.get("nombre"),
+                        "rol": user.get("rol"),
+                    },
+                    "tags": tagsArray,
+                    "fecha_creacion": datetime.now(),
+                    "iterable": {
+                        "num": abs(index - len(lista_frases)),
+                        "total": len(lista_frases)
+                    }
+                }
+                result = texto.insert_one(aux)
+                id_insertado = result.inserted_id  
+                print("Frase ", text, "ID ", id_insertado)
+            else:
+                aux = {
+                    "texto": text,
+                    "creador": {
+                        "id": user.get("_id"),
+                        "nombre": user.get("nombre"),
+                        "rol": user.get("rol"),
+                    },
+                    "tags": tagsArray,
+                    "fecha_creacion": datetime.now(),
+                    "iterable": {
+                        "siguiente": id_insertado,
+                        "num": abs(index - len(lista_frases)),
+                        "total": len(lista_frases)
+                    }
+                }
+                result = texto.insert_one(aux)
+                id_insertado = result.inserted_id           
+                print("Frase ", text, "ID ", id_insertado)
+    
+        flash("Iterable creado correctamente", "success")
+        return redirect(url_for("syllabus.index"))
+    else:
+        flash("Campos erroneos!", "danger")
+        return render_template("syllabus/create_iterable.html")
+    
 
 @bp.route("/update/<string:id>")
 @login_required
@@ -224,3 +303,4 @@ def delete(id):
     else:
         flash("La frase no se ha eliminado. Error genérico", "danger")
         return redirect(url_for("syllabus.index"))
+    
