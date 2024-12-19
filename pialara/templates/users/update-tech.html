@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">
+        {{ message }}
+        </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+  <h1 class="text-center p-3">Actualizar Técnico</h1>
+  <div class="tab-content py-4" id="nav-tabContent">
+      <form class="container" method="POST" style="max-width: 20rem">
+        <div class="mb-3">
+          <label for="tecnico" class="form-label">Técnico</label>
+          <select class="form-select" id="cliente-tecnico" name="tecnico" required>
+            {% for tecnico in tecnicos %}
+            <option value="{{ tecnico._id }}" {% if tecnico.mail == user.parent %} selected {% endif %}>{{ tecnico.mail }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <button class="btn btn-primary w-100 shadow" type="submit" id="actualizarBtn">
+            <i class="bi bi-plus-square me-2"></i>Actualizar
+          </button>
+        </div>
+      </form>
+  </div>
+  <script src="{{ url_for('static', filename='js/font_size.js') }}"></script>
+
+{% endblock %}
