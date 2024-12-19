@@ -17,7 +17,11 @@ from pialara.models.Enfermedades import Enfermedades
 from pialara.models.Disfonias import Disfonias
 from pialara.decorators import rol_required
 
+from werkzeug.security import check_password_hash
+from pialara import db
+
 bp = Blueprint('users', __name__, url_prefix='/users')
+
 
 @bp.route('/')
 @login_required
@@ -30,9 +34,11 @@ def index():
     url = 'users/index.html'
 
     if logged_rol == "admin":
-        users = u.find().sort([("rol", pymongo.ASCENDING),("nombre", pymongo.ASCENDING)])
+        users = u.find().sort(
+            [("rol", pymongo.ASCENDING), ("nombre", pymongo.ASCENDING)])
     elif logged_rol == "tecnico":
-        users = u.find({"rol": {"$eq": 'cliente'}, "parent": {"$eq": current_user.email}})
+        users = u.find({"rol": {"$eq": 'cliente'}, "parent": {
+                       "$eq": current_user.email}})
     else:
         return redirect(url_for('audios.client_tag'))
 
@@ -52,9 +58,11 @@ def search_user():
     if logged_rol == "admin":
         users = u.find({'nombre': {"$regex": user_name, '$options': 'i'}})
     else:
-        users = u.find({"rol": {"$eq": 'cliente'}, 'nombre': {"$regex": user_name, '$options': 'i'}, "parent": {"$eq": current_user.email}})
-  
+        users = u.find({"rol": {"$eq": 'cliente'}, 'nombre': {
+                       "$regex": user_name, '$options': 'i'}, "parent": {"$eq": current_user.email}})
+
     return render_template(url, users=users, user_name=user_name)
+
 
 @bp.route('/create')
 @login_required
@@ -72,6 +80,7 @@ def create():
         enfermedades=enfermedades.find(),
         disfonias=disfonias.find()
     )
+
 
 @bp.route('/create', methods=['POST'])
 @login_required
@@ -106,7 +115,7 @@ def create_post():
 
         newUser = {"nombre": nombreAdmin, "mail": emailAdmin, "rol": "admin",
                    "password": generate_password_hash(pass1, method='sha256'),
-                   "fecha_nacimiento":datetime.now(), "ultima_conexion":datetime.now()}
+                   "fecha_nacimiento": datetime.now(), "ultima_conexion": datetime.now()}
         result = user.insert_one(newUser)
 
     elif nombreTecnico and not existeCorreo(emailTecnico):
@@ -123,7 +132,7 @@ def create_post():
                    "sexo": sexoCliente, "provincia": provinciaCliente, "entidad": entidadCliente,
                    "observaciones": observacionesCliente,
                    "enfermedades": enfermedadesCliente, "dis": disCliente,
-                   "parent": current_user.email, "cant_audios":0}
+                   "parent": current_user.email, "cant_audios": 0}
         result = user.insert_one(newUser)
 
     # Comprobar el resultado y mostrar mensaje
@@ -142,6 +151,7 @@ def existeCorreo(email):
         return True
 
     return False
+
 
 @bp.route('/update-tech/<id>', methods=['GET'])
 @login_required
@@ -191,15 +201,23 @@ def update_tech_post(id):
     flash('Tecnico migrado con exito', 'success')
     return redirect(url_for('users.index'))
 
+
+
 @bp.route('/update/<id>', methods=['GET'])
 @login_required
 def update(id):
     u = Usuario()
     model = u.find_one({'_id': ObjectId(id)})
 
-    return render_template('users/update.html', model=model)
+    if model['rol'] == 'tecnico':
+        url = 'users/update-tecnico.html'
+    else:
+        url = 'users/update.html'
+
+    return render_template(url, model=model)
 
 
+# Actualiza datos de usuarios - POST
 @bp.route('/update/<id>', methods=['POST'])
 @login_required
 def update_post(id):
@@ -210,18 +228,20 @@ def update_post(id):
     entidad = request.form.get('entidad')
     fnac = request.form.get('fnac')
     observaciones = request.form.get('observaciones')
-    font_size = request.form.get('font_size',1)
+    font_size = request.form.get('font_size', 1)
 
     fecha = datetime.strptime(fnac, '%Y-%m-%d')
 
-    mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo, 'entidad': entidad, 'observaciones': observaciones, 'fecha_nacimiento': fecha}}
+    mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo, 'entidad': entidad,
+                          'observaciones': observaciones, 'fecha_nacimiento': fecha }}
 
     if font_size == "":
         font_size = 1
     font_size_flota = float(font_size)
 
     if font_size_flota != session['font_size']:
-        mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo, 'entidad': entidad, 'observaciones': observaciones, 'fecha_nacimiento': fecha, 'font_size': font_size_flota}}
+        mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo, 'entidad': entidad,
+                              'observaciones': observaciones, 'fecha_nacimiento': fecha,'font_size': font_size_flota }}
 
     print("MONGO_SET", mongo_set)
     resultado = usu.update_one({'_id': ObjectId(id)}, mongo_set)
@@ -236,6 +256,62 @@ def update_post(id):
     else:
         flash('La usuario no se ha actualizado. Error genérico', 'danger')
         return redirect(url_for('users.index'))
+
+
+# Actualizar Contraseña - GET
+@bp.route('/update-pass/<id>', methods=['GET'])
+@login_required
+def update_pass_get(id):
+    u = Usuario()
+    model = u.find_one({'_id': ObjectId(id)})
+
+    return render_template('users/update-pass.html', model=model)
+
+
+# Actualizar Contraseña - POST
+@bp.route('/update-pass/<id>', methods=['POST'])
+@login_required
+def update_pass_post(id):
+    usu = Usuario()
+    model = usu.find_one({'_id': ObjectId(id)})
+
+    user_pass = request.form.get('pass')
+    new_pass = request.form.get('new-pass')
+    repeat_pass = request.form.get('repeat-pass')
+
+    # Comprobar Password usuario
+    if not check_password_hash(model['password'], user_pass):
+        flash("Su contraseña no es correcta", 'danger')
+
+        return render_template('users/update-pass.html', model=model)
+    
+    # Comprobar nueva Password
+    if new_pass != repeat_pass:
+        flash("Las contraseñas no son iguales", 'danger')
+        model = usu.find_one({'_id': ObjectId(id)})
+        
+        return render_template('users/update-pass.html', model=model)
+
+    mongo_set = {"$set": {'password': generate_password_hash(new_pass, method='sha256')}}
+
+    font_size = 1
+    font_size_flota = float(font_size)
+
+    print("MONGO_SET", mongo_set)
+    resultado = usu.update_one({'_id': ObjectId(id)}, mongo_set)
+
+    # Mensajes de salida
+    if resultado.acknowledged & resultado.modified_count == 1:
+        session['font_size'] = font_size_flota
+        flash('Constraseña actualizada correctamente', 'success')
+    elif resultado.acknowledged & resultado.modified_count == 0:
+        flash('Error al actualizar la constraseña, inténtelo de nuevo...', 'danger')
+    else:
+        flash('La contaseña no se ha actualizado. Error genérico', 'danger')
+     
+    return redirect(url_for('users.update_pass_post', id=id))
+    
+
 
 @bp.route('/consent')
 @login_required

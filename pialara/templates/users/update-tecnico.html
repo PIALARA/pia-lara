@@ -12,10 +12,10 @@
   {% endif %}
 {% endwith %}
 
-  <div class="text-center p-3">
-    <img src="/static/img/microfono.svg" alt="Descripción del SVG" width="150" height="150" class="mb-3">
-    <h1>Actualizar usuario</h1>
-  </div>
+<div class="text-center p-3">
+  <img src="/static/img/auricular.svg" alt="Descripción del SVG" width="150" height="150" class="mb-3">
+  <h1>Actualizar técnico</h1>
+</div>
 
   <div class="tab-content py-4" id="nav-tabContent">
       <form class="container" method="POST" style="max-width: 20rem">
@@ -52,7 +52,7 @@
           <label for="observaciones" class="form-label">Observaciones</label>
           <textarea class="form-control" id="observaciones" name="observaciones">{{model.observaciones}}</textarea>
         </div>
-        
+
         <div class="text-center mt-3">
           <a href="{{ url_for('users.update_pass_get',id=current_user.id) }}" class="btn btn-success">
               <i class="bi bi-plus-square"></i>&nbsp;&nbsp;&nbsp;Cambiar Contraseña
@@ -61,6 +61,7 @@
 
         <hr>
         <label for="email" class="form-label">Tamaño de texto</label>
+
         <div>         
           <button type="button" class="btn btn-secondary" onclick="changeSize(1)" {% if model.font_size == 1 %}disabled{% endif %}>1x</button>
           <button type="button" class="btn btn-secondary" onclick="changeSize(1.25)" {% if model.font_size == 1.25 %}disabled{% endif %}>1.25x</button>
@@ -74,6 +75,7 @@
             <i class="bi bi-plus-square me-2"></i>Actualizar
           </button>
         </div>
+
       </form>
   </div>
   <script src="{{ url_for('static', filename='js/font_size.js') }}"></script>
