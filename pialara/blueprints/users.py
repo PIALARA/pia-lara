@@ -42,7 +42,7 @@ def index():
     else:
         return redirect(url_for('audios.client_tag'))
 
-    return render_template(url, users=users, user_name='')
+    return render_template(url, users=users, user_name='', logged_rol=logged_rol)
 
 
 @bp.route('/', methods=['POST'])
@@ -152,7 +152,57 @@ def existeCorreo(email):
 
     return False
 
-# Actualizar datos de usuarios - GET
+
+@bp.route('/update-tech/<id>', methods='GET'])
+@login_required
+def update_tech(id):
+    u = Usuario()
+    model = u.find_one({'_id': ObjectId(id)})
+
+    # Guardamos todos los tecnicos
+    tecnicos = u.find({'rol': 'tecnico'})
+
+
+    return render_template('users/update-tech.html', user=model, tecnicos=tecnicos)
+
+@bp.route('/update-tech/<id>', methods=['POST'])
+@login_required
+def update_tech_post(id):
+    usu = Usuario()
+    tecnico = request.form.get('tecnico')
+
+    if len(tecnico) != 24:
+        flash('Error localizando al técnico. Id inexistente.', 'danger')
+        return redirect(url_for('users.index'))
+
+    # Guardamos en model_tec el tecnico seleccionado
+    model_tec = usu.find_one({'_id': ObjectId(tecnico)})
+
+    # Creamos la variable mail para guardar el correo del tecnico
+    mail = ""
+
+    # Comprobamos si existe el id recogido en el formulario
+    if model_tec:
+
+        # Si funciona, guardamos su correo
+        mail = model_tec.get('mail')
+    else:
+
+        # Si no lo encuentra, cancelamos la operacion y avisamos del error
+        flash('Error localizando al técnico seleccionado', 'danger')
+        return redirect(url_for('users.index'))
+
+
+    mongo_set = {"$set": {'parent': mail}}
+
+    print("MONGO_SET", mongo_set)
+    resultado = usu.update_one({'_id': ObjectId(id)}, mongo_set)
+
+    flash('Tecnico migrado con exito', 'success')
+    return redirect(url_for('users.index'))
+
+
+
 @bp.route('/update/<id>', methods=['GET'])
 @login_required
 def update(id):

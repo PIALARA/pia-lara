@@ -69,6 +69,12 @@
           <p class="card-text mb-1">
             <i class="bi bi-clock me-2"></i>{{ user.ultima_conexion.strftime('%d/%m/%Y - %H:%M') }}
           </p>
+          {% if user.rol == "cliente" and logged_rol == "admin" %}
+          <p class="card-text mb-1">
+            <i class="bi bi-person-vcard me-2"></i>{{ user.parent }}
+            <a href="{{ url_for('users.update_tech',id=user._id) }}" class="bi bi-pencil-fill ms-2"></a>
+          </p>
+          {% endif %}
           <p class = "card-text mb-3 tipo_{{ user.rol }}" >
               <i class="bi bi-person"></i>  {{ user.rol }}
           </p>
