@@ -153,7 +153,7 @@ def existeCorreo(email):
     return False
 
 
-@bp.route('/update-tech/<id>', methods='GET'])
+@bp.route('/update-tech/<id>', methods=['GET'])
 @login_required
 def update_tech(id):
     u = Usuario()
