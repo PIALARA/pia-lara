@@ -78,9 +78,16 @@
           <p class = "card-text mb-3 tipo_{{ user.rol }}" >
               <i class="bi bi-person"></i>  {{ user.rol }}
           </p>
-          <a href="{{ url_for('users.update',id=user._id) }}" class="btn btn-primary align-self-start mt-auto">
-            <i class="bi bi-pencil me-2"></i>Editar
-          </a>
+          <div class="d-flex gap-2 mt-auto">
+            <a href="{{ url_for('users.update',id=user._id) }}" class="btn btn-primary align-self-start mt-auto">
+              <i class="bi bi-pencil me-2"></i>Editar
+            </a>
+            {% if user.rol == "cliente" %}
+            <a href="{{ url_for('audios.client_report', id=user._id) }}" class="btn btn-secondary align-self-start mt-auto">
+            <i class="bi bi-file-text me-2"></i>Informe
+            </a>
+            {% endif %}
+          </div>
         </section>
       </article>
     {% endfor %}

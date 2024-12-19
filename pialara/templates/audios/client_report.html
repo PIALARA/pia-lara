@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<header class="header text-center my-4">
+    {% if usuario_id %}
+        <h1>Resumen de Audios del Usuario</h1>
+    {% else %}
+        <h1>Resumen General de Audios</h1>
+    {% endif %}
+</header>
+
+<section class="container">
+    <!-- Total de audios -->
+    <div class="card mb-4">
+        <div class="card-body text-center">
+            <h2>Total de Audios Grabados</h2>
+            <p class="fs-3">{{ total_audios }}</p>
+        </div>
+    </div>
+
+    <!-- Audios por categoría -->
+    <div class="card">
+        <div class="card-body">
+            <h2 class="text-center">Audios por Categoría</h2>
+            <ul class="list-group">
+                {% for category, count in audios_por_categoria.items() %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ category }}
+                    <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</section>
+{% endblock %}

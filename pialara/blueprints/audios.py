@@ -3,6 +3,7 @@ import boto3
 import random
 from bson import ObjectId  # Asegúrate de importar ObjectId desde bson
 
+from bson.objectid import ObjectId
 import bson.objectid
 from flask import current_app
 from flask import Blueprint, render_template
@@ -17,6 +18,8 @@ from pialara.models.Frases import Frases
 from pialara.models.Usuario import Usuario
 from pialara.models.Syllabus import Syllabus
 from pialara.models.Clicks import Clicks
+
+from pialara.decorators import rol_required
 
 from datetime import datetime
 from random import sample
@@ -292,3 +295,69 @@ def tag_search():
         flash("No se han encontrado resultados de la etiqueta '" + tag_name + "'", "danger")
 
     return render_template('audios/client_tag.html', tags=tags, tag_name=tag_name)
+
+@bp.route('/client-report', methods=['GET'])
+@bp.route('/client-report/<id>', methods=['GET'])
+@rol_required(['admin', 'tecnico', 'cliente'])
+@login_required
+def client_report(id=None):
+    total_audios = 0
+    audios_por_categoria = {}
+    logged_rol = current_user.rol
+    url = 'audios/client_report.html'
+
+    if id or logged_rol == "cliente":
+        audios_model = Audios()
+        user_id = ObjectId(id) if id else current_user.id
+        pipeline = [
+            {"$match": {"usuario.id": user_id}},
+            {"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}}
+        ]
+        resultado = list(audios_model.aggregate(pipeline))
+
+        if resultado:
+            audios_por_categoria = {doc['_id']: doc['cantidad'] for doc in resultado}
+            total_audios = sum(audios_por_categoria.values())
+            
+    elif logged_rol == "admin":
+        audios_model = Audios()
+        pipeline = [{"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}}]
+        resultado = audios_model.aggregate(pipeline)
+        audios_por_categoria = {doc['_id']: doc['cantidad'] for doc in resultado}
+        total_audios = sum(audios_por_categoria.values())
+        
+    elif logged_rol == "tecnico":
+        usuario_model = Usuario()
+        pipeline = [
+            {
+                "$match": {
+                "parent": "tecnico@tecnico.com"
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "audios",
+                    "localField": "_id",
+                    "foreignField": "usuario.id",
+                    "as": "audios"
+                }
+            },
+            {
+                "$unwind": "$audios"
+            },
+            {
+                "$group": {
+                    "_id": "$audios.texto.tag",
+                    "cantidad": {
+                        "$sum": 1
+                    }
+                }
+            }
+        ]
+        resultado = usuario_model.aggregate(pipeline)
+        audios_por_categoria = {doc['_id']: doc['cantidad'] for doc in resultado}
+        total_audios = sum(audios_por_categoria.values())
+        
+    audios_por_categoria = dict(sorted(audios_por_categoria.items(), key=lambda x: x[1], reverse=True))
+
+    return render_template(url, total_audios=total_audios, audios_por_categoria=audios_por_categoria, usuario_id=id)
