@@ -305,10 +305,16 @@ def client_report(id=None):
     audios_por_categoria = {}
     logged_rol = current_user.rol
     url = 'audios/client_report.html'
+    cliente_nombre = "N/A"
 
     if id or logged_rol == "cliente":
         audios_model = Audios()
         user_id = ObjectId(id) if id else current_user.id
+        
+        usuario_model = Usuario()
+        cliente = usuario_model.find_one({"_id": user_id})
+        cliente_nombre = cliente.get("nombre", "Desconocido") if cliente else "Desconocido"
+        
         pipeline = [
             {"$match": {"usuario.id": user_id}},
             {"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}}
@@ -325,6 +331,7 @@ def client_report(id=None):
         resultado = audios_model.aggregate(pipeline)
         audios_por_categoria = {doc['_id']: doc['cantidad'] for doc in resultado}
         total_audios = sum(audios_por_categoria.values())
+        cliente_nombre = "Todos los usuarios"
         
     elif logged_rol == "tecnico":
         usuario_model = Usuario()
@@ -357,7 +364,8 @@ def client_report(id=None):
         resultado = usuario_model.aggregate(pipeline)
         audios_por_categoria = {doc['_id']: doc['cantidad'] for doc in resultado}
         total_audios = sum(audios_por_categoria.values())
+        cliente_nombre = "Usuarios supervisados"
         
     audios_por_categoria = dict(sorted(audios_por_categoria.items(), key=lambda x: x[1], reverse=True))
 
-    return render_template(url, total_audios=total_audios, audios_por_categoria=audios_por_categoria, usuario_id=id)
+    return render_template(url, total_audios=total_audios, audios_por_categoria=audios_por_categoria, usuario_id=id, cliente_nombre=cliente_nombre, rol=logged_rol)

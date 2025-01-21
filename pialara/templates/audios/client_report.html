@@ -2,12 +2,14 @@
 
 {% block content %}
 <header class="header text-center my-4">
-    {% if usuario_id %}
-        <h1>Resumen de Audios del Usuario</h1>
-    {% else %}
-        <h1>Resumen General de Audios</h1>
-    {% endif %}
-</header>
+    {% if rol == 'admin' %}
+    <h1>Resumen de Audios de {{cliente_nombre}} </h1>
+    {% elif rol == 'tecnico' %}
+    <h1>Resumen de Audios de los {{cliente_nombre}} </h1>
+   {% elif rol == 'cliente' %}
+   <h1>Mi resumen de audios</h1>
+   {% endif %}
+        </header>
 
 <section class="container">
     <!-- Total de audios -->
