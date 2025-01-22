@@ -121,7 +121,8 @@ def create_post():
     elif nombreTecnico and not existeCorreo(emailTecnico):
         newUser = {"nombre": nombreTecnico, "mail": emailTecnico, "rol": "tecnico",
                    "password": generate_password_hash(pass1, method='sha256'),
-                   "fecha_nacimiento": datetime.now(), "ultima_conexion": datetime.now()}
+                   "fecha_nacimiento": datetime.now(), "ultima_conexion": datetime.now(),
+                   "activo": True}
         result = user.insert_one(newUser)
 
     elif nombreCliente and not existeCorreo(emailCliente):
@@ -132,7 +133,8 @@ def create_post():
                    "sexo": sexoCliente, "provincia": provinciaCliente, "entidad": entidadCliente,
                    "observaciones": observacionesCliente,
                    "enfermedades": enfermedadesCliente, "dis": disCliente,
-                   "parent": current_user.email, "cant_audios": 0}
+                   "parent": current_user.email, "cant_audios": 0,
+                   "activo": True}
         result = user.insert_one(newUser)
 
     # Comprobar el resultado y mostrar mensaje
@@ -222,6 +224,11 @@ def update(id):
 @login_required
 def update_post(id):
     usu = Usuario()
+    # Convertirlo a booleano
+    if request.form.get('activo') == 'true':
+        activo = True
+    elif request.form.get('activo') == 'false':
+        activo = False
     nombre = request.form.get('nombre')
     email = request.form.get('email')
     sexo = request.form.get('sexo')
@@ -232,7 +239,7 @@ def update_post(id):
 
     fecha = datetime.strptime(fnac, '%Y-%m-%d')
 
-    mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo, 'entidad': entidad,
+    mongo_set = {"$set": {'activo':activo, 'nombre': nombre, 'mail': email, 'sexo': sexo, 'entidad': entidad,
                           'observaciones': observaciones, 'fecha_nacimiento': fecha }}
 
     if font_size == "":
@@ -240,7 +247,7 @@ def update_post(id):
     font_size_flota = float(font_size)
 
     if font_size_flota != session['font_size']:
-        mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo, 'entidad': entidad,
+        mongo_set = {"$set": {'activo':activo,'nombre': nombre, 'mail': email, 'sexo': sexo, 'entidad': entidad,
                               'observaciones': observaciones, 'fecha_nacimiento': fecha,'font_size': font_size_flota }}
 
     print("MONGO_SET", mongo_set)
