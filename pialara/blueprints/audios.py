@@ -364,7 +364,7 @@ def client_report(id=None):
         resultado = usuario_model.aggregate(pipeline)
         audios_por_categoria = {doc['_id']: doc['cantidad'] for doc in resultado}
         total_audios = sum(audios_por_categoria.values())
-        cliente_nombre = "Usuarios supervisados"
+        cliente_nombre = "los Usuarios supervisados"
         
     audios_por_categoria = dict(sorted(audios_por_categoria.items(), key=lambda x: x[1], reverse=True))
 
