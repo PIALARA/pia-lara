@@ -7,6 +7,13 @@
 <a href="/users/create" class="btn btn-success m-2">
   <i class="bi bi-plus-square"></i>&nbsp;&nbsp;&nbsp;Añadir Usuario</a>
 
+  {% if current_user.rol == "admin" %}
+
+    <a href="#" class="btn btn-success m-2" onclick="filtrarUsuarios()" id="mostrar_inactivos" name="mostrar_inactivos" value="true">
+      <i class="bi bi-eye-slash-fill"></i>&nbsp;&nbsp;&nbsp;Mostrar Inactivos
+    </a>
+  {% endif %}									  																															 
+
   <form class="container pb-4" style="max-width: 25rem" method="post">
     <div class="input-group">
       <input type="search" name="userName" class="form-control" placeholder="Buscar usuarios..." aria-label="Buscar usuarios..."
@@ -43,6 +50,11 @@
           <p class="card-text mb-1">
             <i class="bi bi-envelope-at me-2"></i>{{ user.mail }}
           </p>
+		  <p class="card-text mb-1">
+            <i class="bi bi-person-fill"></i>{{ user.activo }}
+          </p>						
+															  
+			  
           {% if user.rol == "cliente" %}
             <p class="card-text mb-1">
               <i class="bi bi-geo-alt me-2"></i>{{ user.provincia }}
