@@ -27,8 +27,8 @@
             <table class="table table-striped" id="categorias-tabla">
                 <thead>
                     <tr>
-                        <th onclick="ordenarTabla(0)">Categoría</th>
-                        <th onclick="ordenarTabla(1)">Cantidad audios</th>
+                        <th onclick="ordenarTabla(0)">Categoría <i class="bi bi-sort-down"></i></th>
+                        <th onclick="ordenarTabla(1)">Cantidad audios <i class="bi bi-sort-down"></i></th>
                     </tr>
                     <tbody>
                         {% for category, count in audios_por_categoria.items() %}
