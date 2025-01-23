@@ -18,14 +18,17 @@ window.speechSynthesis.onvoiceschanged = () => {
   // Recogemos las voces
   const voices = window.speechSynthesis.getVoices();
 
+  // Filtramos y obtenemos solo las voces en español
+  const spanishVoices = voices.filter(voice => /es/i.test(voice.lang));
+
   // Se va a seleccionar la primera voz del array de voces por defecto
-  audio.voice = voices[0];
+  audio.voice = spanishVoices[0];
 
   // Añadimos las voces como opciones al selector
   let html = "";
 
-  for (const key in voices) {
-    html += '<option value="' + key + '">' + voices[key].name + '</option>';
+  for (const key in spanishVoices) {
+    html += '<option value="' + key + '">' + spanishVoices[key].name + '</option>';
   }
 
   // Recogemos elemento select
@@ -38,7 +41,7 @@ window.speechSynthesis.onvoiceschanged = () => {
     // Obtenemos el value de la opción seleccionada, que a su vez es el índice del array de voces de la voz seleccionada
     // y la sustituimos por la voz actual.
     voiceIndex = e.target.value;
-    audio.voice = voices[voiceIndex];
+    audio.voice = spanishVoices[voiceIndex];
   });
 };
 //Selector de voz fin
