@@ -24,15 +24,49 @@
     <div class="card">
         <div class="card-body">
             <h2 class="text-center">Audios por Categoría</h2>
-            <ul class="list-group">
-                {% for category, count in audios_por_categoria.items() %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    {{ category }}
-                    <span class="badge bg-primary rounded-pill">{{ count }}</span>
-                </li>
-                {% endfor %}
-            </ul>
+            <table class="table table-striped" id="categorias-tabla">
+                <thead>
+                    <tr>
+                        <th onclick="ordenarTabla(0)">Categoría</th>
+                        <th onclick="ordenarTabla(1)">Cantidad audios</th>
+                    </tr>
+                    <tbody>
+                        {% for category, count in audios_por_categoria.items() %}
+                        <tr>
+                            <td>{{ category }}</td>
+                            <td>{{ count }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </thead>
+            </table>
         </div>
     </div>
 </section>
+
+<script>
+    function ordenarTabla(columnIndex) {
+        const table = document.getElementById("categorias-tabla");
+        const rows = Array.from(table.rows).slice(1); // Obtener todas las filas excepto la de encabezado
+        const isAscending = table.dataset.sortOrder !== "asc"; // Determinar el orden
+        table.dataset.sortOrder = isAscending ? "asc" : "desc";
+
+        rows.sort((rowA, rowB) => {
+            const cellA = rowA.cells[columnIndex].innerText;
+            const cellB = rowB.cells[columnIndex].innerText;
+
+            if (columnIndex === 1) { // Ordenar como números
+                return isAscending ? cellA - cellB : cellB - cellA;
+            } else { // Ordenar como texto
+                return isAscending 
+                    ? cellA.localeCompare(cellB) 
+                    : cellB.localeCompare(cellA);
+            }
+        });
+
+        // Reordenar la tabla
+        const tbody = table.tBodies[0];
+        tbody.append(...rows);
+    }
+</script>
 {% endblock %}
