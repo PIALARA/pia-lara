@@ -12,8 +12,12 @@
   {% endif %}
 {% endwith %}
 
+<div class="mx-5">
+  <button class="btn btn-secondary" onclick="window.history.back()">Volver</button>
+</div>
+
 <div class="text-center p-3">
-  <img src="/static/img/auricular.svg" alt="Descripción del SVG" width="150" height="150" class="mb-3">
+  <img src="/static/img/auricular.svg" alt="auricular" width="100" height="100">
   <h1>Actualizar técnico</h1>
 </div>
 
@@ -54,7 +58,7 @@
         </div>
 
         <div class="text-center mt-3">
-          <a href="{{ url_for('users.update_pass_get',id=current_user.id) }}" class="btn btn-success">
+          <a href="{{ url_for('users.update_pass_get',id=model._id) }}" class="btn btn-success">
               <i class="bi bi-plus-square"></i>&nbsp;&nbsp;&nbsp;Cambiar Contraseña
           </a>
         </div>
@@ -77,6 +81,12 @@
         </div>
 
       </form>
+
+      <div class="text-end mx-5">
+        <button class="btn btn-secondary" onclick="window.history.back()">Volver</button>
+      </div>
+
+      
   </div>
   <script src="{{ url_for('static', filename='js/font_size.js') }}"></script>
 

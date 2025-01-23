@@ -16,13 +16,12 @@
   <button class="btn btn-secondary" onclick="window.history.back()">Volver</button>
 </div>
 
-  <div class="text-center p-3">
-    <img src="/static/img/microfono.svg" alt="microfono" width="100" height="100">
-    <h1>Actualizar cliente</h1>
-  </div>
-
-  <div class="tab-content py-4" id="nav-tabContent">
-      <form class="container" method="POST" style="max-width: 20rem">
+<div class="text-center p-3">
+  <img src="/static/img/admin.svg" alt="administrador" width="100" height="100">
+  <h1>Actualizar administrador</h1>
+</div>
+<div class="tab-content py-4" id="nav-tabContent">
+  <form class="container" method="POST" style="max-width: 20rem">
         <div class="mb-3">
           <label for="nombre" class="form-label">Nombre</label>
           <input type="text" class="form-control" id="nombre" name="nombre" required value="{{model.nombre}}" />
@@ -48,81 +47,24 @@
         </div>
 
         <div class="mb-3">
-          <label for="provincia" class="form-label">Provincia</label>
-          <select class="form-select" id="provincia" name="provincia" required>
-            {% for item_provincia in datos_aux["provincias"] %}
-              <option value="{{ item_provincia }}" {% if item_provincia == model.provincia %}selected{% endif %}>
-                {{ item_provincia }}
-              </option>
-            {% endfor %}
-          </select>
-        </div>
-
-        <div class="mb-3">
           <label for="entidad" class="form-label">Entidad / Asociación</label>
           <input type="text" class="form-control" id="entidad" name="entidad" value="{{model.entidad}}" />
         </div>
 
         <div class="mb-3">
-          <label for="tecnico" class="form-label">Técnico</label>
-          <div class="d-flex">
-            <input type="text" class="form-control" id="tecnico" name="tecnico" value="{{model.parent}}" disabled />
-            {%if rol == "admin" %}
-              <a href="{{ url_for('users.update_tech',id=model._id) }}" class="bi bi-pencil-fill ms-2 pt-1"></a>
-            {% endif %}
-          </div>
-        </div>
-
-        {%if rol == "admin" or rol == "tecnico"%}
-       
-          <fieldset class="mb-3">
-            <legend class="fs-6">Enfermedades</legend>
-            {% for enfermedad in datos_aux["enfermedades"] %}
-              {% if enfermedad.visible == 1 %}
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="enfermedad" value="{{ enfermedad.nombre }}"
-                  id="enf-{{enfermedad.nombre}}" {% if enfermedad.nombre in model.enfermedades %}checked{% endif %}/>
-                  <label class="form-check-label" for="enf-{{enfermedad.nombre}}">{{enfermedad.nombre}}</label>
-                </div>
-              {% endif %}
-            {% endfor %}
-          </fieldset>
-
-          <fieldset class="mb-3">
-            <legend class="fs-6">Disfonias</legend>
-            {% for disfonia in datos_aux["disfonias"] %}
-            {% if disfonia.visible == 1 %}
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="checkbox" name="disfonia" value="{{disfonia.nombre}}" 
-                  id="dis-{{disfonia.nombre}}" {% if disfonia.nombre in model.dis %}checked{% endif %}  />
-                  <label class="form-check-label" for="dis-{{disfonia.nombre}}">{{disfonia.nombre}}</label>
-                </div>
-            {% endif %}
-            {% endfor %}
-          </fieldset>
-
-          <div class="text-end">
-            <label class="form-check-label mx-2" for="activo">Activo</label>
-            <input class="form-check-input" type="checkbox" name="activo" value="{{ model.activo }}" 
-            id="{{ activo }}" {% if model.activo %} checked {% endif %}/>
-          </div>
-
-        {% endif %}
-
-
-        <div class="mb-3">
           <label for="observaciones" class="form-label">Observaciones</label>
           <textarea class="form-control" id="observaciones" name="observaciones">{{model.observaciones}}</textarea>
         </div>
-        
+
         <div class="text-center mt-3">
-          <a href="{{ url_for('users.update_pass_get',id=model._id ) }}" class="btn btn-success">
+          <a href="{{ url_for('users.update_pass_get',id=current_user.id) }}" class="btn btn-success">
               <i class="bi bi-plus-square"></i>&nbsp;&nbsp;&nbsp;Cambiar Contraseña
           </a>
         </div>
 
         <hr>
         <label for="email" class="form-label">Tamaño de texto</label>
+
         <div>         
           <button type="button" class="btn btn-secondary" onclick="changeSize(1)" {% if model.font_size == 1 %}disabled{% endif %}>1x</button>
           <button type="button" class="btn btn-secondary" onclick="changeSize(1.25)" {% if model.font_size == 1.25 %}disabled{% endif %}>1.25x</button>
@@ -136,15 +78,15 @@
             <i class="bi bi-plus-square me-2"></i>Actualizar
           </button>
         </div>
-
-
-      </form>
-
-      <div class="text-end mx-5">
-        <button class="btn btn-secondary" onclick="window.history.back()">Volver</button>
-      </div>
-      
+  </form>
+     
+  <div class="text-end mx-5">
+    <button class="btn btn-secondary" onclick="window.history.back()">Volver</button>
   </div>
-  <script src="{{ url_for('static', filename='js/font_size.js') }}"></script>
+      
+</div>
+
+
+<script src="{{ url_for('static', filename='js/font_size.js') }}"></script>
 
 {% endblock %}
