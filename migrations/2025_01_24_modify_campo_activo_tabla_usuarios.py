@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# TODO: Ejecutar Migracion para produccion.
 # In[33]:
 
 
