@@ -46,7 +46,13 @@ def get_user_by_id(id):
                            password=usuario.get("password"),
                            rol=usuario.get("rol"),
                            ultima_conexion=usuario.get("ultima_conexion"),
-                           parent=usuario.get("parent"))
+                           parent=usuario.get("parent"),
+						   activo=usuario.get("activo"))
+													   
+		  
+				
+		 
+	   
         return usuario_obj
     except Exception as e:
         return e
@@ -66,7 +72,12 @@ def get_user(email):
                            rol=usuario.get("rol"),
                            ultima_conexion=usuario.get("ultima_conexion"),
                            parent=usuario.get("parent"),
-                           font_size=usuario.get("font_size"))
+                           font_size=usuario.get("font_size"),
+						   activo=usuario.get("activo"))
+													   
+						 
+				
+	   
 
         print("Usuario objeto por email:", usuario_obj)
 

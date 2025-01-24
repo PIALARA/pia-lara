@@ -149,5 +149,20 @@
     </div>
   </div>
   <script src="{{ url_for('static', filename='js/accessibility-settings.js') }}"></script>
+  <!-- <script>
+    function filtrarUsuarios() {
+      var mostrarInactivos = document.getElementById('mostrar_inactivos').checked;
+      var url = "{{ url_for('users.index') }}?mostrar_inactivos=" + mostrarInactivos;
+      window.location.href = url;
+    }
+  </script> -->
+  
+  <script>
+    function filtrarUsuarios() {
+      var mostrarInactivos = document.getElementById('mostrar_inactivos').getAttribute('value') === 'true';
+      var url = "{{ url_for('users.index') }}?mostrar_inactivos=" + mostrarInactivos;
+      window.location.href = url;
+    }
+  </script>		   
 </body>
 </html>

@@ -27,6 +27,8 @@ bp = Blueprint('users', __name__, url_prefix='/users')
 @login_required
 @rol_required(['admin', 'tecnico', 'cliente'])
 def index():
+	# mostrar_inactivos=request.form.get("mostrar_inactivos")
+    mostrar_inactivos = request.args.get('mostrar_inactivos') == 'true'
     u = Usuario()
 
     users = []
@@ -34,13 +36,26 @@ def index():
     url = 'users/index.html'
 
     if logged_rol == "admin":
-        users = u.find().sort(
-            [("rol", pymongo.ASCENDING), ("nombre", pymongo.ASCENDING)])
+        # users = u.find({"activo":True}).sort([("rol", pymongo.ASCENDING), ("nombre", pymongo.ASCENDING)])
+		
+        if mostrar_inactivos:
+            users = u.find({"activo": False}).sort([("rol", pymongo.ASCENDING), ("nombre", pymongo.ASCENDING)])
+        else:
+            users = u.find({"activo": True}).sort([("rol", pymongo.ASCENDING), ("nombre", pymongo.ASCENDING)])
     elif logged_rol == "tecnico":
-        users = u.find({"rol": {"$eq": 'cliente'}, "parent": {
-                       "$eq": current_user.email}})
+
+        # users = u.find({"rol": {"$eq": 'cliente'}, "parent": { "$eq": current_user.email}})
+        if mostrar_inactivos:
+            users = u.find({"rol": {"$eq": 'cliente'}, "parent": {"$eq": current_user.email}, "activo": False}).sort([("rol", pymongo.ASCENDING), ("nombre", pymongo.ASCENDING)])
+        else:
+            users = u.find({"rol": {"$eq": 'cliente'}, "parent": {"$eq": current_user.email}, "activo": True}).sort([("rol", pymongo.ASCENDING), ("nombre", pymongo.ASCENDING)])
+    							 
+																																												 
+			 
+																																												
     else:
         return redirect(url_for('audios.client_tag'))
+	
 
     return render_template(url, users=users, user_name='', logged_rol=logged_rol)
 
@@ -94,6 +109,7 @@ def create_post():
     emailTecnico = request.form.get('email_tecnico')
 
     nombreCliente = request.form.get('nombre_cliente')
+    activoCliente = request.form.get('activo_cliente')												  
     emailCliente = request.form.get('email_cliente')
     fNacCliente = request.form.get('fnac_cliente')
     sexoCliente = request.form.get('sexo_cliente')
@@ -121,7 +137,8 @@ def create_post():
     elif nombreTecnico and not existeCorreo(emailTecnico):
         newUser = {"nombre": nombreTecnico, "mail": emailTecnico, "rol": "tecnico",
                    "password": generate_password_hash(pass1, method='sha256'),
-                   "fecha_nacimiento": datetime.now(), "ultima_conexion": datetime.now()}
+                   "fecha_nacimiento": datetime.now(), "ultima_conexion": datetime.now(),
+                   "activo": True}
         result = user.insert_one(newUser)
 
     elif nombreCliente and not existeCorreo(emailCliente):
@@ -132,7 +149,8 @@ def create_post():
                    "sexo": sexoCliente, "provincia": provinciaCliente, "entidad": entidadCliente,
                    "observaciones": observacionesCliente,
                    "enfermedades": enfermedadesCliente, "dis": disCliente,
-                   "parent": current_user.email, "cant_audios": 0}
+                   "parent": current_user.email, "cant_audios": 0,
+                   "activo": True}
         result = user.insert_one(newUser)
 
     # Comprobar el resultado y mostrar mensaje
@@ -239,7 +257,7 @@ def update_post(id):
     # Rol del usuario a actualizar
     rol_usuario = usu.find_one({'_id': ObjectId(id)})['rol']
 
-    nombre = request.form.get('nombre')
+    nombre = request.form.get('nombre')  
     email = request.form.get('email')
     sexo = request.form.get('sexo')
     provincia = request.form.get('provincia')

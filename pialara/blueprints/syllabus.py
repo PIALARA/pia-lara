@@ -172,7 +172,12 @@ def create_iterable():
 @login_required
 def create_iterable_post():
     # Obtener los datos del formulario
-    tags = request.form.get("ftags")
+    tags = request.form.get('ftags')
+    if not tags or tags.strip() == "":
+        flash('El campo de etiquetas no puede estar vacío.', 'danger')
+        return redirect(url_for('syllabus.create_iterable'))
+
+    
     qtyPhrases = request.form.get("qtyPhrases")
 
     # Recogemos todas las frases del formulario
@@ -303,4 +308,3 @@ def delete(id):
     else:
         flash("La frase no se ha eliminado. Error genérico", "danger")
         return redirect(url_for("syllabus.index"))
-    

@@ -23,11 +23,37 @@
 
   <div class="tab-content py-4" id="nav-tabContent">
       <form class="container" method="POST" style="max-width: 20rem">
+         <!-- Comprobamos si el rol del usuario es "admin" -->
+          {% if current_user.rol == "admin" %}
+          <label for="activo" class="form-label">Usuario activo</label>
+          <div>
+            <!-- Botón "Sí" -->
+            <button type="submit" name="activo" value="true" 
+                    class="btn {% if model.activo %}btn-success{% else %}btn-secondary{% endif %}" 
+                    {% if model.activo %}disabled{% endif %}>
+              Sí
+            </button>
+            
+            <!-- Botón "No" -->
+            <button type="submit" name="activo" value="false" 
+                    class="btn {% if not model.activo %}btn-danger{% else %}btn-secondary{% endif %}" 
+                    {% if not model.activo %}disabled{% endif %}>
+              No
+            </button> 
+          </div>
+          {% endif %}
         <div class="mb-3">
           <label for="nombre" class="form-label">Nombre</label>
           <input type="text" class="form-control" id="nombre" name="nombre" required value="{{model.nombre}}" />
         </div>
         <div class="mb-3">
+		  <label for="cliente-activo" class="form-label">Activo</label>
+          <input type="text" class="form-control" id="activo" name="activo"  required value="{{model.activo}}"/>
+        </div>
+        <div class="mb-3">															   
+																												
+			  
+						  
           <label for="email" class="form-label">Email</label>
           <input type="email" class="form-control" id="email" name="email" required value="{{model.mail}}"/>
         </div>
