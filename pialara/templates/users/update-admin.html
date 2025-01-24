@@ -17,31 +17,11 @@
 </div>
 
 <div class="text-center p-3">
-  <img src="/static/img/auricular.svg" alt="auricular" width="100" height="100">
-  <h1>Actualizar técnico</h1>
+  <img src="/static/img/admin.svg" alt="administrador" width="100" height="100">
+  <h1>Actualizar administrador</h1>
 </div>
-
-  <div class="tab-content py-4" id="nav-tabContent">
-      <form class="container" method="POST" style="max-width: 20rem">
-         <!-- Comprobamos si el rol del usuario es "admin" -->
-            {% if current_user.rol == "admin" %}
-            <label for="activo" class="form-label">Usuario activo</label>
-            <div>
-              <!-- Botón "Sí" -->
-              <button type="submit" name="activo" value="true" 
-                      class="btn {% if model.activo %}btn-success{% else %}btn-secondary{% endif %}" 
-                      {% if model.activo %}disabled{% endif %}>
-                Sí
-              </button>
-              
-              <!-- Botón "No" -->
-              <button type="submit" name="activo" value="false" 
-                      class="btn {% if not model.activo %}btn-danger{% else %}btn-secondary{% endif %}" 
-                      {% if not model.activo %}disabled{% endif %}>
-                No
-              </button> 
-            </div>
-            {% endif %}
+<div class="tab-content py-4" id="nav-tabContent">
+  <form class="container" method="POST" style="max-width: 20rem">
         <div class="mb-3">
           <label for="nombre" class="form-label">Nombre</label>
           <input type="text" class="form-control" id="nombre" name="nombre" required value="{{model.nombre}}" />
@@ -77,7 +57,7 @@
         </div>
 
         <div class="text-center mt-3">
-          <a href="{{ url_for('users.update_pass_get',id=model._id) }}" class="btn btn-success">
+          <a href="{{ url_for('users.update_pass_get',id=current_user.id) }}" class="btn btn-success">
               <i class="bi bi-plus-square"></i>&nbsp;&nbsp;&nbsp;Cambiar Contraseña
           </a>
         </div>
@@ -98,15 +78,15 @@
             <i class="bi bi-plus-square me-2"></i>Actualizar
           </button>
         </div>
-
-      </form>
-
-      <div class="text-end mx-5">
-        <button class="btn btn-secondary" onclick="window.history.back()">Volver</button>
-      </div>
-
-      
+  </form>
+     
+  <div class="text-end mx-5">
+    <button class="btn btn-secondary" onclick="window.history.back()">Volver</button>
   </div>
-  <script src="{{ url_for('static', filename='js/font_size.js') }}"></script>
+      
+</div>
+
+
+<script src="{{ url_for('static', filename='js/font_size.js') }}"></script>
 
 {% endblock %}

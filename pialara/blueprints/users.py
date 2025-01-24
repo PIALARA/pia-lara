@@ -224,15 +224,28 @@ def update_tech_post(id):
 @bp.route('/update/<id>', methods=['GET'])
 @login_required
 def update(id):
-    u = Usuario()
-    model = u.find_one({'_id': ObjectId(id)})
+    usu = Usuario()
 
-    if model['rol'] == 'tecnico':
+    # Usuario a actualizar
+    usuario = usu.find_one({'_id': ObjectId(id)})
+
+    # Rol del usuario logeado
+    logged_rol = current_user.rol
+ 
+    # Datos auxiliares, incluye datos que necesite la plantilla
+    datos_aux ={} 
+ 
+    if usuario['rol'] == 'admin':
+        url = 'users/update-admin.html'
+    elif usuario['rol'] == 'tecnico':
         url = 'users/update-tecnico.html'
     else:
+        datos_aux["enfermedades"] = Enfermedades().find()
+        datos_aux["disfonias"] = Disfonias().find()
+        datos_aux["provincias"] = ['Alicante','Valencia','Castellon','Murcia']
         url = 'users/update.html'
-
-    return render_template(url, model=model)
+        
+    return render_template( url, model=usuario, rol=logged_rol, datos_aux=datos_aux )
 
 
 # Actualiza datos de usuarios - POST
@@ -240,56 +253,61 @@ def update(id):
 @login_required
 def update_post(id):
     usu = Usuario()
-    # Convertirlo a booleano
-    if request.form.get('activo') == 'true':
-        activo = True
-    elif request.form.get('activo') == 'false':
-        activo = False
-    nombre = request.form.get('nombre')
-									   
+
+    # Rol del usuario a actualizar
+    rol_usuario = usu.find_one({'_id': ObjectId(id)})['rol']
+
+    nombre = request.form.get('nombre')  
     email = request.form.get('email')
     sexo = request.form.get('sexo')
+    provincia = request.form.get('provincia')
     entidad = request.form.get('entidad')
     fnac = request.form.get('fnac')
     observaciones = request.form.get('observaciones')
     font_size = request.form.get('font_size', 1)
-
+    enfermedades = request.form.getlist('enfermedad')
+    disfonias = request.form.getlist('disfonia')
+    activo = request.form.get('activo')
     fecha = datetime.strptime(fnac, '%Y-%m-%d')
 
-    mongo_set = {"$set": {'activo':activo, 'nombre': nombre, 'mail': email, 'sexo': sexo, 'entidad': entidad,
-                          'observaciones': observaciones, 'fecha_nacimiento': fecha }}
-
-    if font_size == "":
+    if not font_size:
         font_size = 1
-    font_size_flota = float(font_size)
 
-    if font_size_flota != session['font_size']:
-        mongo_set = {"$set": {'activo':activo,'nombre': nombre, 'mail': email, 'sexo': sexo, 'entidad': entidad,
-                              'observaciones': observaciones, 'fecha_nacimiento': fecha,'font_size': font_size_flota }}
-
-    print("MONGO_SET", mongo_set)
+    mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo, 'provincia': provincia, 
+                          'entidad': entidad, 'activo': activo,'observaciones': observaciones,
+                          'fecha_nacimiento': fecha , 'font_size': float(font_size)}}
+    
+    # Añadir atributos especificos de cliente
+    if rol_usuario == "cliente":
+         mongo_set["$set"]["enfermedades"] = enfermedades
+         mongo_set["$set"]["dis"] = disfonias
+   
+    # Actualizar en BD
     resultado = usu.update_one({'_id': ObjectId(id)}, mongo_set)
-
-    if resultado.acknowledged & resultado.modified_count == 1:
-        session['font_size'] = font_size_flota
+ 
+    if resultado.acknowledged:
+        session['font_size'] = font_size
         flash('Usuario actualizado correctamente', 'success')
-        return redirect(url_for('users.index'))
-    elif resultado.acknowledged & resultado.modified_count == 0:
-        flash('Error al actualizar el usuario, inténtelo de nuevo...', 'danger')
-        return redirect(url_for('users.update', id=id))
+        return redirect(url_for('users.index', id=id))
     else:
-        flash('La usuario no se ha actualizado. Error genérico', 'danger')
-        return redirect(url_for('users.index'))
+        flash('Error al actualizar el usuario, inténtelo de nuevo...', 'danger')
+
+    return redirect(url_for('users.update', id=id))
 
 
 # Actualizar Contraseña - GET
 @bp.route('/update-pass/<id>', methods=['GET'])
 @login_required
 def update_pass_get(id):
-    u = Usuario()
-    model = u.find_one({'_id': ObjectId(id)})
+    usu = Usuario()
 
-    return render_template('users/update-pass.html', model=model)
+    # Usuario a actualizar
+    usuario = usu.find_one({'_id': ObjectId(id)})
+
+    # Usuario logeado
+    logged_user = current_user
+
+    return render_template('users/update-pass.html', model=usuario, logged_usuario=logged_user)
 
 
 # Actualizar Contraseña - POST
@@ -297,45 +315,41 @@ def update_pass_get(id):
 @login_required
 def update_pass_post(id):
     usu = Usuario()
-    model = usu.find_one({'_id': ObjectId(id)})
 
-    user_pass = request.form.get('pass')
+    # Usuario a actualizar
+    usuario = usu.find_one({'_id': ObjectId(id)})
+
+    # Usuario logeado
+    logged_user = current_user
+
+    user_logged_pass = request.form.get('pass')
     new_pass = request.form.get('new-pass')
     repeat_pass = request.form.get('repeat-pass')
 
     # Comprobar Password usuario
-    if not check_password_hash(model['password'], user_pass):
+    if not check_password_hash(logged_user.password, user_logged_pass):
         flash("Su contraseña no es correcta", 'danger')
-
-        return render_template('users/update-pass.html', model=model)
+        return redirect(url_for('users.update_pass_post', id=id))
     
     # Comprobar nueva Password
     if new_pass != repeat_pass:
         flash("Las contraseñas no son iguales", 'danger')
-        model = usu.find_one({'_id': ObjectId(id)})
-        
-        return render_template('users/update-pass.html', model=model)
+        return redirect(url_for('users.update_pass_post', id=id))
 
     mongo_set = {"$set": {'password': generate_password_hash(new_pass, method='sha256')}}
 
-    font_size = 1
-    font_size_flota = float(font_size)
-
-    print("MONGO_SET", mongo_set)
+    # Actualizar en BD
     resultado = usu.update_one({'_id': ObjectId(id)}, mongo_set)
 
     # Mensajes de salida
-    if resultado.acknowledged & resultado.modified_count == 1:
-        session['font_size'] = font_size_flota
-        flash('Constraseña actualizada correctamente', 'success')
-    elif resultado.acknowledged & resultado.modified_count == 0:
-        flash('Error al actualizar la constraseña, inténtelo de nuevo...', 'danger')
+    if resultado.acknowledged:
+        flash('Contraseña actualizada correctamente', 'success')
+        return redirect(url_for('users.index'))
     else:
-        flash('La contaseña no se ha actualizado. Error genérico', 'danger')
+        flash('Error al actualizar la constraseña, inténtelo de nuevo...', 'danger')
+        return redirect(url_for('users.update_pass_post', id=id))
      
-    return redirect(url_for('users.update_pass_post', id=id))
     
-
 
 @bp.route('/consent')
 @login_required
