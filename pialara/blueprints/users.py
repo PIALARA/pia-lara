@@ -240,11 +240,7 @@ def update(id):
 @login_required
 def update_post(id):
     usu = Usuario()
-    # Convertirlo a booleano
-    if request.form.get('activo') == 'true':
-        activo = True
-    elif request.form.get('activo') == 'false':
-        activo = False
+    
     nombre = request.form.get('nombre')
 									   
     email = request.form.get('email')
