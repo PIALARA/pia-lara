@@ -9,7 +9,7 @@ def create_app():
     app = Flask(__name__)
     config = configparser.ConfigParser()
     
-    config.read(os.path.abspath(os.path.join("../.ini")))
+    config.read(os.path.abspath(os.path.join(".ini")))
     
     # config.read('/var/www/pia-lara/.ini')
     # config.read('.ini')

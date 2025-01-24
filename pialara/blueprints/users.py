@@ -256,8 +256,9 @@ def update_post(id):
 
     # Rol del usuario a actualizar
     rol_usuario = usu.find_one({'_id': ObjectId(id)})['rol']
-
-    nombre = request.form.get('nombre')  
+    
+    nombre = request.form.get('nombre')
+									   
     email = request.form.get('email')
     sexo = request.form.get('sexo')
     provincia = request.form.get('provincia')
