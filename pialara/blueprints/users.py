@@ -271,6 +271,8 @@ def update_post(id):
     activo = request.form.get('activo')
     fecha = datetime.strptime(fnac, '%Y-%m-%d')
 
+    activo = True if activo else False
+
     if not font_size:
         font_size = 1
 
