@@ -6,8 +6,27 @@
 
 
 from pymongo import MongoClient
+import os
+import configparser
 
-client = MongoClient('mongodb://prelara:pr3l4r4m3c@27.0.172.67/prelara')
+config = configparser.ConfigParser()
+config.read(os.path.abspath(os.path.join("../.ini")))
+
+if config['DEFAULT']['ENVIRONMENT'] == "Local":
+    DB_URI = config['LOCAL']['PIALARA_DB_URI']
+    DB_NAME = config['LOCAL']['PIALARA_DB_NAME']
+else:
+    DB_URI = config['PROD']['PIALARA_DB_URI']
+    DB_NAME = config['PROD']['PIALARA_DB_NAME']
+
+
+client = MongoClient(
+    DB_URI,
+    maxPoolSize = 50,
+    timeoutMS = 2500,
+    ssl=False
+)[DB_NAME]
+
 tecnicos_asistentes = client['prelara']['usuarios'].distinct("parent", {"rol": "cliente"})
 
 print(tecnicos_asistentes)
