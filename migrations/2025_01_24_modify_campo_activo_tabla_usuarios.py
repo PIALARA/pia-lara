@@ -27,7 +27,7 @@ client = MongoClient(
     ssl=False
 )[DB_NAME]
 
-tecnicos_asistentes = client['prelara']['usuarios'].distinct("parent", {"rol": "cliente"})
+tecnicos_asistentes = client['usuarios'].distinct("parent", {"rol": "cliente"})
 
 print(tecnicos_asistentes)
 print(f"Cantidad de técnicos actualmente asignados a clientes: {len(tecnicos_asistentes)}")
@@ -39,7 +39,7 @@ print(f"Cantidad de técnicos actualmente asignados a clientes: {len(tecnicos_as
 # Vamos a consultar la cantidad de tecnicos que hay en la base de datos
 lista_todos_tecnicos = []
 
-todos_tecnicos = client['prelara']['usuarios'].find({"rol":"tecnico"})
+todos_tecnicos = client['usuarios'].find({"rol":"tecnico"})
 
 for tecnico in todos_tecnicos:
     lista_todos_tecnicos.append(tecnico)
@@ -51,7 +51,7 @@ print(f"Cantidad de tecnicos totales en la base de datos: {len(lista_todos_tecni
 # In[56]:
 
 
-tecnicos_parados = client['prelara']['usuarios'].aggregate([{"$match":{ 'mail' : {"$nin": tecnicos_asistentes},  "rol": "tecnico"}}])
+tecnicos_parados = client['usuarios'].aggregate([{"$match":{ 'mail' : {"$nin": tecnicos_asistentes},  "rol": "tecnico"}}])
 
 tecnicos_parados_list = []
 
@@ -64,7 +64,7 @@ ids_tecnicos_parados = [x["_id"] for x in tecnicos_parados_list]
 
 # Consultamos por asegurarnos si los ids extraidos pertenecen a tecnicos_asistentes
 
-check_rol = client['prelara']['usuarios'].find({"_id" : {"$in": ids_tecnicos_parados}}, {"rol": 1})
+check_rol = client['usuarios'].find({"_id" : {"$in": ids_tecnicos_parados}}, {"rol": 1})
 
 for rol in check_rol:
     if 'tecnico' not in rol["rol"]:
@@ -84,7 +84,7 @@ for rol in check_rol:
 
 # Activo = True / False
 
-client['prelara']['usuarios'].update_many(
+client['usuarios'].update_many(
   {'rol': 'cliente'}, 
   { "$set": {'activo': True}}
 )
@@ -93,7 +93,7 @@ client['prelara']['usuarios'].update_many(
 # In[61]:
 
 
-tecnicos_parados = client['prelara']['usuarios'].aggregate([{"$match":{ 'mail' : {"$nin": tecnicos_asistentes},  "rol": "tecnico"}}])
+tecnicos_parados = client['usuarios'].aggregate([{"$match":{ 'mail' : {"$nin": tecnicos_asistentes},  "rol": "tecnico"}}])
 
 tecnicos_parados_list = []
 
@@ -103,7 +103,7 @@ for tecnico_parado in tecnicos_parados:
 ids_tecnicos_parados = [x["_id"] for x in tecnicos_parados_list]
 print(ids_tecnicos_parados)
 
-client['prelara']['usuarios'].update_many(
+client['usuarios'].update_many(
   {
     'rol': 'tecnico', 
     '_id': { "$in": ids_tecnicos_parados} 
@@ -115,7 +115,7 @@ client['prelara']['usuarios'].update_many(
 # In[63]:
 
 
-client['prelara']['usuarios'].update_many(
+client['usuarios'].update_many(
   {
     'rol': 'tecnico', 
     'mail': { "$in": tecnicos_asistentes} 
