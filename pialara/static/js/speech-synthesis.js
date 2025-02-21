@@ -12,6 +12,40 @@ const speedButtons = document.querySelectorAll('.speed-button');
 
 const audio = new SpeechSynthesisUtterance();
 
+// Este evento se lanza cuando las voces han cargado correctemente
+window.speechSynthesis.onvoiceschanged = () => {
+
+  // Recogemos las voces
+  const voices = window.speechSynthesis.getVoices();
+
+  // Filtramos y obtenemos solo las voces en español
+  const spanishVoices = voices.filter(voice => /es/i.test(voice.lang));
+
+  // Se va a seleccionar la primera voz del array de voces por defecto
+  audio.voice = spanishVoices[0];
+
+  // Añadimos las voces como opciones al selector
+  let html = "";
+
+  for (const key in spanishVoices) {
+    html += '<option value="' + key + '">' + spanishVoices[key].name + '</option>';
+  }
+
+  // Recogemos elemento select
+  const elemVoiceSelect = document.querySelector('.voice-select');
+
+  elemVoiceSelect.innerHTML = html;
+
+  // Evento que se lanza cuando el selector cambia
+  elemVoiceSelect.addEventListener('change', (e) => {
+    // Obtenemos el value de la opción seleccionada, que a su vez es el índice del array de voces de la voz seleccionada
+    // y la sustituimos por la voz actual.
+    voiceIndex = e.target.value;
+    audio.voice = spanishVoices[voiceIndex];
+  });
+};
+//Selector de voz fin
+
 audio.addEventListener('end', () => {
   playButton.classList.replace('btn-danger', 'btn-warning');
   playButton.innerHTML = `

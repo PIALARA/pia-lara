@@ -1,0 +1,63 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">
+        {{ message }}
+        </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<div class="mx-5">
+  <button class="btn btn-secondary" onclick="window.history.back()">Volver</button>
+</div>
+
+<div class="text-center p-3">
+  <img src="/static/img/pass.svg" alt="contraseña" width="150" height="100">
+  <h1>Cambiar contraseña</h1>
+</div>
+
+  <div class="tab-content py-4" id="nav-tabContent">
+      <form class="container" method="POST" style="max-width: 20rem">
+
+        <p>{{ logged_usuario.rol.capitalize() }} : <span class="fw-bold">{{ logged_usuario.nombre }}</span></p>
+        
+        <div class="mb-3">
+          <label for="cliente-password" class="form-label">Contraseña</label>
+          <input type="password" class="form-control js-password" id="cliente-password" name="pass" required />
+          <div class="invalid-feedback">Introduce la contraseña.</div>
+        </div>
+        
+        {% if model._id|string != logged_usuario.get_id() %}
+          <p class="mt-4">{{ model.rol.capitalize() }} : <span class="fw-bold">{{ model.nombre }}</span></p>
+        {% endif %}
+ 
+        <div class="mb-3">
+          <label for="cliente-password" class="form-label">Nueva Contraseña</label>
+          <input type="password" class="form-control js-password" id="cliente-password" name="new-pass" required />
+          <div class="invalid-feedback">Introduce la contraseña.</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="cliente-password-repeat" class="form-label">Repetir Contraseña</label>
+          <input type="password" class="form-control js-password-repeat" id="cliente-password-repeat" name="repeat-pass" required />
+          <div class="invalid-feedback">Las contraseñas deben coincidir.</div>
+        </div>
+
+        <br/>
+       
+        <div class="mb-3">
+          <button class="btn btn-primary w-100 shadow" type="submit" id="actualizarBtn">
+            <i class="bi bi-plus-square me-2"></i>Actualizar
+          </button>
+        </div>
+
+      </form>
+  </div>
+  <script src="{{ url_for('static', filename='js/font_size.js') }}"></script>
+
+{% endblock %}

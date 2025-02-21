@@ -1,12 +1,14 @@
 import os.path
 import boto3
 import random
+from bson import ObjectId  # Asegúrate de importar ObjectId desde bson
 
+from bson.objectid import ObjectId
 import bson.objectid
 from flask import current_app
 from flask import Blueprint, render_template
 from flask import (
-    Blueprint, flash, redirect, render_template, request, url_for, jsonify
+    Blueprint, flash, redirect, render_template, request, url_for, jsonify, session
 )
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
@@ -16,6 +18,8 @@ from pialara.models.Frases import Frases
 from pialara.models.Usuario import Usuario
 from pialara.models.Syllabus import Syllabus
 from pialara.models.Clicks import Clicks
+
+from pialara.decorators import rol_required
 
 from datetime import datetime
 from random import sample
@@ -62,43 +66,103 @@ def client_tag():
 
     return render_template('audios/client_tag.html', tags_suerte=tags_suerte, tags_menos=tags_menos_grabadas, tags3=tags_aleatorio)
 
-
 @bp.route('/client-record/<string:tag_name>')
 @login_required
 def client_record(tag_name):
+    
+    
     syllabus = Syllabus()
     pipeline = [
         {
             '$unwind': {
                 'path': '$tags'
             }
-        }, {
+        },
+        {
             '$match': {
                 'tags': {'$regex': tag_name, '$options': 'i'}
             }
         }
     ]
-    syllabus = syllabus.aggregate(pipeline)
 
     # Guardamos el click
     clicks = Clicks()
     click_doc = {
-        "class":"audios",
-        "method":"client_record",
+        "class": "audios",
+        "method": "client_record",
         "tag": tag_name,
         "usuario": current_user.email,
         "timestamp": datetime.now()
     }
     clicks.insert_one(click_doc)
 
-    # Obtenemos una frase del syllabus con la etiqueta recibida
-    syllabus_list = [syllabus_item for syllabus_item in syllabus]
-    random_syllabus = random.choice(syllabus_list)
+    # Obtenemos las frases que coinciden con la etiqueta
+    syllabus_items = list(syllabus.aggregate(pipeline))  # Convertimos el cursor en lista
+    if not syllabus_items:
+        flash(f"No se han encontrado frases con la etiqueta '{tag_name}'", "danger")
+        return redirect(url_for('audios.client_tag'))  # Redirige si no se encuentran frases
+    
+    tag_name_ent = session.get('tag_name_ent', None)
+   
+    if tag_name_ent==tag_name or tag_name_ent==None:
+        session['tag_name_ent'] = str(tag_name)
+    else:
+        session.pop('next_syllabus_item_ent', None) 
+        session['tag_name_ent'] = str(tag_name)
 
-    # if not frases.alive:
-    #     flash("No se han encontrado frases con la etiqueta '" + tag_name + "'", "danger")
+    # Recuperamos el id de la siguiente frase desde la sesión (si existe)
+    current_item_id = session.get('next_syllabus_item_ent', None)
+    next_syllabus_item = None
 
-    return render_template('audios/client_record.html', tag=tag_name, syllabus=random_syllabus)
+    if current_item_id:
+        # Recuperamos la frase actual
+        current_item = syllabus.find_one({"_id": ObjectId(current_item_id)})
+        
+        if current_item:
+            # Comprobamos si tiene el campo 'iterable'
+            iterable = current_item.get('iterable', None)
+            
+            if iterable:
+                num = iterable.get('num')
+                siguiente_id = iterable.get('siguiente')
+
+                if  num == 1 or siguiente_id!=None:
+                    # Si tiene 'iterable.num == 1' y 'siguiente_id', pasamos a la siguiente frase
+                    next_syllabus_item = syllabus.find_one({"_id": ObjectId(siguiente_id)})
+                    
+                    if next_syllabus_item:
+                        session['next_syllabus_item_ent'] = str(next_syllabus_item['_id'])
+                        
+                    else:
+                        # Si no tiene 'siguiente_id', seleccionamos aleatoriamente
+                        next_syllabus_item = select_random_item(syllabus_items)
+                        session['next_syllabus_item_ent'] = str(next_syllabus_item['_id'])
+                else:
+                    # Si no tiene 'siguiente' o 'iterable.num' no es 1, seleccionamos aleatoria
+                    next_syllabus_item = select_random_item(syllabus_items)
+                    session['next_syllabus_item_ent'] = str(next_syllabus_item['_id'])
+            else:
+                # Si no tiene campo 'iterable', seleccionamos aleatoria
+                next_syllabus_item = select_random_item(syllabus_items)
+                session['next_syllabus_item_ent'] = str(next_syllabus_item['_id'])
+        else:
+            # Si no se encuentra el item actual, seleccionamos aleatoriamente una frase
+            next_syllabus_item = select_random_item(syllabus_items)
+            session['next_syllabus_item_ent'] = str(next_syllabus_item['_id'])
+    else:
+        # Si no hay 'current_item_id', seleccionamos aleatoria
+        next_syllabus_item = select_random_item(syllabus_items)
+        session['next_syllabus_item_ent'] = str(next_syllabus_item['_id'])
+
+    # Pasamos el item seleccionado a la plantilla
+    return render_template('audios/client_record.html', tag=tag_name, syllabus=next_syllabus_item)
+
+# Función para seleccionar una frase aleatoria que no tenga 'iterable' o tenga 'iterable.num = 1'
+def select_random_item(syllabus_items):
+    # Filtramos las frases que no tienen 'iterable' o tienen 'iterable.num == 1'
+    valid_items = [item for item in syllabus_items if not item.get('iterable') or item['iterable'].get('num') == 1]
+    if valid_items:
+        return random.choice(valid_items)
 
 
 @bp.route('/client-text')
@@ -231,3 +295,77 @@ def tag_search():
         flash("No se han encontrado resultados de la etiqueta '" + tag_name + "'", "danger")
 
     return render_template('audios/client_tag.html', tags=tags, tag_name=tag_name)
+
+@bp.route('/client-report', methods=['GET'])
+@bp.route('/client-report/<id>', methods=['GET'])
+@rol_required(['admin', 'tecnico', 'cliente'])
+@login_required
+def client_report(id=None):
+    total_audios = 0
+    audios_por_categoria = {}
+    logged_rol = current_user.rol
+    url = 'audios/client_report.html'
+    cliente_nombre = "N/A"
+
+    if id or logged_rol == "cliente":
+        audios_model = Audios()
+        user_id = ObjectId(id) if id else current_user.id
+        
+        usuario_model = Usuario()
+        cliente = usuario_model.find_one({"_id": user_id})
+        cliente_nombre = cliente.get("nombre", "Desconocido") if cliente else "Desconocido"
+        
+        pipeline = [
+            {"$match": {"usuario.id": user_id}},
+            {"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}}
+        ]
+        resultado = list(audios_model.aggregate(pipeline))
+
+        if resultado:
+            audios_por_categoria = {doc['_id']: doc['cantidad'] for doc in resultado}
+            total_audios = sum(audios_por_categoria.values())
+            
+    elif logged_rol == "admin":
+        audios_model = Audios()
+        pipeline = [{"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}}]
+        resultado = audios_model.aggregate(pipeline)
+        audios_por_categoria = {doc['_id']: doc['cantidad'] for doc in resultado}
+        total_audios = sum(audios_por_categoria.values())
+        cliente_nombre = "Todos los usuarios"
+        
+    elif logged_rol == "tecnico":
+        usuario_model = Usuario()
+        pipeline = [
+            {
+                "$match": {
+                "parent": "tecnico@tecnico.com"
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "audios",
+                    "localField": "_id",
+                    "foreignField": "usuario.id",
+                    "as": "audios"
+                }
+            },
+            {
+                "$unwind": "$audios"
+            },
+            {
+                "$group": {
+                    "_id": "$audios.texto.tag",
+                    "cantidad": {
+                        "$sum": 1
+                    }
+                }
+            }
+        ]
+        resultado = usuario_model.aggregate(pipeline)
+        audios_por_categoria = {doc['_id']: doc['cantidad'] for doc in resultado}
+        total_audios = sum(audios_por_categoria.values())
+        cliente_nombre = "los Usuarios supervisados"
+        
+    audios_por_categoria = dict(sorted(audios_por_categoria.items(), key=lambda x: x[1], reverse=True))
+
+    return render_template(url, total_audios=total_audios, audios_por_categoria=audios_por_categoria, usuario_id=id, cliente_nombre=cliente_nombre, rol=logged_rol)

@@ -1,0 +1,72 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<header class="header text-center my-4">
+    {% if rol == 'admin' %}
+    <h1>Resumen de Audios de {{cliente_nombre}} </h1>
+    {% elif rol == 'tecnico' %}
+    <h1>Resumen de Audios de {{cliente_nombre}} </h1>
+   {% elif rol == 'cliente' %}
+   <h1>Mi resumen de audios</h1>
+   {% endif %}
+        </header>
+
+<section class="container">
+    <!-- Total de audios -->
+    <div class="card mb-4">
+        <div class="card-body text-center">
+            <h2>Total de Audios Grabados</h2>
+            <p class="fs-3">{{ total_audios }}</p>
+        </div>
+    </div>
+
+    <!-- Audios por categoría -->
+    <div class="card">
+        <div class="card-body">
+            <h2 class="text-center">Audios por Categoría</h2>
+            <table class="table table-striped" id="categorias-tabla">
+                <thead>
+                    <tr>
+                        <th onclick="ordenarTabla(0)">Categoría <i class="bi bi-sort-down"></i></th>
+                        <th onclick="ordenarTabla(1)">Cantidad audios <i class="bi bi-sort-down"></i></th>
+                    </tr>
+                    <tbody>
+                        {% for category, count in audios_por_categoria.items() %}
+                        <tr>
+                            <td>{{ category }}</td>
+                            <td>{{ count }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </thead>
+            </table>
+        </div>
+    </div>
+</section>
+
+<script>
+    function ordenarTabla(columnIndex) {
+        const table = document.getElementById("categorias-tabla");
+        const rows = Array.from(table.rows).slice(1); // Obtener todas las filas excepto la de encabezado
+        const isAscending = table.dataset.sortOrder !== "asc"; // Determinar el orden
+        table.dataset.sortOrder = isAscending ? "asc" : "desc";
+
+        rows.sort((rowA, rowB) => {
+            const cellA = rowA.cells[columnIndex].innerText;
+            const cellB = rowB.cells[columnIndex].innerText;
+
+            if (columnIndex === 1) { // Ordenar como números
+                return isAscending ? cellA - cellB : cellB - cellA;
+            } else { // Ordenar como texto
+                return isAscending 
+                    ? cellA.localeCompare(cellB) 
+                    : cellB.localeCompare(cellA);
+            }
+        });
+
+        // Reordenar la tabla
+        const tbody = table.tBodies[0];
+        tbody.append(...rows);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">
+        {{ message }}
+        </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<div class="mx-5">
+  <button class="btn btn-secondary" onclick="window.history.back()">Volver</button>
+</div>
+
+<div class="text-center p-3">
+  <img src="/static/img/admin.svg" alt="administrador" width="100" height="100">
+  <h1>Actualizar administrador</h1>
+</div>
+<div class="tab-content py-4" id="nav-tabContent">
+  <form class="container" method="POST" style="max-width: 20rem">
+        <div class="mb-3">
+          <label for="nombre" class="form-label">Nombre</label>
+          <input type="text" class="form-control" id="nombre" name="nombre" required value="{{model.nombre}}" />
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" name="email" required value="{{model.mail}}"/>
+        </div>
+        <div class="mb-3">
+          <label for="sexo" class="form-label">Sexo</label>
+          <select class="form-select" id="cliente-sexo" name="sexo" required>
+            <option value="H" {% if model.sexo == "H" %} selected {% endif %}>Hombre</option>
+            <option value="M" {% if model.sexo == "M" %} selected {% endif %}>Mujer</option>
+            <option value="A" {% if model.sexo == "A" %} selected {% endif %}>Ambiguo</option>
+            <option value="T" {% if model.sexo == "T" %} selected {% endif %}>Trans</option>
+          </select>
+        </div>
+
+        {% set fnac = model.fecha_nacimiento.strftime('%Y-%m-%d') %}
+        <div class="mb-3">
+          <label for="fecha_nacimiento" class="form-label">Fecha de nacimiento</label>
+          <input type="date" class="form-control" id="fecha_nacimiento" name="fnac" value="{{fnac}}"/>
+        </div>
+
+        <div class="mb-3">
+          <label for="entidad" class="form-label">Entidad / Asociación</label>
+          <input type="text" class="form-control" id="entidad" name="entidad" value="{{model.entidad}}" />
+        </div>
+
+        <div class="mb-3">
+          <label for="observaciones" class="form-label">Observaciones</label>
+          <textarea class="form-control" id="observaciones" name="observaciones">{{model.observaciones}}</textarea>
+        </div>
+
+        <div class="text-center mt-3">
+          <a href="{{ url_for('users.update_pass_get',id=current_user.id) }}" class="btn btn-success">
+              <i class="bi bi-plus-square"></i>&nbsp;&nbsp;&nbsp;Cambiar Contraseña
+          </a>
+        </div>
+
+        <hr>
+        <label for="email" class="form-label">Tamaño de texto</label>
+
+        <div>         
+          <button type="button" class="btn btn-secondary" onclick="changeSize(1)" {% if model.font_size == 1 %}disabled{% endif %}>1x</button>
+          <button type="button" class="btn btn-secondary" onclick="changeSize(1.25)" {% if model.font_size == 1.25 %}disabled{% endif %}>1.25x</button>
+          <button type="button" class="btn btn-secondary" onclick="changeSize(1.5)" {% if model.font_size == 1.5 %}disabled{% endif %}>1.5x</button>
+        </div>
+        <input type="hidden" id="font_size" name="font_size" value="{{model.font_size}}"/>
+        <p id="textoEjemplo" class="mt-3">Texto de ejemplo</p>
+
+        <div class="mb-3">
+          <button class="btn btn-primary w-100 shadow" type="submit" id="actualizarBtn">
+            <i class="bi bi-plus-square me-2"></i>Actualizar
+          </button>
+        </div>
+  </form>
+     
+  <div class="text-end mx-5">
+    <button class="btn btn-secondary" onclick="window.history.back()">Volver</button>
+  </div>
+      
+</div>
+
+
+<script src="{{ url_for('static', filename='js/font_size.js') }}"></script>
+
+{% endblock %}

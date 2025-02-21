@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="notification is-danger">
+                {{ messages[0] }}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <h1 class="text-center p-3">Crear Encadenados</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+ 
+    <form class="container" name="miFormulario" onsubmit="return validarFormulario()" 
+	method="post" style="max-width: 30rem" 
+	action="{{ url_for("syllabus.create_iterable") }}">
+        <div class="mb-3">
+            <div class="mb-3">
+                <label class="form_label mb-3" for="numberSelect">¿Cuantas frases encadenadas?</label>
+                <div class="form_label mb-3">
+                    <select id="numberSelect" name="qtyPhrases">
+                        <option value="0">Seleccionar</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+        
+                <div id="inputContainer" class="d-flex justify-content-center flex-column"></div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="tags" class="form-label">Tags (separados por comas)</label>
+            <input class="form-control" id="tags" type="text" name="ftags" placeholder="Tags" rows="1" cols="70"/>
+        </div>
+        <div class="mb-3">
+            <button class="btn btn-primary w-100 shadow" type="submit">
+                <i class="bi bi-plus-square me-2"></i>Crear frase
+            </button>
+        </div>
+    </form>
+
+<script>
+
+    function validarFormulario() {
+        let tag = document.forms["miFormulario"]["ftags"].value;
+        if (tag.trim() == "") {
+            alert("Todos los campos deben estar llenos.");
+            return false;
+        }
+
+        // Validar que los campos de texto dinámicos no estén vacíos 
+        const inputs = document.querySelectorAll('#inputContainer input[type="text"]');
+        for (let input of inputs) {
+            if (input.value.trim() === "") {
+                alert("Todos los campos de frases encadenadas deben estar llenos.");
+                return false;
+            }
+        }
+
+        return true
+    }
+
+    window.onload = function() {
+        document.getElementById("numberSelect").value = "0";
+    };
+    // Referencia al select y al contenedor de inputs
+    const numberSelect = document.getElementById('numberSelect');
+    const inputContainer = document.getElementById('inputContainer');
+
+    // Evento para detectar cambios en el select
+    numberSelect.addEventListener('change', () => {
+        // Limpia los inputs previos
+        inputContainer.innerHTML = '';
+
+        // Obtén el número seleccionado
+        const numInputs = parseInt(numberSelect.value);
+
+        // Genera tantos inputs como el número seleccionado
+        for (let i = 1; i <= numInputs; i++) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = `ftext${i}`;
+            input.placeholder = `Input ${i}`;
+            input.classList.add('d-flex', 'justify-content-center', 'm-2')
+            inputContainer.appendChild(input);
+
+            // Añadir un salto de línea para la estética
+            inputContainer.appendChild(document.createElement('br'));
+        }
+    });
+</script>
+{% endblock %}
