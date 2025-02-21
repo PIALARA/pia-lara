@@ -20,6 +20,12 @@ a:hover {
     color: lightblue;   
 }
 
+.recuperarPass {
+    color: gray !important; /* Asegura que sobrescriba */
+    font-weight: normal !important;
+    text-decoration: none; /* Si quieres que tenga subrayado */
+}
+
 .inciarSesion{
     background-color: rgb(80, 150, 166) !important;
 }
