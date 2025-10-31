@@ -12,12 +12,12 @@ body{
 
 a {
     text-decoration: none;
-    color: white;
+    color: rgb(44, 93, 207);
     font-weight: bold;
 }
 
 a:hover {
-    color: lightblue;   
+    color: rgb(22, 49, 207);   
 }
 
 .inciarSesion{
