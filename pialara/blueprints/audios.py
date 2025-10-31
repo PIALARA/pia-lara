@@ -31,6 +31,7 @@ bp = Blueprint('audios', __name__, url_prefix='/audios')
 def client_tag():
     syllabus = Syllabus()
     audio = Audios()
+    clicks = Clicks() 
 
     pipeline = [
         {
@@ -64,7 +65,28 @@ def client_tag():
 
     tags_aleatorio = sample(list(set(todos_tags)),5)
 
-    return render_template('audios/client_tag.html', tags_suerte=tags_suerte, tags_menos=tags_menos_grabadas, tags3=tags_aleatorio)
+# 🎯 4️⃣ Últimas etiquetas grabadas con contador
+    pipeline_ultimas = [
+        {"$match": {"usuario": current_user.email, "class": "audios"}},
+        {"$sort": {"timestamp": -1}},
+        {"$group": {
+            "_id": "$tag",
+            "count": {"$sum": 1},
+            "last_time": {"$first": "$timestamp"}
+        }},
+        {"$sort": {"last_time": -1}},
+        {"$limit": 5}
+    ]
+    tags_ultimas_docs = list(clicks.aggregate(pipeline_ultimas))
+    tags_ultimas = [
+    {
+        "name": doc["_id"], # el nombre limpio
+        "display": f"{doc['_id']} ({doc['count']})"  # lo que se muestra
+    }
+    for doc in tags_ultimas_docs
+]
+
+    return render_template('audios/client_tag.html', tags_suerte=tags_suerte, tags_menos=tags_menos_grabadas, tags3=tags_aleatorio,tags_ultimas=tags_ultimas)
 
 @bp.route('/client-record/<string:tag_name>')
 @login_required
@@ -110,6 +132,7 @@ def client_record(tag_name):
         session.pop('next_syllabus_item_ent', None) 
         session['tag_name_ent'] = str(tag_name)
 
+
     # Recuperamos el id de la siguiente frase desde la sesión (si existe)
     current_item_id = session.get('next_syllabus_item_ent', None)
     next_syllabus_item = None
@@ -153,6 +176,8 @@ def client_record(tag_name):
         # Si no hay 'current_item_id', seleccionamos aleatoria
         next_syllabus_item = select_random_item(syllabus_items)
         session['next_syllabus_item_ent'] = str(next_syllabus_item['_id'])
+
+    
 
     # Pasamos el item seleccionado a la plantilla
     return render_template('audios/client_record.html', tag=tag_name, syllabus=next_syllabus_item)
