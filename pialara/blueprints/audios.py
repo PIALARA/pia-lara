@@ -1,6 +1,7 @@
 import os.path
 import boto3
 import random
+import re
 from bson import ObjectId  # Asegúrate de importar ObjectId desde bson
 
 from bson.objectid import ObjectId
@@ -56,6 +57,8 @@ def client_tag():
     todos_tags = syllabus.distinct("tags",{})
     tags_audios_menos_grabadas = audio.distinct("texto.tag", {"texto.tipo": "syllabus"})
     tags_menos_grabadas = list(set(todos_tags) - set(tags_audios_menos_grabadas))
+    patron = re.compile(r"^\d{1,3}[A-Za-z]{1,2}\d$")
+    tags_menos_grabadas = [tag for tag in tags_menos_grabadas if patron.match(tag)]
 
     if tags_menos_grabadas and len(tags_menos_grabadas) >= 5:
         tags_menos_grabadas = sample(tags_menos_grabadas, 5)
