@@ -135,7 +135,7 @@ def create_post():
     activoCliente = request.form.get('activo_cliente')
     observacionesCliente = request.form.get('observaciones_cliente')
     enfermedadesCliente = request.form.getlist('enfermedades')
-    afectacionCliente = request.form.getlist('afectacion_cliente')
+    afectacionCliente = request.form.get('afectacion_cliente')
 
     user = Usuario()
 
