@@ -169,7 +169,7 @@ def select_random_item(syllabus_items):
 @login_required
 def client_text():
     return render_template('audios/client_text.html')
-
+    
 
 @bp.route('/save-record', methods=['POST'])
 @login_required
