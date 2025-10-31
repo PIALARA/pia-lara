@@ -40,38 +40,86 @@
 
     <section class="tab-pane fade show active" id="nav-cliente" role="tabpanel" aria-labelledby="nav-cliente-tab" tabindex="0">
       <form class="container js-form" style="max-width: 24rem" method="post">
+        <h2>Datos de la asociación</h2>
         <div class="mb-3">
-          <label for="cliente-nombre" class="form-label">Nombre</label>
+          <label for="entidad-nombre" class="form-label">Nombre de la Entidad</label>
+          <input type="text" class="form-control" id="entidad-nombre" name="nombre_entidad" required />
+        </div>
+        <div class="mb-3">
+          <label for="entidad-cif" class="form-label">CIF</label>
+          <input type="text" class="form-control" id="entidad-cif" name="cif_entidad" required />
+        </div>
+        <div class="mb-3">
+          <label for="entidad-persona" class="form-label">Persona de referencia</label>
+          <input type="text" class="form-control" id="entidad-persona" name="persona_referencia" required />
+        </div>
+        <div class="mb-3">
+          <label for="entidad-direccion" class="form-label">Dirección</label>
+          <input type="text" class="form-control" id="entidad-direccion" name=direccion_entidad" required />
+        </div>
+        <div class="mb-3">
+          <label for="entidad-telefono" class="form-label">Teléfono</label>
+          <input type="text" class="form-control" id="entidad-telefono" name="telefono_entidad" required />
+        </div>
+        <div class="mb-3">
+          <label for="entidad-mail" class="form-label">Mail</label>
+          <input type="email" class="form-control" id="entidad-mail" name="mail_entidad" required />
+        </div>
+        <fieldset class="mb-3">
+          <legend class="fs-6">Colectivo de atención</legend>
+          {% for enfermedad in enfermedades %}
+            {% if enfermedad.visible == 1 %}
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="enfermedades" value="{{ enfermedad.nombre }}" id="enf-{{enfermedad.nombre}}" />
+                <label class="form-check-label" for="enf-{{enfermedad.nombre}}">{{enfermedad.nombre}}</label>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </fieldset>
+        
+        <h2>Datos de la persona Tutor/a - Madre/Padre</h2>
+        <div class="mb-3">
+          <label for="tutor-nombre" class="form-label">Nombre de la persona madre/padre o persona encargada</label>
+          <input type="text" class="form-control" id="tutor-nombre" name="nombre-tutor" required />
+        </div>
+        <div class="mb-3">
+          <label for="tutor-dni" class="form-label">DNI</label>
+          <input type="text" class="form-control" id="tutor-dni" name="dni_tutor" required />
+        </div>
+        <div class="mb-3">
+          <label for="tutor-direccion" class="form-label">Dirección</label>
+          <input type="text" class="form-control" id="tutor-direccion" name="direccion_tutor" required />
+        </div>
+        <div class="mb-3">
+          <label for="tutor-telefono" class="form-label">Teléfono</label>
+          <input type="text" class="form-control" id="tutor-telefono" name="telefono_tutor" required />
+        </div>
+        <div class="mb-3">
+          <label for="tutor-mail" class="form-label">Mail</label>
+          <input type="email" class="form-control" id="tutor-mail" name="mail_tutor" required />
+        </div>
+
+        <h2>Datos de la persona participante "Donante de voz"</h2>
+        <div class="mb-3">
+          <label for="cliente-nombre" class="form-label">Nombre y Apellidos</label>
           <input type="text" class="form-control" id="cliente-nombre" name="nombre_cliente" required />
         </div>
         <div class="mb-3">
-          <label for="cliente-email" class="form-label">Email</label>
-          <input type="email" class="form-control" id="cliente-email" name="email_cliente" required />
-        </div>
-        
-        <div class="mb-3">
-          <label for="cliente-password" class="form-label">Contraseña</label>
-          <input type="password" class="form-control js-password" id="cliente-password" name="pass1" required />
-          <div class="invalid-feedback">Introduce la contraseña.</div>
-        </div>
-        <div class="mb-3">
-          <label for="cliente-password-repeat" class="form-label">Repetir contraseña</label>
-          <input type="password" class="form-control js-password-repeat" id="cliente-password-repeat" name="pass2" required />
-          <div class="invalid-feedback">Las contraseñas deben coincidir.</div>
+          <label for="cliente-dni" class="form-label">DNI</label>
+          <input type="text" class="form-control" id="cliente-dni" name="dni_cliente" required />
         </div>
         <div class="mb-3">
           <label for="cliente-fecha_nacimiento" class="form-label">Fecha de nacimiento</label>
           <input type="date" class="form-control" id="cliente-fecha_nacimiento" name="fnac_cliente" required />
         </div>
         <div class="mb-3">
-          <label for="cliente-sexo" class="form-label">Sexo</label>
-          <select class="form-select" id="cliente-sexo" name="sexo_cliente" required>
-            <option value="H">Hombre</option>
-            <option value="M">Mujer</option>
-            <option value="A">Ambiguo</option>
-            <option value="T">Trans</option>
-          </select>
-        </div>  
+          <label for="cliente-direccion" class="form-label">Dirección</label>
+          <input type="text" class="form-control" id="cliente-direccion" name="direccion_cliente" required />
+        </div>
+        <div class="mb-3">
+          <label for="cliente-localidad" class="form-label">Localidad</label>
+          <input type="text" class="form-control" id="cliente-localidad" name="localidad_cliente" required />
+        </div>
         <div class="mb-3">
           <label for="cliente-provincia" class="form-label">Provincia</label>
           <select class="form-select" id="cliente-provincia" name="provincia_cliente" required>
@@ -126,24 +174,20 @@
             <option value="Zamora">Zamora</option>
             <option value="Zaragoza">Zaragoza</option>
           </select>
-        </div>
+        </div> 
+        
         <div class="mb-3">
-          <label for="cliente-entidad" class="form-label">Entidad / Asociación</label>
-          <input type="text" class="form-control" id="cliente-entidad" name="entidad_cliente" />
-        </div>      
+          <label for="cliente-sexo" class="form-label">Sexo</label>
+          <select class="form-select" id="cliente-sexo" name="sexo_cliente" required>
+            <option value="H">Hombre</option>
+            <option value="M">Mujer</option>
+            <option value="A">Ambiguo</option>
+            <option value="T">Trans</option>
+          </select>
+        </div>    
+        
         <fieldset class="mb-3">
-          <legend class="fs-6">Enfermedades</legend>
-          {% for enfermedad in enfermedades %}
-            {% if enfermedad.visible == 1 %}
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="enfermedades" value="{{ enfermedad.nombre }}" id="enf-{{enfermedad.nombre}}" />
-                <label class="form-check-label" for="enf-{{enfermedad.nombre}}">{{enfermedad.nombre}}</label>
-              </div>
-            {% endif %}
-          {% endfor %}
-        </fieldset>
-        <fieldset class="mb-3">
-          <legend class="fs-6">Dis</legend>
+          <legend class="fs-6">Tipo de trastornos del habla</legend>
           {% for disfonia in disfonias %}
           {% if disfonia.visible == 1 %}
               <div class="form-check form-check-inline">
@@ -153,6 +197,30 @@
           {% endif %}
           {% endfor %}
         </fieldset>
+        <div class="mb-3">
+          <label for="cliente-grado" class="form-label">Grado de afectación</label>
+          <select class="form-select" id="cliente-grado" name="afectacion_cliente" required>
+            <option value="leve">Leve</option>
+            <option value="moderado">Moderado</option>
+            <option value="severo">Severo</option>
+          </select>
+        </div>
+        <h2>Datos de inicio de sesión</h2>
+        <div class="mb-3">
+          <label for="cliente-email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="cliente-email" name="mail_cliente" required />
+        </div>
+        
+        <div class="mb-3">
+          <label for="cliente-password" class="form-label">Contraseña</label>
+          <input type="password" class="form-control js-password" id="cliente-password" name="pass1" required />
+          <div class="invalid-feedback">Introduce la contraseña.</div>
+        </div>
+        <div class="mb-3">
+          <label for="cliente-password-repeat" class="form-label">Repetir contraseña</label>
+          <input type="password" class="form-control js-password-repeat" id="cliente-password-repeat" name="pass2" required />
+          <div class="invalid-feedback">Las contraseñas deben coincidir.</div>
+        </div>
         <div class="mb-3">
           <label for="cliente-observaciones" class="form-label">Observaciones</label>
           <textarea class="form-control" id="cliente-observaciones" name="observaciones_cliente"></textarea>
