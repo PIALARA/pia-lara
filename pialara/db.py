@@ -97,3 +97,21 @@ def update_ultima_conexion(email):
     except Exception as e:
         print("Se ha producido un error", e)
         return None
+
+def update_password(email, hashed_password):
+    """
+    Actualiza la contraseña de un usuario en MongoDB
+    """
+    try:
+        resultado = db.usuarios.update_one(
+            {"mail": email},
+            {"$set": {"password": hashed_password}}
+        )
+
+        if resultado.modified_count > 0:
+            print(f"Contraseña actualizada para {email}")
+        else:
+            print(f"No se encontró ningún usuario con el email {email} o la contraseña ya era la misma")
+
+    except Exception as e:
+        print("Error al actualizar la contraseña:", e)
