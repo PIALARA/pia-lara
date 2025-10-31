@@ -31,7 +31,6 @@ bp = Blueprint('audios', __name__, url_prefix='/audios')
 def client_tag():
     syllabus = Syllabus()
     audio = Audios()
-    clicks = Clicks() 
 
     pipeline = [
         {
