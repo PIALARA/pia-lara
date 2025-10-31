@@ -108,16 +108,34 @@ def create_post():
     nombreTecnico = request.form.get('nombre_tecnico')
     emailTecnico = request.form.get('email_tecnico')
 
+    # Datos de la entidad / asociación
+    nombreEntidad = request.form.get('nombre_entidad')
+    cifEntidad = request.form.get('cif_entidad')
+    personaReferencia = request.form.get('persona_referencia')
+    direccionEntidad = request.form.get('direccion_entidad')
+    telefonoEntidad = request.form.get('telefono_entidad')
+    mailEntidad = request.form.get('mail_entidad')
+    # Datos de la persona tutor / tutora / madre / padre
+    nombreTutor = request.form.get('nombre_tutor')
+    dniTutor = request.form.get('dni_tutor')
+    direccionTutor = request.form.get('direccion_tutor')
+    telefonoTutor = request.form.get('telefono_tutor')
+    mailTutor = request.form.get('mail_tutor')
+    # Datos del cliente
     nombreCliente = request.form.get('nombre_cliente')
-    activoCliente = request.form.get('activo_cliente')												  
-    emailCliente = request.form.get('email_cliente')
+    dniCliente = request.form.get('dni_cliente')
     fNacCliente = request.form.get('fnac_cliente')
-    sexoCliente = request.form.get('sexo_cliente')
+    direccionCliente = request.form.get('direccion_cliente')
+    localidadCliente = request.form.get('localidad_cliente')
     provinciaCliente = request.form.get('provincia_cliente')
-    entidadCliente = request.form.get('entidad_cliente')
+    sexoCliente = request.form.get('sexo_cliente')
+    disCliente = request.form.getlist('dis')
+    telefonoCliente = request.form.get('telefono_cliente')
+    mailCliente = request.form.get('mail_cliente')
+    activoCliente = request.form.get('activo_cliente')
     observacionesCliente = request.form.get('observaciones_cliente')
     enfermedadesCliente = request.form.getlist('enfermedades')
-    disCliente = request.form.getlist('dis')
+    afectacionCliente = request.form.get('afectacion_cliente')
 
     user = Usuario()
 
@@ -141,16 +159,24 @@ def create_post():
                    "activo": True}
         result = user.insert_one(newUser)
 
-    elif nombreCliente and not existeCorreo(emailCliente):
+    elif nombreCliente and not existeCorreo(mailCliente):
         fecha = datetime.strptime(fNacCliente, '%Y-%m-%d')
-        newUser = {"nombre": nombreCliente, "mail": emailCliente, "rol": "cliente",
+        newUser = {"nombre": nombreCliente, "mail": mailCliente, "rol": "cliente",
                    "password": generate_password_hash(pass1, method='sha256'),
                    "fecha_nacimiento": fecha, "ultima_conexion": datetime.now(),
-                   "sexo": sexoCliente, "provincia": provinciaCliente, "entidad": entidadCliente,
+                   "sexo": sexoCliente, "provincia": provinciaCliente, "entidad": nombreEntidad,
                    "observaciones": observacionesCliente,
                    "enfermedades": enfermedadesCliente, "dis": disCliente,
                    "parent": current_user.email, "cant_audios": 0,
-                   "activo": True}
+                   "activo": True, "cif_entidad": cifEntidad,
+                   "persona_referencia": personaReferencia, "direccion_entidad": direccionEntidad,
+                   "telefono_entidad": telefonoEntidad, "mail_entidad": mailEntidad,
+                   "nombre_tutor": nombreTutor, "dni_tutor": dniTutor,
+                   "direccion_tutor": direccionTutor, "telefono_tutor": telefonoTutor,
+                   "mail_tutor": mailTutor, "dni": dniCliente,
+                   "direccion": direccionCliente, "localidad": localidadCliente,
+                   "telefono": telefonoCliente,
+                   "afectacion": afectacionCliente}
         result = user.insert_one(newUser)
 
     # Comprobar el resultado y mostrar mensaje
