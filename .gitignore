@@ -41,5 +41,3 @@ migrations/users_upd_pwd.py
 
 # Ruta servidor
 pialara/__init__.py
-
-.ini
