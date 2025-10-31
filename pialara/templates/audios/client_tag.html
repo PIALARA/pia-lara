@@ -36,18 +36,44 @@
       <fieldset>
         <legend>Etiquetas menos grabadas</legend>
         {% for tag in tags_menos %}
-          <a class="tag button" href="/audios/client-record/{{ tag }}">{{ tag.upper() }}</a>
+          {% set last_char = tag[-1] %}
+          {% set base_digits = tag[:3] if tag[:3].isdigit() else tag[:2] if tag[:2].isdigit() else tag[:1] if tag[:1].isdigit() else '' %}
+          {% set fonema = tag[base_digits|length:-1] %}
+          {% set tipo_frase = "frase larga" if base_digits.isdigit() and base_digits|int > 100 else "frase corta" %}
+          {% set posicion_lengua = 
+            "abajo" if last_char == "1" else 
+            "medio" if last_char == "2" else 
+            "arriba" if last_char == "3" else 
+            "desconocida" 
+          %}
+          {% set valido = base_digits.isdigit() and last_char.isdigit() %}
+          {% set descripcion = tipo_frase ~ ", fonema " ~ fonema ~ ", lengua " ~ posicion_lengua %}
+          <a class="tag button" href="/audios/client-record/{{ tag }}" title="{{ descripcion if valido else tag }}">{{ tag.upper() }}</a>
         {% endfor %}
+
       </fieldset>
     </div>
     {% endif %}
+
 
     {% if tags3 %}
     <div class="tags-container">
       <fieldset>
         <legend>Etiquetas aleatorias</legend>
         {% for tag in tags3 %}
-          <a class="tag button" href="/audios/client-record/{{ tag }}">{{ tag.upper() }}</a>
+          {% set last_char = tag[-1] %}
+          {% set base_digits = tag[:3] if tag[:3].isdigit() else tag[:2] if tag[:2].isdigit() else tag[:1] if tag[:1].isdigit() else '' %}
+          {% set fonema = tag[base_digits|length:-1] %}
+          {% set tipo_frase = "frase larga" if base_digits.isdigit() and base_digits|int > 100 else "frase corta" %}
+          {% set posicion_lengua = 
+            "abajo" if last_char == "1" else 
+            "medio" if last_char == "2" else 
+            "arriba" if last_char == "3" else 
+            "desconocida" 
+          %}
+          {% set valido = base_digits.isdigit() and last_char.isdigit() %}
+          {% set descripcion = tipo_frase ~ ", fonema " ~ fonema ~ ", lengua " ~ posicion_lengua %}
+          <a class="tag button" href="/audios/client-record/{{ tag }}" title="{{descripcion if valido else tag}}">{{ tag.upper() }}</a>
         {% endfor %}
       </fieldset>
     </div>
