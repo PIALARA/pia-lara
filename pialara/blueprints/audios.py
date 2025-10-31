@@ -65,26 +65,36 @@ def client_tag():
 
     tags_aleatorio = sample(list(set(todos_tags)),5)
 
-# 🎯 4️⃣ Últimas etiquetas grabadas con contador
+# 🎯 Últimas etiquetas grabadas con contador (solo grabaciones reales del usuario)
     pipeline_ultimas = [
-        {"$match": {"usuario": current_user.email, "class": "audios"}},
-        {"$sort": {"timestamp": -1}},
-        {"$group": {
-            "_id": "$tag",
-            "count": {"$sum": 1},
-            "last_time": {"$first": "$timestamp"}
-        }},
+        {
+            "$match": {
+                "usuario.mail": current_user.email,  # 👈 el mail está dentro de usuario
+                "texto.tipo": "syllabus"             # solo grabaciones tipo syllabus
+            }
+        },
+        {"$sort": {"fecha": -1}},                   # ordenamos por fecha descendente
+        {
+            "$group": {
+                "_id": "$texto.tag",                 # agrupamos por etiqueta
+                "count": {"$sum": 1},                # contamos cuántas grabaciones hay
+                "last_time": {"$first": "$fecha"}    # guardamos la última vez
+            }
+        },
         {"$sort": {"last_time": -1}},
         {"$limit": 5}
     ]
-    tags_ultimas_docs = list(clicks.aggregate(pipeline_ultimas))
+
+    tags_ultimas_docs = list(audio.aggregate(pipeline_ultimas))
+
     tags_ultimas = [
-    {
-        "name": doc["_id"], # el nombre limpio
-        "display": f"{doc['_id']} ({doc['count']})"  # lo que se muestra
-    }
-    for doc in tags_ultimas_docs
+        {
+            "id": doc["_id"],  # el tag limpio
+            "display": f"{str(doc['_id'])} ({str(doc['count'])})"  # texto mostrado
+        }
+        for doc in tags_ultimas_docs if doc["_id"]
 ]
+
 
     return render_template('audios/client_tag.html', tags_suerte=tags_suerte, tags_menos=tags_menos_grabadas, tags3=tags_aleatorio,tags_ultimas=tags_ultimas)
 
