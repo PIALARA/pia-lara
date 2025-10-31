@@ -95,7 +95,6 @@ def client_tag():
         for doc in tags_ultimas_docs if doc["_id"]
 ]
 
-
     return render_template('audios/client_tag.html', tags_suerte=tags_suerte, tags_menos=tags_menos_grabadas, tags3=tags_aleatorio,tags_ultimas=tags_ultimas)
 
 @bp.route('/client-record/<string:tag_name>')
