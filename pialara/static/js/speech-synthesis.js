@@ -21,6 +21,8 @@ document.addEventListener('click', () => {
 }, { once: true });
 
 
+
+
 // Este evento se lanza cuando las voces han cargado correctemente
 window.speechSynthesis.onvoiceschanged = () => {
 
@@ -56,6 +58,13 @@ window.speechSynthesis.onvoiceschanged = () => {
   });
 };
 //Selector de voz fin
+
+// 🔹 Forzar carga de voces en Safari/iOS si ya están disponibles
+if (speechSynthesis.getVoices().length > 0) {
+  window.speechSynthesis.onvoiceschanged();
+}
+
+
 
 audio.addEventListener('end', () => {
   playButton.classList.replace('btn-danger', 'btn-warning');
