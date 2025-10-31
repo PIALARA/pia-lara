@@ -31,7 +31,6 @@ bp = Blueprint('audios', __name__, url_prefix='/audios')
 def client_tag():
     syllabus = Syllabus()
     audio = Audios()
-    clicks = Clicks() 
 
     pipeline = [
         {
@@ -65,38 +64,7 @@ def client_tag():
 
     tags_aleatorio = sample(list(set(todos_tags)),5)
 
-# 🎯 Últimas etiquetas grabadas con contador (solo grabaciones reales del usuario)
-    pipeline_ultimas = [
-        {
-            "$match": {
-                "usuario.mail": current_user.email,  # 👈 el mail está dentro de usuario
-                "texto.tipo": "syllabus"             # solo grabaciones tipo syllabus
-            }
-        },
-        {"$sort": {"fecha": -1}},                   # ordenamos por fecha descendente
-        {
-            "$group": {
-                "_id": "$texto.tag",                 # agrupamos por etiqueta
-                "count": {"$sum": 1},                # contamos cuántas grabaciones hay
-                "last_time": {"$first": "$fecha"}    # guardamos la última vez
-            }
-        },
-        {"$sort": {"last_time": -1}},
-        {"$limit": 5}
-    ]
-
-    tags_ultimas_docs = list(audio.aggregate(pipeline_ultimas))
-
-    tags_ultimas = [
-        {
-            "id": doc["_id"],  # el tag limpio
-            "display": f"{str(doc['_id'])} ({str(doc['count'])})"  # texto mostrado
-        }
-        for doc in tags_ultimas_docs if doc["_id"]
-]
-
-
-    return render_template('audios/client_tag.html', tags_suerte=tags_suerte, tags_menos=tags_menos_grabadas, tags3=tags_aleatorio,tags_ultimas=tags_ultimas)
+    return render_template('audios/client_tag.html', tags_suerte=tags_suerte, tags_menos=tags_menos_grabadas, tags3=tags_aleatorio)
 
 @bp.route('/client-record/<string:tag_name>')
 @login_required
@@ -142,7 +110,6 @@ def client_record(tag_name):
         session.pop('next_syllabus_item_ent', None) 
         session['tag_name_ent'] = str(tag_name)
 
-
     # Recuperamos el id de la siguiente frase desde la sesión (si existe)
     current_item_id = session.get('next_syllabus_item_ent', None)
     next_syllabus_item = None
@@ -186,8 +153,6 @@ def client_record(tag_name):
         # Si no hay 'current_item_id', seleccionamos aleatoria
         next_syllabus_item = select_random_item(syllabus_items)
         session['next_syllabus_item_ent'] = str(next_syllabus_item['_id'])
-
-    
 
     # Pasamos el item seleccionado a la plantilla
     return render_template('audios/client_record.html', tag=tag_name, syllabus=next_syllabus_item)
