@@ -11,6 +11,15 @@ const speedButtons = document.querySelectorAll('.speed-button');
 //botones audio fin
 
 const audio = new SpeechSynthesisUtterance();
+// 🔹 Desbloquea el contexto de audio en iPhone al primer toque
+document.addEventListener('click', () => {
+  if (!window.speechSynthesis.speaking && !window.speechSynthesis.pending) {
+    const unlock = new SpeechSynthesisUtterance('');
+    window.speechSynthesis.speak(unlock);
+    window.speechSynthesis.cancel();
+  }
+}, { once: true });
+
 
 // Este evento se lanza cuando las voces han cargado correctemente
 window.speechSynthesis.onvoiceschanged = () => {
@@ -23,6 +32,8 @@ window.speechSynthesis.onvoiceschanged = () => {
 
   // Se va a seleccionar la primera voz del array de voces por defecto
   audio.voice = spanishVoices[0];
+  audio.lang = spanishVoices[0]?.lang || 'es-ES'; // 🔹 Necesario para Safari
+
 
   // Añadimos las voces como opciones al selector
   let html = "";
