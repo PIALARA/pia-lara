@@ -31,6 +31,17 @@
     </div>
     {% endif %}
 
+    {% if tags_ultimas %}
+    <div class="tags-container">
+      <fieldset>
+        <legend>Últimas etiquetas grabadas</legend>
+        {% for tag in tags_ultimas %}
+          <a class="tag button" href="/audios/client-record/{{ tag.id }}">{{ tag.display.upper() }}</a>
+        {% endfor %}
+      </fieldset>
+    </div>
+    {% endif %}
+
     {% if tags_menos %}
     <div class="tags-container">
       <fieldset>
