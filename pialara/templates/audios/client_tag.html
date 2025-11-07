@@ -39,7 +39,7 @@
           {% set last_char = tag[-1] %}
           {% set base_digits = tag[:3] if tag[:3].isdigit() else tag[:2] if tag[:2].isdigit() else tag[:1] if tag[:1].isdigit() else '' %}
           {% set fonema = tag[base_digits|length:-1] %}
-          {% set tipo_frase = "frase larga" if base_digits.isdigit() and base_digits|int > 100 else "frase corta" %}
+          {% set tipo_frase = "frase corta" if base_digits.isdigit() and base_digits|int > 100 else "frase larga" %}
           {% set posicion_lengua = 
             "abajo" if last_char == "1" else 
             "medio" if last_char == "2" else 
