@@ -1,0 +1,4 @@
+[tool.semantic_release]
+version_variable = "pialara/__init__.py:__version__"
+changelog_file = "CHANGELOG.md"
+upload_to_pypi = false
