@@ -1,4 +1,3 @@
-__version__ = "1.0.0"
 from flask import Flask
 from flask_login import LoginManager
 from pialara import db
