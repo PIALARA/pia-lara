@@ -162,6 +162,18 @@ body.contrast-3 button {
   padding: 1rem;
 }
 
+.tags-container fieldset {
+  text-align: center;
+  margin-block: 0.5rem;
+}
+
+.tags-container legend {
+  text-align: center;
+  width: 100%;
+  display: block;
+}
+
+
 
 .syllabus {
   width: 50rem;

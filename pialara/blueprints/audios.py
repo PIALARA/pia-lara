@@ -67,11 +67,11 @@ def client_tag():
 
     tags_aleatorio = sample(list(set(todos_tags)),5)
 
-# 🎯 Últimas etiquetas grabadas con contador (solo grabaciones reales del usuario)
+    #  Últimas etiquetas grabadas con contador (solo grabaciones reales del usuario)
     pipeline_ultimas = [
         {
             "$match": {
-                "usuario.mail": current_user.email,  # 👈 el mail está dentro de usuario
+                "usuario.mail": current_user.email,  #  el mail está dentro de usuario
                 "texto.tipo": "syllabus"             # solo grabaciones tipo syllabus
             }
         },
@@ -91,8 +91,8 @@ def client_tag():
 
     tags_ultimas = [
         {
-            "id": doc["_id"],  # el tag limpio
-            "display": f"{str(doc['_id'])} ({str(doc['count'])})"  # texto mostrado
+            "id": doc["_id"],  # la categoria
+            "count": doc['count']  # el número de veces qe se repite
         }
         for doc in tags_ultimas_docs if doc["_id"]
 ]
