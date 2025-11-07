@@ -40,8 +40,4 @@ migrations/users_gv2324.csv
 migrations/users_upd_pwd.py
 
 # Ruta servidor
-<<<<<<< HEAD
 pialara/__init__.py
-=======
-pialara/__init__.py
->>>>>>> 77fe3bb9486731fdd6da6071a48fe91a1d001bb5

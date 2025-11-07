@@ -10,7 +10,7 @@
     {% endwith %}
     <h1 class="text-center p-3">Crear frase</h1>
 
-    <form class="container" method="post" style="max-width: 30rem" action="{{ url_for("syllabus.create") }}">
+    <form class="container" method="post" style="max-width: 30rem" action="{{ url_for("syllabus.create") }}" onsubmit="trimText()">
         <div class="mb-3">
             <label for="texto" class="form-label">Texto</label>
             <textarea id="texto" class="form-control" name="ftext" placeholder="Frase" rows="5" cols="100"></textarea>
@@ -25,4 +25,13 @@
             </button>
         </div>
     </form>
+
+    <script>
+        function trimText() {
+            const texto = document.getElementById('texto');
+            const tags = document.getElementById('tags');
+            texto.value = texto.value.trim();
+            tags.value = tags.value.split(',').map(tag => tag.trim()).join(', ');
+        }
+    </script> 
 {% endblock %}
