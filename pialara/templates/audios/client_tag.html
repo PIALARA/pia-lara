@@ -36,7 +36,7 @@
       <fieldset>
         <legend>Últimas etiquetas grabadas</legend>
         {% for tag in tags_ultimas %}
-          <a class="tag button" href="/audios/client-record/{{ tag.id }}">{{ tag.display.upper() }}</a>
+          <a class="tag button" href="/audios/client-record/{{ tag.id }}">{{ tag.id.upper() }} ({{ tag.count }})</a>
         {% endfor %}
       </fieldset>
     </div>
