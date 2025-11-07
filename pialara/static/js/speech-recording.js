@@ -17,9 +17,12 @@ const canvasCtx = canvas.getContext('2d');
 let audioCtx;
 let duration;
 
+let currentStream; // NUEVO: Variable para guardar el stream del micrófono
+
 navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
     handlerFunction(stream);
-    visualize(stream);
+    currentStream = stream; // GUARDAR: Guardamos el stream para usarlo en el click
+    // ¡IMPORTANTE! Se ELIMINA la llamada a visualize(stream) de aquí
 });
 
 function handlerFunction(stream) {
@@ -27,7 +30,8 @@ function handlerFunction(stream) {
     mediaRecorder.addEventListener('dataavailable', e => {
         audioChunks.push(e.data);
         if (mediaRecorder.state === 'inactive') {
-            let blob = new Blob(audioChunks, {type: 'audio/mpeg-3'});
+            // CORRECCIÓN DE FORMATO: 'audio/mpeg-3' no es estándar, cambiamos a 'audio/wav'
+            let blob = new Blob(audioChunks, {type: 'audio/wav'});
             const url = URL.createObjectURL(blob);
             recordedAudio.controls = true;
             recordedAudio.src = url;
@@ -48,6 +52,20 @@ function handlerFunction(stream) {
 
 recordButton.addEventListener('click', () => {
     if (mediaRecorder.state === 'inactive') {
+        // --- COMIENZO DEL PARCHE PARA SAFARI/iOS ---
+        if (!audioCtx) {
+            audioCtx = new AudioContext();
+        }
+        // REANUDAR: Si el contexto está suspendido (típico en iOS), lo reanudamos
+        if (audioCtx.state === 'suspended' && audioCtx.resume) {
+            audioCtx.resume();
+        }
+        // Llamar a visualize(currentStream) aquí, dentro del gesto del usuario
+        if (currentStream) {
+            visualize(currentStream);
+        }
+        // --- FIN DEL PARCHE PARA SAFARI/iOS ---
+
         console.log('Recording started.');
         $sendButton.hide();
         recordButton.classList.add('recording');
@@ -135,6 +153,8 @@ $sendButton.on('click', () => {
 })
 
 function visualize(stream) {
+    // La inicialización/reanudación de audioCtx se mueve al click del botón
+    // para cumplir con las políticas de iOS.
     if (!audioCtx) {
         audioCtx = new AudioContext();
     }
@@ -142,6 +162,7 @@ function visualize(stream) {
     const source = audioCtx.createMediaStreamSource(stream);
 
     const analyser = audioCtx.createAnalyser();
+// ... (resto de la función visualize sin cambios)
     analyser.fftSize = 2048;
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
