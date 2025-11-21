@@ -27,7 +27,7 @@ from random import sample
 
 bp = Blueprint('audios', __name__, url_prefix='/audios')
 
-@bp.route('/client-tag')
+@bp.route('/cliente-tag')
 @login_required
 def client_tag():
     syllabus = Syllabus()
@@ -92,12 +92,12 @@ def client_tag():
     tags_ultimas = [
         {
             "id": doc["_id"],  # la categoria
-            "count": doc['count']  # el número de veces qe se repite
+            "count": doc['count']  # el número de veces que se repite
         }
         for doc in tags_ultimas_docs if doc["_id"]
-]
+    ]
 
-    return render_template('audios/client_tag.html', tags_suerte=tags_suerte, tags_menos=tags_menos_grabadas, tags3=tags_aleatorio,tags_ultimas=tags_ultimas)
+    return render_template('audios/client_tag.html', tags_suerte=tags_suerte, tags_menos=tags_menos_grabadas, tags3=tags_aleatorio, tags_ultimas=tags_ultimas)
 
 @bp.route('/client-record/<string:tag_name>')
 @login_required
