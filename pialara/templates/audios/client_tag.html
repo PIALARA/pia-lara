@@ -1,103 +1,137 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-  <header class="header">
-    <h1 class="text-center">Etiquetas</h1>
-  </header>
+<header class="header">
+  <h1 class="text-center">Etiquetas</h1>
+</header>
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">
-          {{ message }}
+{% if daily_goal is defined %}
+<div class="d-flex justify-content-center mb-5">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body text-center">
+        <h5 class="card-title text-primary"><i class="bi bi-trophy-fill me-2"></i>Objetivo Diario</h5>
+        <p class="card-text fs-4 fw-bold">
+          {{ audios_today }} / {{ daily_goal }}
+        </p>
+        <div class="progress" style="height: 25px;">
+          {% set percentage = (audios_today / daily_goal * 100) if daily_goal > 0 else 100 %}
+          <div
+            class="progress-bar progress-bar-striped progress-bar-animated {% if audios_today >= daily_goal %}bg-success{% else %}bg-primary{% endif %}"
+            role="progressbar" style="width: {{ percentage }}%;" aria-valuenow="{{ audios_today }}" aria-valuemin="0"
+            aria-valuemax="{{ daily_goal }}">
+            {{ percentage | int }}%
+          </div>
         </div>
+        {% if audios_today >= daily_goal %}
+        <p class="mt-2 text-success fw-bold">¡Objetivo alcanzado! 🎉</p>
+        {% else %}
+        <p class="mt-2 text-muted small">¡Sigue así! Te faltan {{ daily_goal - audios_today }} para tu meta.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }}">
+  {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<section>
+  <form class="tags-form" method="post" action="{{ url_for('audios.tag_search') }}">
+    <input class="tags-form__input" type="search" name="tagName" placeholder="Buscar etiqueta..."
+      value="{{ tag_name }}" />
+    <button class="tags-form__button btn btn-primary" type="submit" id="search">
+      <i class="bi bi-search me-2"></i>
+    </button>
+  </form>
+
+  {% if tags_suerte %}
+  <div class="tags-container">
+    {% for tag in tags_suerte %}
+    <a class="btn btn-info" href="/audios/client-record/{{ tag._id }}">¿Voy a tener suerte?</a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if tags_ultimas %}
+  <div class="tags-container">
+    <fieldset>
+      <legend>Últimas etiquetas grabadas</legend>
+      {% for tag in tags_ultimas %}
+      <a class="tag button" href="/audios/client-record/{{ tag.id }}">{{ tag.id.upper() }} ({{ tag.count }})</a>
       {% endfor %}
-    {% endif %}
-  {% endwith %}
+    </fieldset>
+  </div>
+  {% endif %}
 
-  <section>
-    <form class="tags-form" method="post" action="{{ url_for('audios.tag_search') }}">
-      <input class="tags-form__input" type="search" name="tagName" placeholder="Buscar etiqueta..." value="{{ tag_name }}"/>
-      <button class="tags-form__button btn btn-primary" type="submit" id="search">
-        <i class="bi bi-search me-2"></i>
-      </button>
-    </form>
-
-    {% if tags_suerte %}
-    <div class="tags-container">
-      {% for tag in tags_suerte %}
-        <a class="btn btn-info" href="/audios/client-record/{{ tag._id }}">¿Voy a tener suerte?</a>
+  {% if tags_menos %}
+  <div class="tags-container">
+    <fieldset>
+      <legend>Etiquetas menos grabadas</legend>
+      {% for tag in tags_menos %}
+      {% set last_char = tag[-1] %}
+      {% set base_digits = tag[:3] if tag[:3].isdigit() else tag[:2] if tag[:2].isdigit() else tag[:1] if
+      tag[:1].isdigit() else '' %}
+      {% set fonema = tag[base_digits|length:-1] %}
+      {% set tipo_frase = "frase corta" if base_digits.isdigit() and base_digits|int > 100 else "frase larga" %}
+      {% set posicion_lengua =
+      "abajo" if last_char == "1" else
+      "medio" if last_char == "2" else
+      "arriba" if last_char == "3" else
+      "desconocida"
+      %}
+      {% set valido = base_digits.isdigit() and last_char.isdigit() %}
+      {% set descripcion = tipo_frase ~ ", fonema " ~ fonema ~ ", lengua " ~ posicion_lengua %}
+      <a class="tag button" href="/audios/client-record/{{ tag }}" title="{{ descripcion if valido else tag }}">{{
+        tag.upper() }}</a>
       {% endfor %}
-    </div>
-    {% endif %}
 
-    {% if tags_ultimas %}
-    <div class="tags-container">
-      <fieldset>
-        <legend>Últimas etiquetas grabadas</legend>
-        {% for tag in tags_ultimas %}
-          <a class="tag button" href="/audios/client-record/{{ tag.id }}">{{ tag.id.upper() }} ({{ tag.count }})</a>
-        {% endfor %}
-      </fieldset>
-    </div>
-    {% endif %}
-
-    {% if tags_menos %}
-    <div class="tags-container">
-      <fieldset>
-        <legend>Etiquetas menos grabadas</legend>
-        {% for tag in tags_menos %}
-          {% set last_char = tag[-1] %}
-          {% set base_digits = tag[:3] if tag[:3].isdigit() else tag[:2] if tag[:2].isdigit() else tag[:1] if tag[:1].isdigit() else '' %}
-          {% set fonema = tag[base_digits|length:-1] %}
-          {% set tipo_frase = "frase corta" if base_digits.isdigit() and base_digits|int > 100 else "frase larga" %}
-          {% set posicion_lengua = 
-            "abajo" if last_char == "1" else 
-            "medio" if last_char == "2" else 
-            "arriba" if last_char == "3" else 
-            "desconocida" 
-          %}
-          {% set valido = base_digits.isdigit() and last_char.isdigit() %}
-          {% set descripcion = tipo_frase ~ ", fonema " ~ fonema ~ ", lengua " ~ posicion_lengua %}
-          <a class="tag button" href="/audios/client-record/{{ tag }}" title="{{ descripcion if valido else tag }}">{{ tag.upper() }}</a>
-        {% endfor %}
-
-      </fieldset>
-    </div>
-    {% endif %}
+    </fieldset>
+  </div>
+  {% endif %}
 
 
-    {% if tags3 %}
-    <div class="tags-container">
-      <fieldset>
-        <legend>Etiquetas aleatorias</legend>
-        {% for tag in tags3 %}
-          {% set last_char = tag[-1] %}
-          {% set base_digits = tag[:3] if tag[:3].isdigit() else tag[:2] if tag[:2].isdigit() else tag[:1] if tag[:1].isdigit() else '' %}
-          {% set fonema = tag[base_digits|length:-1] %}
-          {% set tipo_frase = "frase larga" if base_digits.isdigit() and base_digits|int > 100 else "frase corta" %}
-          {% set posicion_lengua = 
-            "abajo" if last_char == "1" else 
-            "medio" if last_char == "2" else 
-            "arriba" if last_char == "3" else 
-            "desconocida" 
-          %}
-          {% set valido = base_digits.isdigit() and last_char.isdigit() %}
-          {% set descripcion = tipo_frase ~ ", fonema " ~ fonema ~ ", lengua " ~ posicion_lengua %}
-          <a class="tag button" href="/audios/client-record/{{ tag }}" title="{{descripcion if valido else tag}}">{{ tag.upper() }}</a>
-        {% endfor %}
-      </fieldset>
-    </div>
-    {% endif %}
-
-    {% if tags %}
-    <div class="tags-container">
-      Etiquetas encontradas:
-      {% for tag in tags %}
-        <a class="tag button" href="/audios/client-record/{{ tag._id }}">{{ tag._id.upper() }}</a>
+  {% if tags3 %}
+  <div class="tags-container">
+    <fieldset>
+      <legend>Etiquetas aleatorias</legend>
+      {% for tag in tags3 %}
+      {% set last_char = tag[-1] %}
+      {% set base_digits = tag[:3] if tag[:3].isdigit() else tag[:2] if tag[:2].isdigit() else tag[:1] if
+      tag[:1].isdigit() else '' %}
+      {% set fonema = tag[base_digits|length:-1] %}
+      {% set tipo_frase = "frase larga" if base_digits.isdigit() and base_digits|int > 100 else "frase corta" %}
+      {% set posicion_lengua =
+      "abajo" if last_char == "1" else
+      "medio" if last_char == "2" else
+      "arriba" if last_char == "3" else
+      "desconocida"
+      %}
+      {% set valido = base_digits.isdigit() and last_char.isdigit() %}
+      {% set descripcion = tipo_frase ~ ", fonema " ~ fonema ~ ", lengua " ~ posicion_lengua %}
+      <a class="tag button" href="/audios/client-record/{{ tag }}" title="{{descripcion if valido else tag}}">{{
+        tag.upper() }}</a>
       {% endfor %}
-    </div>
-    {% endif %}
+    </fieldset>
+  </div>
+  {% endif %}
 
-  </section>
+  {% if tags %}
+  <div class="tags-container">
+    Etiquetas encontradas:
+    {% for tag in tags %}
+    <a class="tag button" href="/audios/client-record/{{ tag._id }}">{{ tag._id.upper() }}</a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</section>
 {% endblock %}
