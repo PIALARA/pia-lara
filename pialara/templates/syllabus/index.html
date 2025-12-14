@@ -33,6 +33,40 @@
     {% endwith %}
 </form>
 
+{% if frase_sugerida %}
+<section class="container mt-4">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3>Frase sugerida para practicar</h3>
+      <div class="d-flex align-items-center">
+        <span class="badge bg-info text-dark me-2">
+            <i class="bi bi-clock"></i> {{ momento_dia|capitalize }}
+        </span>
+        <form action="{{ url_for('syllabus.index') }}" method="GET" class="d-flex">
+            <select name="location" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="general" {% if ubicacion == 'general' or not ubicacion %}selected{% endif %}>General</option>
+                <option value="casa" {% if ubicacion == 'casa' %}selected{% endif %}>Casa</option>
+                <option value="colegio" {% if ubicacion == 'colegio' %}selected{% endif %}>Colegio</option>
+                <option value="hospital" {% if ubicacion == 'hospital' %}selected{% endif %}>Hospital</option>
+                <option value="trabajo" {% if ubicacion == 'trabajo' %}selected{% endif %}>Trabajo</option>
+            </select>
+        </form>
+      </div>
+    </div>
+    <div class="card-body">
+      <p id="frase-sugerida-text" class="card-text">{{ frase_sugerida.texto }}</p>
+      {% if frase_sugerida.tags %}
+      <footer class="blockquote-footer"><cite title="Tags">Etiquetas: {{ frase_sugerida.tags }}</cite></footer>
+      {% endif %}
+      <button id="frase-play-button" class="btn btn-warning mt-2">
+        <span><i class="bi bi-ear me-2"></i></span>
+        <span>Escuchar</span>
+      </button>
+    </div>
+  </div>
+</section>
+{% endif %}
+
 <section class="container d-flex flex-wrap justify-content-center gap-2">
     {% for frase in syllabus %}
     <article class="card shadow-sm" style="width: 20rem">
@@ -71,5 +105,7 @@
     </article>
     {% endif %}
 </div>
+
+<script src="{{ url_for('static', filename='js/frase-sugerida.js') }}"></script>
 
 {% endblock %}

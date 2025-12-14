@@ -1,5 +1,6 @@
 from datetime import datetime
 import math
+import random
 from bson.objectid import ObjectId
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
@@ -104,6 +105,21 @@ def index():
     }
     clicks.insert_one(click_doc)
 
+    # Lógica para frase sugerida
+    dias_semana = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo']
+    dia_actual = dias_semana[datetime.now().weekday()]
+    
+    frases_dia = list(syllabus.find({"tags": {"$regex": dia_actual, "$options": "i"}}))
+    
+    if frases_dia:
+        frase_sugerida = random.choice(frases_dia)
+    else:
+        todas_frases = list(syllabus.find())
+        if todas_frases:
+            frase_sugerida = random.choice(todas_frases)
+        else:
+            frase_sugerida = None
+
     return render_template(
         "syllabus/index.html",
         syllabus=documentos,
@@ -114,6 +130,7 @@ def index():
         total_pages=total_pages,
         tag_date_since=tag_date_since,
         tag_date_to=tag_date_to,
+        frase_sugerida=frase_sugerida,
     )
 
 
