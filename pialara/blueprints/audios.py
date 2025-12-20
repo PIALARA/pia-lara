@@ -55,7 +55,9 @@ def client_tag():
 
     # TODO - Es una chapuza ... rehacer en un futuro con una única consulta a MongoDB
     todos_tags = syllabus.distinct("tags",{})
-    tags_audios_menos_grabadas = audio.distinct("texto.tag", {"texto.tipo": "syllabus"})
+    tags_audios_menos_grabadas = audio.distinct(
+        "texto.tag", 
+        {"metadata.fuente": "syllabus"})
     tags_menos_grabadas = list(set(todos_tags) - set(tags_audios_menos_grabadas))
     patron = re.compile(r"^\d{1,3}[A-Za-z]{1,2}\d$")
     tags_menos_grabadas = [tag for tag in tags_menos_grabadas if patron.match(tag)]
@@ -72,7 +74,7 @@ def client_tag():
         {
             "$match": {
                 "usuario.mail": current_user.email,  #  el mail está dentro de usuario
-                "texto.tipo": "syllabus"             # solo grabaciones tipo syllabus
+                "metadata.fuente": "syllabus"             # solo grabaciones tipo syllabus
             }
         },
         {"$sort": {"fecha": -1}},                   # ordenamos por fecha descendente
@@ -338,28 +340,123 @@ def tag_search():
 @login_required
 def client_report(id=None):
     total_audios = 0
-    audios_por_categoria = {}
     logged_rol = current_user.rol
     url = 'audios/client_report.html'
     cliente_nombre = "N/A"
+    ultimas_etiquetas = []
+    etiquetas_mas_grabadas = []
+    etiquetas_menos_grabadas = []
+    total_fonemas = 0
+    ultimos_fonemas = []
+    fonemas_mas_grabados = []
+    fonemas_menos_grabados = []
+
 
     if id or logged_rol == "cliente":
         audios_model = Audios()
         user_id = ObjectId(id) if id else current_user.id
+
+        #Total de audios:
+        total_audios = audios_model.count_documents({
+            "usuario.id": user_id,
+            "metadata.fuente": "syllabus"
+        })
+
+        #Cinco etiquetas finales grabadas
+        pipeline_ultimas_cinco_etiquetas = [
+            {
+                "$match":{
+                    "usuario.id": user_id,
+                    "metadata.fuente": "syllabus"
+                }
+            },
+            {
+                "$sort":{
+                    "fecha": -1
+                }
+            },
+            {
+                "$group": {
+                    "_id": "$texto.tag",
+                    "last_time": {"$first": "$fecha"}
+                }
+            },
+            {
+                "$sort":{
+                    "last_time": -1
+                }
+            },
+            {
+                "$limit": 5
+            }
+        ]
+
+        ultimas_etiquetas = list(audios_model.aggregate(pipeline_ultimas_cinco_etiquetas))
+        
+
+        #Cinco etiquetas más grabadas
+
+        pipeline_etiquetas_mas_grabadas = [
+            {
+                "$match":{
+                    "usuario.id":user_id,
+                    "metadata.fuente": "syllabus"
+                }
+            },
+            {
+                "$group":{
+                    "_id":"$texto.tag",
+                    "count": {"$sum": 1}
+                }
+            },
+            {
+                "$sort":{
+                    "count": -1
+                }
+            },
+            {
+                "$limit": 5
+            }
+        ]
+
+        etiquetas_mas_grabadas = list(audios_model.aggregate(pipeline_etiquetas_mas_grabadas))
+
+        #Cinco etiquetas menos grabadas
+        pipeline_etiquetas_menos_grabadas = [
+             {
+                "$match":{
+                    "usuario.id":user_id,
+                    "metadata.fuente": "syllabus"
+                }
+            },
+            {
+                "$group":{
+                    "_id":"$texto.tag",
+                    "count": {"$sum": 1}
+                }
+            },
+            {
+                "$sort":{
+                    "count": 1
+                }
+            },
+            {
+                "$limit": 5
+            }
+        ]
+        etiquetas_menos_grabadas = list(audios_model.aggregate(pipeline_etiquetas_menos_grabadas))
+        
+        #Fonemas
+        total_fonemas = total_audios
+        ultimos_fonemas = ultimas_etiquetas
+        fonemas_mas_grabados = etiquetas_mas_grabadas
+        fonemas_menos_grabados = etiquetas_menos_grabadas
         
         usuario_model = Usuario()
         cliente = usuario_model.find_one({"_id": user_id})
         cliente_nombre = cliente.get("nombre", "Desconocido") if cliente else "Desconocido"
         
-        pipeline = [
-            {"$match": {"usuario.id": user_id}},
-            {"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}}
-        ]
-        resultado = list(audios_model.aggregate(pipeline))
 
-        if resultado:
-            audios_por_categoria = {doc['_id']: doc['cantidad'] for doc in resultado}
-            total_audios = sum(audios_por_categoria.values())
             
     elif logged_rol == "admin":
         audios_model = Audios()
@@ -402,6 +499,20 @@ def client_report(id=None):
         total_audios = sum(audios_por_categoria.values())
         cliente_nombre = "los Usuarios supervisados"
         
-    audios_por_categoria = dict(sorted(audios_por_categoria.items(), key=lambda x: x[1], reverse=True))
 
-    return render_template(url, total_audios=total_audios, audios_por_categoria=audios_por_categoria, usuario_id=id, cliente_nombre=cliente_nombre, rol=logged_rol)
+    return render_template(
+    url,
+    total_audios=total_audios,
+    ultimas_etiquetas=ultimas_etiquetas,
+    etiquetas_mas=etiquetas_mas_grabadas,
+    etiquetas_menos=etiquetas_menos_grabadas,
+    total_fonemas=total_fonemas,
+    ultimos_fonemas=ultimos_fonemas,
+    fonemas_mas_grabados=fonemas_mas_grabados,
+    fonemas_menos_grabados=fonemas_menos_grabados,
+    usuario_id=id,
+    cliente_nombre=cliente_nombre,
+    rol=logged_rol
+)
+
+
