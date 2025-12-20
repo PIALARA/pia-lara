@@ -1,8 +1,6 @@
 from pymongo import MongoClient
 
-#Conexión:
-cliente = MongoClient("mongodb://prelara:pr3l4r4m3c@27.0.172.67/prelara")
-db = cliente["prelara"]
+
 
 def add_metadata():
     #Colección audios
