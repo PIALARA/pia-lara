@@ -6,10 +6,10 @@
     <h1>Resumen de Audios de {{cliente_nombre}} </h1>
     {% elif rol == 'tecnico' %}
     <h1>Resumen de Audios de {{cliente_nombre}} </h1>
-   {% elif rol == 'cliente' %}
-   <h1>Mi resumen de audios</h1>
-   {% endif %}
-        </header>
+    {% elif rol == 'cliente' %}
+    <h1>Mi resumen de audios</h1>
+    {% endif %}
+</header>
 
 <section class="container">
     <!-- Total de audios -->
@@ -20,6 +20,95 @@
         </div>
     </div>
 
+    <!--Últimas 5 etiquetas-->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2>Últimas 5 etiquetas grabadas</h2>
+            <ul>
+                {% for etiqueta in ultimas_etiquetas %}
+                <li>{{ etiqueta._id }}</li>
+                {% else %}
+                <li>No hay datos</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Cinco etiquetas más grabadas-->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2>5 etiquetas más grabadas</h2>
+            <ul>
+                {% for etiqueta in etiquetas_mas %}
+                <li>{{ etiqueta._id }} ({{ etiqueta.count }})</li>
+                {% else %}
+                <li>No hay datos</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <!-- 5 etiquetas menos grabadas-->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2>5 etiquetas menos grabadas</h2>
+            <ul>
+                {% for etiqueta in etiquetas_menos %}
+                <li>{{ etiqueta._id }} ({{ etiqueta.count }})</li>
+                {% else %}
+                <li>No hay datos</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <!--Total de fonemas-->
+    <div class="card mb-4">
+        <div class="card-body text-center">
+            <h2>Total de fonemas grabados</h2>
+            <p class="fs-3">{{ total_fonemas }}</p>
+        </div>
+    </div>
+
+    <!--Últimos 5 fonemas-->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2>Últimos 5 fonemas grabados</h2>
+            <ul>
+                {% for fonema in ultimos_fonemas %}
+                <li>{{ fonema._id }}</li>
+                {% else %}
+                <li>No hay datos</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!--5 fonemas más grabados-->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2>5 fonemas más grabados</h2>
+            <ul>
+                {% for fonema in fonemas_mas_grabados %}
+                <li>{{ fonema._id }} ({{ fonema.count }})</li>
+                {% else %}
+                <li>No hay datos</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!--5 fonemas menos grabados-->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2>5 fonemas menos grabados</h2>
+            <ul>
+                {% for fonema in fonemas_menos_grabados %}
+                <li>{{ fonema._id }} ({{ fonema.count }})</li>
+                {% else %}
+                <li>No hay datos</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
     <!-- Audios por categoría -->
     <div class="card">
         <div class="card-body">
@@ -30,14 +119,14 @@
                         <th onclick="ordenarTabla(0)">Categoría <i class="bi bi-sort-down"></i></th>
                         <th onclick="ordenarTabla(1)">Cantidad audios <i class="bi bi-sort-down"></i></th>
                     </tr>
-                    <tbody>
-                        {% for category, count in audios_por_categoria.items() %}
-                        <tr>
-                            <td>{{ category }}</td>
-                            <td>{{ count }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
+                <tbody>
+                    {% for category, count in audios_por_categoria.items() %}
+                    <tr>
+                        <td>{{ category }}</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
                 </thead>
             </table>
         </div>
@@ -58,9 +147,9 @@
             if (columnIndex === 1) { // Ordenar como números
                 return isAscending ? cellA - cellB : cellB - cellA;
             } else { // Ordenar como texto
-                return isAscending 
-                    ? cellA.localeCompare(cellB) 
-                    : cellB.localeCompare(cellA);
+                return isAscending ?
+                    cellA.localeCompare(cellB) :
+                    cellB.localeCompare(cellA);
             }
         });
 
