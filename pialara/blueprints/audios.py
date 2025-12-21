@@ -405,3 +405,98 @@ def client_report(id=None):
     audios_por_categoria = dict(sorted(audios_por_categoria.items(), key=lambda x: x[1], reverse=True))
 
     return render_template(url, total_audios=total_audios, audios_por_categoria=audios_por_categoria, usuario_id=id, cliente_nombre=cliente_nombre, rol=logged_rol)
+
+
+# Edita los informes de estadísticas del cliente para mostrar la siguiente información (sólo teniendo en cuenta las etiquetas asociadas a syllabus):
+        # Cantidad total de audios grabados.
+        # Últimas 5 etiquetas grabadas.
+        # 5 etiquetas más grabadas
+        # 5 etiquetas menos grabadas.
+        # Cantidad total de fonemas grabados.
+        # Últimas 5 fonemas grabados.
+        # 5 fonemas más grabados.
+        # 5 fonemas menos grabados.
+
+
+@bp.route('/client-report', methods=['GET'])
+@login_required
+def client_report():
+    audios_model = Audios()
+    user_id = current_user.id
+
+    base_match = {
+        "$match": {
+            "usuario.id": user_id,
+            "texto.tipo": "syllabus",
+            "metadata.fonema": {"$exists": True}
+        }
+    }
+
+    # Cantidad total de audios
+    total_audios = audios_model.count_documents(base_match["$match"])
+
+    # Últimas 5 etiquetas (fonemas) grabadas
+    pipeline_ultimas = [
+        base_match,
+        {"$sort": {"fecha": -1}},
+        {"$limit": 5},
+        {"$project": {"_id": 0, "fonema": "$metadata.fonema"}}
+    ]
+    ultimas_etiquetas = list(audios_model.aggregate(pipeline_ultimas))
+
+    # 5 etiquetas más grabadas
+    pipeline_mas = [
+        base_match,
+        {
+            "$group": {
+                "_id": "$metadata.fonema",
+                "cantidad": {"$sum": 1}
+            }
+        },
+        {"$sort": {"cantidad": -1}},
+        {"$limit": 5}
+    ]
+    etiquetas_mas = list(audios_model.aggregate(pipeline_mas))
+
+    # 5 etiquetas menos grabadas
+    pipeline_menos = [
+        base_match,
+        {
+            "$group": {
+                "_id": "$metadata.fonema",
+                "cantidad": {"$sum": 1}
+            }
+        },
+        {"$sort": {"cantidad": 1}},
+        {"$limit": 5}
+    ]
+    etiquetas_menos = list(audios_model.aggregate(pipeline_menos))
+
+    # Cantidad total de fonemas grabados (distintos)
+    total_fonemas = len(
+        audios_model.distinct(
+            "metadata.fonema",
+            base_match["$match"]
+        )
+    )
+
+    # Últimos 5 fonemas grabados
+    ultimos_fonemas = ultimas_etiquetas  # mismo resultado
+
+    # 5 fonemas más grabados
+    fonemas_mas = etiquetas_mas
+
+    # 5 fonemas menos grabados
+    fonemas_menos = etiquetas_menos
+
+    return render_template(
+        "audios/client_report.html",
+        total_audios=total_audios,
+        ultimas_etiquetas=ultimas_etiquetas,
+        etiquetas_mas=etiquetas_mas,
+        etiquetas_menos=etiquetas_menos,
+        total_fonemas=total_fonemas,
+        ultimos_fonemas=ultimos_fonemas,
+        fonemas_mas=fonemas_mas,
+        fonemas_menos=fonemas_menos
+    )
