@@ -414,48 +414,155 @@ def update(id):
 @login_required
 def update_post(id):
     usu = Usuario()
+    usuario_db = usu.find_one({'_id': ObjectId(id)})
 
-    # Rol del usuario a actualizar
-    rol_usuario = usu.find_one({'_id': ObjectId(id)})['rol']
-    
-    nombre = request.form.get('nombre')
-									   
+    if not usuario_db:
+        flash('Usuario no encontrado', 'danger')
+        return redirect(url_for('users.index'))
+
+    rol_usuario_objetivo = usuario_db.get('rol')
+    schema_version = str(request.form.get('schema_version', '1'))
+
+    font_size = request.form.get('font_size', 1) or 1
+
+    activo = True if request.form.get('activo') else False
+
+    rol_editor = getattr(current_user, "rol", None)
+    puede_editar_restringido = rol_editor in ("admin", "tecnico")
+
+    # ========== SCHEMA VERSION 2 ==========
+    if schema_version == "2":
+        email = request.form.get('email')
+        sexo = request.form.get('sexo')
+        provincia = request.form.get('provincia')
+        observaciones = request.form.get('observaciones')
+
+        nombre_cliente = request.form.get('nombre_cliente')
+        dni_cliente = request.form.get('dni_cliente')
+        fnac_cliente = request.form.get('fnac_cliente')
+        direccion_cliente = request.form.get('direccion_cliente')
+        localidad_cliente = request.form.get('localidad_cliente')
+        telefono_cliente = request.form.get('telefono_cliente')
+
+        fecha_cliente = None
+        if fnac_cliente:
+            fecha_cliente = datetime.strptime(fnac_cliente, '%Y-%m-%d')
+
+        mongo_set = {
+            "$set": {
+                "schema_version": 2,
+
+                "nombre": nombre_cliente,
+                "mail": email,
+                "sexo": sexo,
+                "provincia": provincia,
+                "fecha_nacimiento": fecha_cliente if fecha_cliente else usuario_db.get("fecha_nacimiento"),
+                "activo": activo,
+                "font_size": float(font_size),
+
+                "perfil.participante.nombre": nombre_cliente,
+                "perfil.participante.dni": dni_cliente,
+                "perfil.participante.fecha_nacimiento": fecha_cliente if fecha_cliente else usuario_db.get("fecha_nacimiento"),
+                "perfil.participante.direccion": direccion_cliente,
+                "perfil.participante.localidad": localidad_cliente,
+                "perfil.participante.provincia": provincia,
+                "perfil.participante.sexo": sexo,
+                "perfil.participante.telefono": telefono_cliente,
+
+                "perfil.observaciones": observaciones
+            }
+        }
+
+        if puede_editar_restringido:
+            nombre_entidad = request.form.get('nombre_entidad')
+            cif_entidad = request.form.get('cif_entidad')
+            persona_referencia = request.form.get('persona_referencia')
+            direccion_entidad = request.form.get('direccion_entidad')
+            telefono_entidad = request.form.get('telefono_entidad')
+            mail_entidad = request.form.get('mail_entidad')
+            colectivos_atencion = request.form.getlist('enfermedades')
+
+            nombre_tutor = request.form.get('nombre_tutor')
+            dni_tutor = request.form.get('dni_tutor')
+            direccion_tutor = request.form.get('direccion_tutor')
+            telefono_tutor = request.form.get('telefono_tutor')
+            mail_tutor = request.form.get('mail_tutor')
+
+            trastornos_habla = request.form.getlist('disfonia')
+            grado_afectacion = request.form.get('afectacion_cliente')
+
+            mongo_set["$set"].update({
+                "perfil.entidad.nombre": nombre_entidad,
+                "perfil.entidad.cif": cif_entidad,
+                "perfil.entidad.persona_referencia": persona_referencia,
+                "perfil.entidad.direccion": direccion_entidad,
+                "perfil.entidad.telefono": telefono_entidad,
+                "perfil.entidad.mail": mail_entidad,
+                "perfil.entidad.colectivos_atencion": colectivos_atencion,
+
+                "perfil.tutor.nombre": nombre_tutor,
+                "perfil.tutor.dni": dni_tutor,
+                "perfil.tutor.direccion": direccion_tutor,
+                "perfil.tutor.telefono": telefono_tutor,
+                "perfil.tutor.mail": mail_tutor,
+
+                "perfil.participante.trastornos_habla": trastornos_habla,
+                "perfil.participante.grado_afectacion": grado_afectacion
+            })
+
+        resultado = usu.update_one({'_id': ObjectId(id)}, mongo_set)
+
+        if resultado.acknowledged:
+            session['font_size'] = font_size
+            flash('Usuario actualizado correctamente', 'success')
+            return redirect(url_for('users.index', id=id))
+
+        flash('Error al actualizar el usuario, inténtelo de nuevo...', 'danger')
+        return redirect(url_for('users.update', id=id))
+
+    # ========== SCHEMA VERSION 1 ==========
+    nombre = request.form.get('nombre_cliente') or request.form.get('nombre')
     email = request.form.get('email')
     sexo = request.form.get('sexo')
     provincia = request.form.get('provincia')
     entidad = request.form.get('entidad')
-    fnac = request.form.get('fnac')
+    fnac = request.form.get('fnac_cliente') or request.form.get('fnac')
     observaciones = request.form.get('observaciones')
-    font_size = request.form.get('font_size', 1)
-    enfermedades = request.form.getlist('enfermedad')
-    disfonias = request.form.getlist('disfonia')
-    activo = request.form.get('activo')
-    fecha = datetime.strptime(fnac, '%Y-%m-%d')
 
-    activo = True if activo else False
+    fecha = None
+    if fnac:
+        fecha = datetime.strptime(fnac, '%Y-%m-%d')
 
-    if not font_size:
-        font_size = 1
+    mongo_set = {
+        "$set": {
+            "nombre": nombre,
+            "mail": email,
+            "sexo": sexo,
+            "provincia": provincia,
+            "activo": activo,
+            "observaciones": observaciones,
+            "fecha_nacimiento": fecha if fecha else usuario_db.get("fecha_nacimiento"),
+            "font_size": float(font_size)
+        }
+    }
 
-    mongo_set = {"$set": {'nombre': nombre, 'mail': email, 'sexo': sexo, 'provincia': provincia, 
-                          'entidad': entidad, 'activo': activo,'observaciones': observaciones,
-                          'fecha_nacimiento': fecha , 'font_size': float(font_size)}}
-    
-    # Añadir atributos especificos de cliente
-    if rol_usuario == "cliente":
-         mongo_set["$set"]["enfermedades"] = enfermedades
-         mongo_set["$set"]["dis"] = disfonias
-   
-    # Actualizar en BD
+    if puede_editar_restringido:
+        mongo_set["$set"]["entidad"] = entidad
+
+    if rol_usuario_objetivo == "cliente" and puede_editar_restringido:
+        enfermedades = request.form.getlist('enfermedades')
+        disfonias = request.form.getlist('disfonia')
+        mongo_set["$set"]["enfermedades"] = enfermedades
+        mongo_set["$set"]["dis"] = disfonias
+
     resultado = usu.update_one({'_id': ObjectId(id)}, mongo_set)
- 
+
     if resultado.acknowledged:
         session['font_size'] = font_size
         flash('Usuario actualizado correctamente', 'success')
         return redirect(url_for('users.index', id=id))
-    else:
-        flash('Error al actualizar el usuario, inténtelo de nuevo...', 'danger')
 
+    flash('Error al actualizar el usuario, inténtelo de nuevo...', 'danger')
     return redirect(url_for('users.update', id=id))
 
 
