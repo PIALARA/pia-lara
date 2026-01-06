@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash
 from datetime import datetime
 from bson.objectid import ObjectId
 import pymongo
+from pymongo.errors import PyMongoError
 from flask import Blueprint, render_template, request
 from urllib import request
 
@@ -99,6 +100,7 @@ def create():
 
 @bp.route('/create', methods=['POST'])
 @login_required
+@rol_required(['admin', 'tecnico'])
 def create_post():
     nombreAdmin = request.form.get('nombre_admin')
     emailAdmin = request.form.get('email_admin')
@@ -108,20 +110,19 @@ def create_post():
     nombreTecnico = request.form.get('nombre_tecnico')
     emailTecnico = request.form.get('email_tecnico')
 
-    # Datos de la entidad / asociación
     nombreEntidad = request.form.get('nombre_entidad')
     cifEntidad = request.form.get('cif_entidad')
     personaReferencia = request.form.get('persona_referencia')
     direccionEntidad = request.form.get('direccion_entidad')
     telefonoEntidad = request.form.get('telefono_entidad')
     mailEntidad = request.form.get('mail_entidad')
-    # Datos de la persona tutor / tutora / madre / padre
+
     nombreTutor = request.form.get('nombre_tutor')
     dniTutor = request.form.get('dni_tutor')
     direccionTutor = request.form.get('direccion_tutor')
     telefonoTutor = request.form.get('telefono_tutor')
     mailTutor = request.form.get('mail_tutor')
-    # Datos del cliente
+
     nombreCliente = request.form.get('nombre_cliente')
     dniCliente = request.form.get('dni_cliente')
     fNacCliente = request.form.get('fnac_cliente')
@@ -130,9 +131,7 @@ def create_post():
     provinciaCliente = request.form.get('provincia_cliente')
     sexoCliente = request.form.get('sexo_cliente')
     disCliente = request.form.getlist('dis')
-    telefonoCliente = request.form.get('telefono_cliente')
     mailCliente = request.form.get('mail_cliente')
-    activoCliente = request.form.get('activo_cliente')
     observacionesCliente = request.form.get('observaciones_cliente')
     enfermedadesCliente = request.form.getlist('enfermedades')
     afectacionCliente = request.form.get('afectacion_cliente')
@@ -140,52 +139,137 @@ def create_post():
     user = Usuario()
 
     if pass1 != pass2:
-        flash("Las contraseñas no son iguales", 'danger')
-        return render_template('users/create.html')
+        flash("Las contraseñas no son iguales", "danger")
+        return render_template("users/create.html")
 
-    result = None
+    try:
+        # ADMIN
+        if nombreAdmin:
+            if existeCorreo(emailAdmin):
+                flash("El correo del admin ya existe", "danger")
+                return redirect(url_for("users.create"))
 
-    if nombreAdmin and not existeCorreo(emailAdmin):
+            newUser = {
+                "nombre": nombreAdmin,
+                "mail": emailAdmin,
+                "rol": "admin",
+                "password": generate_password_hash(pass1, method="sha256"),
+                "fecha_nacimiento": datetime.now(),
+                "ultima_conexion": datetime.now()
+            }
+            result = user.insert_one(newUser)
 
-        newUser = {"nombre": nombreAdmin, "mail": emailAdmin, "rol": "admin",
-                   "password": generate_password_hash(pass1, method='sha256'),
-                   "fecha_nacimiento": datetime.now(), "ultima_conexion": datetime.now()}
-        result = user.insert_one(newUser)
+            if result.acknowledged:
+                flash("Usuario creado correctamente", "success")
+                return redirect(url_for("users.index"))
 
-    elif nombreTecnico and not existeCorreo(emailTecnico):
-        newUser = {"nombre": nombreTecnico, "mail": emailTecnico, "rol": "tecnico",
-                   "password": generate_password_hash(pass1, method='sha256'),
-                   "fecha_nacimiento": datetime.now(), "ultima_conexion": datetime.now(),
-                   "activo": True}
-        result = user.insert_one(newUser)
+            flash("El usuario no se ha creado. Error genérico", "danger")
+            return redirect(url_for("users.create"))
 
-    elif nombreCliente and not existeCorreo(mailCliente):
-        fecha = datetime.strptime(fNacCliente, '%Y-%m-%d')
-        newUser = {"nombre": nombreCliente, "mail": mailCliente, "rol": "cliente",
-                   "password": generate_password_hash(pass1, method='sha256'),
-                   "fecha_nacimiento": fecha, "ultima_conexion": datetime.now(),
-                   "sexo": sexoCliente, "provincia": provinciaCliente, "entidad": nombreEntidad,
-                   "observaciones": observacionesCliente,
-                   "enfermedades": enfermedadesCliente, "dis": disCliente,
-                   "parent": current_user.email, "cant_audios": 0,
-                   "activo": True, "cif_entidad": cifEntidad,
-                   "persona_referencia": personaReferencia, "direccion_entidad": direccionEntidad,
-                   "telefono_entidad": telefonoEntidad, "mail_entidad": mailEntidad,
-                   "nombre_tutor": nombreTutor, "dni_tutor": dniTutor,
-                   "direccion_tutor": direccionTutor, "telefono_tutor": telefonoTutor,
-                   "mail_tutor": mailTutor, "dni": dniCliente,
-                   "direccion": direccionCliente, "localidad": localidadCliente,
-                   "telefono": telefonoCliente,
-                   "afectacion": afectacionCliente}
-        result = user.insert_one(newUser)
+        # TECNICO
+        if nombreTecnico:
+            if existeCorreo(emailTecnico):
+                flash("El correo del técnico ya existe", "danger")
+                return redirect(url_for("users.create"))
 
-    # Comprobar el resultado y mostrar mensaje
-    if not result == None and result.acknowledged:
-        flash('Usuario creado correctamente', 'success')
-        return redirect(url_for('users.index'))
-    else:
-        flash('El usuario no se ha creado. Error genérico', 'danger')
-        return redirect(url_for('users.create'))
+            newUser = {
+                "nombre": nombreTecnico,
+                "mail": emailTecnico,
+                "rol": "tecnico",
+                "password": generate_password_hash(pass1, method="sha256"),
+                "fecha_nacimiento": datetime.now(),
+                "ultima_conexion": datetime.now(),
+                "activo": True
+            }
+            result = user.insert_one(newUser)
+
+            if result.acknowledged:
+                flash("Usuario creado correctamente", "success")
+                return redirect(url_for("users.index"))
+
+            flash("El usuario no se ha creado. Error genérico", "danger")
+            return redirect(url_for("users.create"))
+
+        # CLIENTE
+        if nombreCliente:
+            if existeCorreo(mailCliente):
+                flash("El correo del cliente ya existe", "danger")
+                return redirect(url_for("users.create"))
+
+            if not fNacCliente:
+                flash("Fecha de nacimiento vacía", "danger")
+                return redirect(url_for("users.create"))
+
+            fecha = datetime.strptime(fNacCliente, "%Y-%m-%d")
+
+            newUser = {
+                "schema_version": 2,
+                "nombre": nombreCliente,
+                "mail": mailCliente,
+                "rol": "cliente",
+                "password": generate_password_hash(pass1, method="sha256"),
+                "fecha_nacimiento": fecha,
+                "ultima_conexion": datetime.now(),
+                "sexo": sexoCliente,
+                "provincia": provinciaCliente,
+                "parent": current_user.email,
+
+                "perfil": {
+                    "entidad": {
+                        "nombre": nombreEntidad,
+                        "cif": cifEntidad,
+                        "persona_referencia": personaReferencia,
+                        "direccion": direccionEntidad,
+                        "telefono": telefonoEntidad,
+                        "mail": mailEntidad,
+                        "colectivos_atencion": enfermedadesCliente
+                    },
+                    "tutor": {
+                        "nombre": nombreTutor,
+                        "dni": dniTutor,
+                        "direccion": direccionTutor,
+                        "telefono": telefonoTutor,
+                        "mail": mailTutor
+                    },
+                    "participante": {
+                        "nombre": nombreCliente,
+                        "dni": dniCliente,
+                        "fecha_nacimiento": fecha,
+                        "direccion": direccionCliente,
+                        "localidad": localidadCliente,
+                        "provincia": provinciaCliente,
+                        "sexo": sexoCliente,
+                        "trastornos_habla": disCliente,
+                        "grado_afectacion": afectacionCliente
+                    },
+                    "observaciones": observacionesCliente
+                },
+
+                "font_size": 1,
+                "cant_audios": 0,
+                "activo": True
+            }
+
+            result = user.insert_one(newUser)
+
+            if result.acknowledged:
+                flash("Usuario creado correctamente", "success")
+                return redirect(url_for("users.index"))
+
+            flash("El usuario no se ha creado. Error genérico", "danger")
+            return redirect(url_for("users.create"))
+
+        # Si no venía nada que crear
+        flash("Formulario incompleto: no se recibió admin/técnico/cliente", "danger")
+        return redirect(url_for("users.create"))
+
+    except PyMongoError as e:
+        flash(f"Error MongoDB: {str(e)}", "danger")
+        return redirect(url_for("users.create"))
+
+    except Exception as e:
+        flash(f"Error: {str(e)}", "danger")
+        return redirect(url_for("users.create"))
 
 
 def existeCorreo(email):
@@ -268,7 +352,58 @@ def update(id):
     else:
         datos_aux["enfermedades"] = Enfermedades().find()
         datos_aux["disfonias"] = Disfonias().find()
-        datos_aux["provincias"] = ['Alicante','Valencia','Castellon','Murcia']
+        datos_aux["provincias"] = [
+            "Álava",
+            "Albacete",
+            "Alicante",
+            "Almería",
+            "Asturias",
+            "Ávila",
+            "Badajoz",
+            "Barcelona",
+            "Burgos",
+            "Cáceres",
+            "Cádiz",
+            "Cantabria",
+            "Castellón",
+            "Ciudad Real",
+            "Córdoba",
+            "Cuenca",
+            "Girona",
+            "Granada",
+            "Guadalajara",
+            "Guipúzcoa",
+            "Huelva",
+            "Huesca",
+            "Islas Baleares",
+            "Jaén",
+            "La Coruña",
+            "La Rioja",
+            "Las Palmas",
+            "León",
+            "Lleida",
+            "Lugo",
+            "Madrid",
+            "Málaga",
+            "Murcia",
+            "Navarra",
+            "Ourense",
+            "Palencia",
+            "Pontevedra",
+            "Salamanca",
+            "Santa Cruz de Tenerife",
+            "Segovia",
+            "Sevilla",
+            "Soria",
+            "Tarragona",
+            "Teruel",
+            "Toledo",
+            "Valencia",
+            "Valladolid",
+            "Vizcaya",
+            "Zamora",
+            "Zaragoza"
+        ]
         url = 'users/update.html'
         
     return render_template( url, model=usuario, rol=logged_rol, datos_aux=datos_aux )
