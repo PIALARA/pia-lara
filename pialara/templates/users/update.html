@@ -22,133 +22,319 @@
   </div>
 
   <div class="tab-content py-4" id="nav-tabContent">
+    {% if model.schema_version and model.schema_version == 2 %}
       <form class="container" method="POST" style="max-width: 20rem">
-         
-        <div class="mb-3">
-          <label for="nombre" class="form-label">Nombre</label>
-          <input type="text" class="form-control" id="nombre" name="nombre" required value="{{model.nombre}}" />
-        </div>
-        
-        <div class="mb-3">															   
-																												
-			  
-						  
-          <label for="email" class="form-label">Email</label>
-          <input type="email" class="form-control" id="email" name="email" required value="{{model.mail}}"/>
-        </div>
-        <div class="mb-3">
-          <label for="sexo" class="form-label">Sexo</label>
-          <select class="form-select" id="cliente-sexo" name="sexo" required>
-            <option value="H" {% if model.sexo == "H" %} selected {% endif %}>Hombre</option>
-            <option value="M" {% if model.sexo == "M" %} selected {% endif %}>Mujer</option>
-            <option value="A" {% if model.sexo == "A" %} selected {% endif %}>Ambiguo</option>
-            <option value="T" {% if model.sexo == "T" %} selected {% endif %}>Trans</option>
-          </select>
-        </div>
+        <div class="form-wrapper">
+          {% if rol == "admin" or rol == "tecnico" %}
+          <div class="form-info-section" id="asoc-info">
+            <h2>Datos de la asociación</h2>
+            <div class="mb-3">
+              <label for="entidad-nombre" class="form-label">Nombre de la Entidad</label>
+              <input type="text" class="form-control" id="entidad-nombre" name="nombre_entidad" required value="{{ model.perfil.entidad.nombre }}" />
+            </div>
+            <div class="mb-3">
+              <label for="entidad-cif" class="form-label">CIF</label>
+              <input type="text" class="form-control" id="entidad-cif" name="cif_entidad" required value="{{ model.perfil.entidad.cif }}" />
+            </div>
+            <div class="mb-3">
+              <label for="entidad-persona" class="form-label">Persona de referencia</label>
+              <input type="text" class="form-control" id="entidad-persona" name="persona_referencia" required value="{{ model.perfil.entidad.persona_referencia }}" />
+            </div>
+            <div class="mb-3">
+              <label for="entidad-direccion" class="form-label">Dirección</label>
+              <input type="text" class="form-control" id="entidad-direccion" name="direccion_entidad" required value="{{ model.perfil.entidad.direccion }}" />
+            </div>
+            <div class="mb-3">
+              <label for="entidad-telefono" class="form-label">Teléfono</label>
+              <input type="text" class="form-control" id="entidad-telefono" name="telefono_entidad" required value="{{ model.perfil.entidad.telefono }}" />
+            </div>
+            <div class="mb-3">
+              <label for="entidad-mail" class="form-label">Mail</label>
+              <input type="email" class="form-control" id="entidad-mail" name="mail_entidad" required value="{{ model.perfil.entidad.mail }}" />
+            </div>
+            <fieldset class="mb-3">
+              <legend class="fs-6">Colectivo de atención</legend>
+              {% for enfermedad in datos_aux.enfermedades %}
+                {% if enfermedad.visible == 1 %}
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="enfermedades" value="{{ enfermedad.nombre }}" {{ "checked" if enfermedad.nombre in model.perfil.entidad.colectivos_atencion else "" }} id="enf-{{enfermedad.nombre}}" />
+                    <label class="form-check-label" for="enf-{{enfermedad.nombre}}">{{enfermedad.nombre}}</label>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </fieldset>
+          </div>
+          <div class="form-info-section" id="parent-info">
+            <h2>Datos de la persona Tutor/a - Madre/Padre</h2>
+            <div class="mb-3">
+              <label for="tutor-nombre" class="form-label">Nombre de la persona madre/padre o persona encargada</label>
+              <input type="text" class="form-control" id="tutor-nombre" name="nombre_tutor" required value="{{ model.perfil.tutor.nombre }}" />
+            </div>
+            <div class="mb-3">
+              <label for="tutor-dni" class="form-label">DNI</label>
+              <input type="text" class="form-control" id="tutor-dni" name="dni_tutor" required value="{{ model.perfil.tutor.dni }}" />
+            </div>
+            <div class="mb-3">
+              <label for="tutor-direccion" class="form-label">Dirección</label>
+              <input type="text" class="form-control" id="tutor-direccion" name="direccion_tutor" required value="{{ model.perfil.tutor.direccion }}" />
+            </div>
+            <div class="mb-3">
+              <label for="tutor-telefono" class="form-label">Teléfono</label>
+              <input type="text" class="form-control" id="tutor-telefono" name="telefono_tutor" required value="{{ model.perfil.tutor.telefono }}" />
+            </div>
+            <div class="mb-3">
+              <label for="tutor-mail" class="form-label">Mail</label>
+              <input type="email" class="form-control" id="tutor-mail" name="mail_tutor" required value="{{ model.perfil.tutor.mail }}" />
+            </div>
+          </div>
+          {% endif %}
+          <div class="form-info-section" id="client-info">
+            <h2>Datos de la persona <em>Donante de voz</em></h2>
+            <div class="mb-3">
+              <label for="cliente-nombre" class="form-label">Nombre y Apellidos</label>
+              <input type="text" class="form-control" id="cliente-nombre" name="nombre_cliente" required value="{{model.perfil.participante.nombre}}"/>
+            </div>
+            <div class="mb-3">
+              <label for="cliente-dni" class="form-label">DNI</label>
+              <input type="text" class="form-control" id="cliente-dni" name="dni_cliente" required value="{{model.perfil.participante.dni}}" />
+            </div>
 
-        {% set fnac = model.fecha_nacimiento.strftime('%Y-%m-%d') %}
-        <div class="mb-3">
-          <label for="fecha_nacimiento" class="form-label">Fecha de nacimiento</label>
-          <input type="date" class="form-control" id="fecha_nacimiento" name="fnac" value="{{fnac}}"/>
-        </div>
+            {% set fnac = model.fecha_nacimiento.strftime('%Y-%m-%d') %}
+            <div class="mb-3">
+              <label for="cliente-fecha_nacimiento" class="form-label">Fecha de nacimiento</label>
+              <input type="date" class="form-control" id="cliente-fecha_nacimiento" name="fnac_cliente" required value="{{fnac}}" />
+            </div>
 
-        <div class="mb-3">
-          <label for="provincia" class="form-label">Provincia</label>
-          <select class="form-select" id="provincia" name="provincia" required>
-            {% for item_provincia in datos_aux["provincias"] %}
-              <option value="{{ item_provincia }}" {% if item_provincia == model.provincia %}selected{% endif %}>
-                {{ item_provincia }}
-              </option>
-            {% endfor %}
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label for="entidad" class="form-label">Entidad / Asociación</label>
-          <input type="text" class="form-control" id="entidad" name="entidad" value="{{model.entidad}}" />
-        </div>
-
-        <div class="mb-3">
-          <label for="tecnico" class="form-label">Técnico</label>
-          <div class="d-flex">
-            <input type="text" class="form-control" id="tecnico" name="tecnico" value="{{model.parent}}" disabled />
-            {%if rol == "admin" %}
-              <a href="{{ url_for('users.update_tech',id=model._id) }}" class="bi bi-pencil-fill ms-2 pt-1"></a>
+            <div class="mb-3">
+              <label for="cliente-direccion" class="form-label">Dirección</label>
+              <input type="text" class="form-control" id="cliente-direccion" name="direccion_cliente" required value="{{model.perfil.participante.direccion}}" />
+            </div>
+            <div class="mb-3">
+              <label for="cliente-localidad" class="form-label">Localidad</label>
+              <input type="text" class="form-control" id="cliente-localidad" name="localidad_cliente" required value="{{model.perfil.participante.localidad}}" />
+            </div>
+            <div class="mb-3">
+              <label for="cliente-provincia" class="form-label">Provincia</label>
+              <select class="form-select" id="provincia" name="provincia" required>
+                {% for item_provincia in datos_aux.provincias %}
+                  <option value="{{ item_provincia }}" {% if item_provincia == model.perfil.participante.provincia %}selected{% endif %}>
+                    {{ item_provincia }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div> 
+            
+            <div class="mb-3">
+              <label for="cliente-sexo" class="form-label">Sexo</label>
+              <select class="form-select" id="cliente-sexo" name="sexo" required>
+                <option value="H" {% if model.perfil.participante.sexo == "H" %} selected {% endif %}>Hombre</option>
+                <option value="M" {% if model.perfil.participante.sexo == "M" %} selected {% endif %}>Mujer</option>
+                <option value="A" {% if model.perfil.participante.sexo == "A" %} selected {% endif %}>Ambiguo</option>
+                <option value="T" {% if model.perfil.participante.sexo == "T" %} selected {% endif %}>Trans</option>
+              </select>
+            </div>    
+            
+            {% if rol == "admin" or rol == "tecnico" %}
+            <fieldset class="mb-3">
+              <legend class="fs-6">Tipo de trastornos del habla</legend>
+              {% for disfonia in datos_aux.disfonias %}
+                {% if disfonia.visible == 1 %}
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="disfonia" value="{{disfonia.nombre}}" 
+                    id="dis-{{disfonia.nombre}}" {% if disfonia.nombre in model.perfil.participante.trastornos_habla %}checked{% endif %}  />
+                    <label class="form-check-label" for="dis-{{disfonia.nombre}}">{{disfonia.nombre}}</label>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </fieldset>
+            <div class="mb-3">
+              <label for="cliente-grado" class="form-label">Grado de afectación</label>
+              <select class="form-select" id="cliente-grado" name="afectacion_cliente" required>
+                <option value="leve" {% if model.perfil.participante.grado_afectacion == "leve" %} selected {% endif %}>Leve</option>
+                <option value="moderado" {% if model.perfil.participante.grado_afectacion == "moderado" %} selected {% endif %}>Moderado</option>
+                <option value="severo" {% if model.perfil.participante.grado_afectacion == "severo" %} selected {% endif %}>Severo</option>
+              </select>
+            </div>
             {% endif %}
+          </div>
+          <div class="form-info-section" id="info-tecnica">
+            <h2>Información técnica</h2>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email" required value="{{model.mail}}"/>
+            </div>
+            <div class="mb-3">
+              <label for="tecnico" class="form-label">Técnico</label>
+              <div class="d-flex">
+                <input type="text" class="form-control" id="tecnico" name="tecnico" value="{{model.parent}}" disabled />
+                {%if rol == "admin" %}
+                  <a href="{{ url_for('users.update_tech',id=model._id) }}" class="bi bi-pencil-fill ms-2 pt-1"></a>
+                {% endif %}
+              </div>
+            </div>
+            {% if rol == "admin" or rol == "tecnico" %}
+            <div class="text-start mb-3">
+              <label class="form-check-label mx-2" for="activo">Activo</label>
+              <input class="form-check-input" type="checkbox" name="activo" value="{{ model.activo }}" 
+              id="{{ activo }}" {% if model.activo %} checked {% endif %}/>
+            </div>
+            {% endif %}
+            <div class="mb-3">
+              <label for="observaciones" class="form-label">Observaciones</label>
+              <textarea class="form-control" id="observaciones" name="observaciones">{{model.perfil.observaciones}}</textarea>
+            </div>
+            <h2>Preferencias</h2>
+            <div class="text-center mt-3">
+              <a href="{{ url_for('users.update_pass_get',id=model._id ) }}" class="btn btn-success">
+                  <i class="bi bi-plus-square"></i>&nbsp;&nbsp;&nbsp;Cambiar Contraseña
+              </a>
+            </div>
+  
+            <hr>
+            <label for="email" class="form-label">Tamaño de texto</label>
+            <div>         
+              <button type="button" class="btn btn-secondary" onclick="changeSize(1)" {% if model.font_size == 1 %}disabled{% endif %}>1x</button>
+              <button type="button" class="btn btn-secondary" onclick="changeSize(1.25)" {% if model.font_size == 1.25 %}disabled{% endif %}>1.25x</button>
+              <button type="button" class="btn btn-secondary" onclick="changeSize(1.5)" {% if model.font_size == 1.5 %}disabled{% endif %}>1.5x</button>
+            </div>
+            <input type="hidden" id="font_size" name="font_size" value="{{model.font_size}}"/>
+            <p id="textoEjemplo" class="mt-3">Texto de ejemplo</p>
           </div>
         </div>
 
-        {%if rol == "admin" or rol == "tecnico"%}
-       
-          <fieldset class="mb-3">
-            <legend class="fs-6">Enfermedades</legend>
-            {% for enfermedad in datos_aux["enfermedades"] %}
-              {% if enfermedad.visible == 1 %}
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="enfermedad" value="{{ enfermedad.nombre }}"
-                  id="enf-{{enfermedad.nombre}}" {% if enfermedad.nombre in model.enfermedades %}checked{% endif %}/>
-                  <label class="form-check-label" for="enf-{{enfermedad.nombre}}">{{enfermedad.nombre}}</label>
-                </div>
-              {% endif %}
-            {% endfor %}
-          </fieldset>
-
-          <fieldset class="mb-3">
-            <legend class="fs-6">Disfonias</legend>
-            {% for disfonia in datos_aux["disfonias"] %}
-            {% if disfonia.visible == 1 %}
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="checkbox" name="disfonia" value="{{disfonia.nombre}}" 
-                  id="dis-{{disfonia.nombre}}" {% if disfonia.nombre in model.dis %}checked{% endif %}  />
-                  <label class="form-check-label" for="dis-{{disfonia.nombre}}">{{disfonia.nombre}}</label>
-                </div>
-            {% endif %}
-            {% endfor %}
-          </fieldset>
-
-          <div class="text-end">
-            <label class="form-check-label mx-2" for="activo">Activo</label>
-            <input class="form-check-input" type="checkbox" name="activo" value="{{ model.activo }}" 
-            id="{{ activo }}" {% if model.activo %} checked {% endif %}/>
-          </div>
-
-        {% endif %}
-
+        <input type="hidden" name="schema_version" id="schema_version" value="2"/>
 
         <div class="mb-3">
-          <label for="observaciones" class="form-label">Observaciones</label>
-          <textarea class="form-control" id="observaciones" name="observaciones">{{model.observaciones}}</textarea>
-        </div>
-        
-        <div class="text-center mt-3">
-          <a href="{{ url_for('users.update_pass_get',id=model._id ) }}" class="btn btn-success">
-              <i class="bi bi-plus-square"></i>&nbsp;&nbsp;&nbsp;Cambiar Contraseña
-          </a>
-        </div>
-
-        <hr>
-        <label for="email" class="form-label">Tamaño de texto</label>
-        <div>         
-          <button type="button" class="btn btn-secondary" onclick="changeSize(1)" {% if model.font_size == 1 %}disabled{% endif %}>1x</button>
-          <button type="button" class="btn btn-secondary" onclick="changeSize(1.25)" {% if model.font_size == 1.25 %}disabled{% endif %}>1.25x</button>
-          <button type="button" class="btn btn-secondary" onclick="changeSize(1.5)" {% if model.font_size == 1.5 %}disabled{% endif %}>1.5x</button>
-        </div>
-        <input type="hidden" id="font_size" name="font_size" value="{{model.font_size}}"/>
-        <p id="textoEjemplo" class="mt-3">Texto de ejemplo</p>
-
-        <div class="mb-3">
-          <button class="btn btn-primary w-100 shadow" type="submit" id="actualizarBtn">
+          <button class="btn btn-primary w-100 shadow" type="submit" id="actualizarBtn" style="width: 100%;">
             <i class="bi bi-plus-square me-2"></i>Actualizar
           </button>
         </div>
 
+      </form>
+    {% else %}
+      <form class="container" method="POST" style="max-width: 20rem">
+        <div class="form-wrapper">
+          <div class="form-info-section" id="client-info">
+            <h2>Datos de la persona <em>Donante de voz</em></h2>
+            <div class="mb-3">
+              <label for="cliente-nombre" class="form-label">Nombre y Apellidos</label>
+              <input type="text" class="form-control" id="cliente-nombre" name="nombre_cliente" required value="{{model.nombre}}"/>
+            </div>
+
+            {% set fnac = model.fecha_nacimiento.strftime('%Y-%m-%d') %}
+            <div class="mb-3">
+              <label for="cliente-fecha_nacimiento" class="form-label">Fecha de nacimiento</label>
+              <input type="date" class="form-control" id="cliente-fecha_nacimiento" name="fnac_cliente" required value="{{fnac}}" />
+            </div>
+            <div class="mb-3">
+              <label for="cliente-provincia" class="form-label">Provincia</label>
+              <select class="form-select" id="provincia" name="provincia" required>
+                {% for item_provincia in datos_aux.provincias %}
+                  <option value="{{ item_provincia }}" {% if item_provincia == model.provincia %}selected{% endif %}>
+                    {{ item_provincia }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div> 
+            
+            <div class="mb-3">
+              <label for="cliente-sexo" class="form-label">Sexo</label>
+              <select class="form-select" id="cliente-sexo" name="sexo" required>
+                <option value="H" {% if model.sexo == "H" %} selected {% endif %}>Hombre</option>
+                <option value="M" {% if model.sexo == "M" %} selected {% endif %}>Mujer</option>
+                <option value="A" {% if model.sexo == "A" %} selected {% endif %}>Ambiguo</option>
+                <option value="T" {% if model.sexo == "T" %} selected {% endif %}>Trans</option>
+              </select>
+            </div>    
+            
+            {% if rol == "admin" or rol == "tecnico" %}
+            <fieldset class="mb-3">
+              <legend class="fs-6">Enfermedades</legend>
+              {% for enfermedad in datos_aux.enfermedades %}
+                {% if enfermedad.visible == 1 %}
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="enfermedades" value="{{ enfermedad.nombre }}" {{ "checked" if enfermedad.nombre in model.enfermedades else "" }} id="enf-{{enfermedad.nombre}}" />
+                    <label class="form-check-label" for="enf-{{enfermedad.nombre}}">{{enfermedad.nombre}}</label>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </fieldset>
+            <fieldset class="mb-3">
+              <legend class="fs-6">Tipo de trastornos del habla</legend>
+              {% for disfonia in datos_aux.disfonias %}
+                {% if disfonia.visible == 1 %}
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="disfonia" value="{{disfonia.nombre}}" 
+                    id="dis-{{disfonia.nombre}}" {% if disfonia.nombre in model.dis %}checked{% endif %}  />
+                    <label class="form-check-label" for="dis-{{disfonia.nombre}}">{{disfonia.nombre}}</label>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </fieldset>
+            {% endif %}
+          </div>
+          <div class="form-info-section" id="info-tecnica">
+            <h2>Información técnica</h2>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email" required value="{{model.mail}}"/>
+            </div>
+            <div class="mb-3">
+              <label for="entidad" class="form-label">Entidad / Asociación</label>
+              <input type="text" class="form-control" id="entidad" name="entidad" value="{{model.entidad}}" />
+            </div>
+            <div class="mb-3">
+              <label for="tecnico" class="form-label">Técnico</label>
+              <div class="d-flex">
+                <input type="text" class="form-control" id="tecnico" name="tecnico" value="{{model.parent}}" disabled />
+                {%if rol == "admin" %}
+                  <a href="{{ url_for('users.update_tech',id=model._id) }}" class="bi bi-pencil-fill ms-2 pt-1"></a>
+                {% endif %}
+              </div>
+            </div>
+            {% if rol == "admin" or rol == "tecnico" %}
+            <div class="text-start mb-3">
+              <label class="form-check-label mx-2" for="activo">Activo</label>
+              <input class="form-check-input" type="checkbox" name="activo" value="{{ model.activo }}" 
+              id="{{ activo }}" {% if model.activo %} checked {% endif %}/>
+            </div>
+            {% endif %}
+            <div class="mb-3">
+              <label for="observaciones" class="form-label">Observaciones</label>
+              <textarea class="form-control" id="observaciones" name="observaciones">{{model.observaciones}}</textarea>
+            </div>
+            <h2>Preferencias</h2>
+            <div class="text-center mt-3">
+              <a href="{{ url_for('users.update_pass_get',id=model._id ) }}" class="btn btn-success">
+                  <i class="bi bi-plus-square"></i>&nbsp;&nbsp;&nbsp;Cambiar Contraseña
+              </a>
+            </div>
+  
+            <hr>
+            <label for="email" class="form-label">Tamaño de texto</label>
+            <div>         
+              <button type="button" class="btn btn-secondary" onclick="changeSize(1)" {% if model.font_size == 1 %}disabled{% endif %}>1x</button>
+              <button type="button" class="btn btn-secondary" onclick="changeSize(1.25)" {% if model.font_size == 1.25 %}disabled{% endif %}>1.25x</button>
+              <button type="button" class="btn btn-secondary" onclick="changeSize(1.5)" {% if model.font_size == 1.5 %}disabled{% endif %}>1.5x</button>
+            </div>
+            <input type="hidden" id="font_size" name="font_size" value="{{model.font_size}}"/>
+            <p id="textoEjemplo" class="mt-3">Texto de ejemplo</p>
+          </div>
+        </div>
+
+        <input type="hidden" name="schema_version" id="schema_version" value="1"/>
+
+        <div class="mb-3">
+          <button class="btn btn-primary w-100 shadow" type="submit" id="actualizarBtn" style="width: 100%;">
+            <i class="bi bi-plus-square me-2"></i>Actualizar
+          </button>
+        </div>
 
       </form>
-
+    {% endif %}
       <div class="text-end mx-5">
-        <button class="btn btn-secondary" onclick="window.history.back()">Volver</button>
+        <button class="btn btn-secondary" style="width: 100%;" onclick="window.history.back()">Volver</button>
       </div>
-      
   </div>
   <script src="{{ url_for('static', filename='js/font_size.js') }}"></script>
 
