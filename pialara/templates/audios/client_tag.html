@@ -15,89 +15,120 @@
     {% endif %}
   {% endwith %}
 
-  <section>
-    <form class="tags-form" method="post" action="{{ url_for('audios.tag_search') }}">
-      <input class="tags-form__input" type="search" name="tagName" placeholder="Buscar etiqueta..." value="{{ tag_name }}"/>
-      <button class="tags-form__button btn btn-primary" type="submit" id="search">
-        <i class="bi bi-search me-2"></i>
-      </button>
-    </form>
+<section>
 
-    {% if tags_suerte %}
-    <div class="tags-container">
-      {% for tag in tags_suerte %}
-        <a class="btn btn-info" href="/audios/client-record/{{ tag._id }}">¿Voy a tener suerte?</a>
+  <!-- Buscador -->
+  <form class="tags-form" method="post" action="{{ url_for('audios.tag_search') }}">
+    <input class="tags-form__input"
+           type="search"
+           name="tagName"
+           placeholder="Buscar etiqueta..."
+           value="{{ tag_name }}" />
+    <button class="tags-form__button btn btn-primary" type="submit">
+      <i class="bi bi-search me-2"></i>
+    </button>
+  </form>
+
+  <!-- Botón suerte -->
+  <div class="tags-container">
+    {% for tag in tags_suerte %}
+      <a class="btn btn-info" href="/audios/client-record/{{ tag._id }}">
+        ¿Voy a tener suerte?
+      </a>
+    {% endfor %}
+  </div>
+
+  <!-- ETIQUETAS -->
+  {% if not tags %}
+  <div class="tags-container">
+    <fieldset>
+      🎙️ Audios grabados: <strong>{{ total_audios[0].total if total_audios else 0 }}</strong>
+    </fieldset>
+  </div>
+
+  <div class="tags-container">
+    <fieldset>
+      <legend>Últimas 5 etiquetas grabadas</legend>
+      {% for x in ultimas_etiquetas %}
+        <a class="tag button"
+           href="/audios/client-record/{{ x.tag }}" title="Total audios grabados: {{ x.total }}">
+          {{ x.tag.upper() }}
+        </a>
       {% endfor %}
-    </div>
-    {% endif %}
+    </fieldset>
+  </div>
 
-    {% if tags_ultimas %}
-    <div class="tags-container">
-      <fieldset>
-        <legend>Últimas etiquetas grabadas</legend>
-        {% for tag in tags_ultimas %}
-          <a class="tag button" href="/audios/client-record/{{ tag.id }}">{{ tag.id.upper() }} ({{ tag.count }})</a>
-        {% endfor %}
-      </fieldset>
-    </div>
-    {% endif %}
+  <div class="tags-container">
+    <fieldset>
+      <legend>5 etiquetas más grabadas</legend>
+      {% for x in top_etiquetas %}
+        <a class="tag button"
+           href="/audios/client-record/{{ x.tag }}" title="Total audios grabados: {{ x.total }}">
+          {{ x.tag.upper() }}
+        </a>
+      {% endfor %}
+    </fieldset>
+  </div>
 
-    {% if tags_menos %}
-    <div class="tags-container">
-      <fieldset>
-        <legend>Etiquetas menos grabadas</legend>
-        {% for tag in tags_menos %}
-          {% set last_char = tag[-1] %}
-          {% set base_digits = tag[:3] if tag[:3].isdigit() else tag[:2] if tag[:2].isdigit() else tag[:1] if tag[:1].isdigit() else '' %}
-          {% set fonema = tag[base_digits|length:-1] %}
-          {% set tipo_frase = "frase corta" if base_digits.isdigit() and base_digits|int > 100 else "frase larga" %}
-          {% set posicion_lengua = 
-            "abajo" if last_char == "1" else 
-            "medio" if last_char == "2" else 
-            "arriba" if last_char == "3" else 
-            "desconocida" 
-          %}
-          {% set valido = base_digits.isdigit() and last_char.isdigit() %}
-          {% set descripcion = tipo_frase ~ ", fonema " ~ fonema ~ ", lengua " ~ posicion_lengua %}
-          <a class="tag button" href="/audios/client-record/{{ tag }}" title="{{ descripcion if valido else tag }}">{{ tag.upper() }}</a>
-        {% endfor %}
+  <div class="tags-container">
+    <fieldset>
+      <legend>5 etiquetas menos grabadas</legend>
+      {% for x in bottom_etiquetas %}
+        <a class="tag button"
+           href="/audios/client-record/{{ x.tag }}" title="Total audios grabados: {{ x.total }}">
+          {{ x.tag.upper() }}
+        </a>
+      {% endfor %}
+    </fieldset>
+  </div>
 
-      </fieldset>
-    </div>
-    {% endif %}
+  <!-- FONEMAS -->
+  <!-- TODO: sobre un fonema, crear un método /client-fonema/ Wque recupere todas las etiquetas asociadas, y devuelva una aleatoria, y de ahí, un redirect a client-record
+  <div class="tags-container">
+    <fieldset>
+      <legend>Últimos 5 fonemas grabados</legend>
+      {% for x in ultimos_fonemas %}
+        <span class="tag button">
+          {{ x.fonema.upper() }}
+        </span>
+      {% endfor %}
+    </fieldset>
 
+    <fieldset>
+      <legend>5 fonemas más grabados</legend>
+      {% for x in top_fonemas %}
+        <span class="tag button">
+          {{ x.fonema.upper() }} ({{ x.total }})
+        </span>
+      {% endfor %}
+    </fieldset>
 
-    {% if tags3 %}
-    <div class="tags-container">
-      <fieldset>
-        <legend>Etiquetas aleatorias</legend>
-        {% for tag in tags3 %}
-          {% set last_char = tag[-1] %}
-          {% set base_digits = tag[:3] if tag[:3].isdigit() else tag[:2] if tag[:2].isdigit() else tag[:1] if tag[:1].isdigit() else '' %}
-          {% set fonema = tag[base_digits|length:-1] %}
-          {% set tipo_frase = "frase larga" if base_digits.isdigit() and base_digits|int > 100 else "frase corta" %}
-          {% set posicion_lengua = 
-            "abajo" if last_char == "1" else 
-            "medio" if last_char == "2" else 
-            "arriba" if last_char == "3" else 
-            "desconocida" 
-          %}
-          {% set valido = base_digits.isdigit() and last_char.isdigit() %}
-          {% set descripcion = tipo_frase ~ ", fonema " ~ fonema ~ ", lengua " ~ posicion_lengua %}
-          <a class="tag button" href="/audios/client-record/{{ tag }}" title="{{descripcion if valido else tag}}">{{ tag.upper() }}</a>
-        {% endfor %}
-      </fieldset>
-    </div>
-    {% endif %}
+    <fieldset>
+      <legend>5 fonemas menos grabados</legend>
+      {% for x in bottom_fonemas %}
+        <span class="tag button">
+          {{ x.fonema.upper() }} ({{ x.total }})
+        </span>
+      {% endfor %}
+    </fieldset>
+  </div>
+  -->
+  {% endif %}
 
-    {% if tags %}
-    <div class="tags-container">
-      Etiquetas encontradas:
+  <!-- Resultados búsqueda -->
+  {% if tags %}
+  <div class="tags-container">
+    <fieldset>
+      <legend>Etiquetas encontradas</legend>
       {% for tag in tags %}
-        <a class="tag button" href="/audios/client-record/{{ tag._id }}">{{ tag._id.upper() }}</a>
+        <a class="tag button"
+           href="/audios/client-record/{{ tag._id }}">
+          {{ tag._id.upper() }}
+        </a>
       {% endfor %}
-    </div>
-    {% endif %}
+    </fieldset>
+  {% endif %}
+  </div>
 
-  </section>
+</section>
 {% endblock %}
