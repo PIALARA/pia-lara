@@ -162,6 +162,23 @@ body.contrast-3 button {
   padding: 1rem;
 }
 
+.tags-container fieldset {
+  text-align: center;
+  margin-block: 0.5rem;
+}
+
+.tags-container legend {
+  text-align: center;
+  width: 100%;
+  display: block;
+}
+
+.tags-container .tag.button,
+.tags-container .btn {
+  margin: 0.4rem 0.6rem; 
+  
+}
+
 
 .syllabus {
   width: 50rem;
@@ -432,7 +449,6 @@ div.container-paginacion {
 
 .paginacion:hover {
   background-color: grey; /* Color de fondo al hacer hover */
-  color: 
 }
 
 .pag-actual{
@@ -460,3 +476,29 @@ div.container-paginacion {
 }
 
 /*# sourceMappingURL=style_cliente.css.map */
+
+
+/* ========= MEDIA QUERY FOR USER CREATION FORM ON PC ========== */
+@media (min-width: 768px) {
+  form:has(.form-wrapper) {
+    max-width: none !important;
+  }
+
+  .form-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    border: 2px solid #ccc;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+  }
+
+  .form-info-section {
+    margin: 10px 20px;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+}

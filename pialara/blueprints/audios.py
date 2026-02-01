@@ -1,6 +1,7 @@
 import os.path
 import boto3
 import random
+import re
 from bson import ObjectId  # Asegúrate de importar ObjectId desde bson
 
 from bson.objectid import ObjectId
@@ -26,45 +27,103 @@ from random import sample
 
 bp = Blueprint('audios', __name__, url_prefix='/audios')
 
-@bp.route('/client-tag')
+@bp.route('/cliente-tag')
 @login_required
 def client_tag():
-    syllabus = Syllabus()
     audio = Audios()
+    
+    match_base = {
+        "texto.tipo": "syllabus",
+        "usuario.mail": current_user.email
+    }
 
     pipeline = [
+        {"$match": match_base},
         {
-            '$unwind': {
-                'path': '$tags'
-            }
-        }, {
-            '$group': {
-                '_id': '$tags', 
-                'fecha': {
-                    '$last': '$fecha_creacion'
-                }
-            }
-        }, {
-            '$sample': {
-                'size': 1
+            "$facet": {
+                # Cantidad total de audios
+                "total_audios": [
+                    {"$count": "total"}
+                ],
+                "totales_por_etiqueta": [
+                    {"$group": {"_id": "$texto.tag", "total": {"$sum": 1}}},
+                    {"$sort": {"total": -1}},
+                    {"$project": {"_id": 0, "tag": "$_id", "total": 1}}
+                ],
+                # Últimas 5 etiquetas grabadas
+                "ultimas_etiquetas": [
+                    {"$sort": {"fecha": -1}},
+                    {"$limit": 5},
+                    {"$project": {"_id": 0, "tag": "$texto.tag", "fecha": 1}}
+                ],
+                # Cantidad total de fonemas distintos
+                "total_fonemas": [
+                    {"$match": {"metadata.fonema": {"$exists": True}}},
+                    {"$group": {"_id": "$metadata.fonema"}},
+                    {"$count": "total"}
+                ],
+
+                # Últimos 5 fonemas grabados
+                "ultimos_fonemas": [
+                    {"$match": {"metadata.fonema": {"$exists": True}}},
+                    {"$sort": {"fecha": -1}},
+                    {"$group": {"_id": "$metadata.fonema", "last_time": {"$first": "$fecha"}}},
+                    {"$sort": {"last_time": -1}},
+                    {"$limit": 5},
+                    {"$project": {"_id": 0, "fonema": "$_id", "fecha": "$last_time"}}
+                ],
+
+                # 5 fonemas más grabados
+                "top_fonemas": [
+                    {"$match": {"metadata.fonema": {"$exists": True}}},
+                    {"$group": {"_id": "$metadata.fonema", "total": {"$sum": 1}}},
+                    {"$sort": {"total": -1}},
+                    {"$limit": 5},
+                    {"$project": {"_id": 0, "fonema": "$_id", "total": 1}}
+                ],
+
+                # 5 fonemas menos grabados
+                "bottom_fonemas": [
+                    {"$match": {"metadata.fonema": {"$exists": True}}},
+                    {"$group": {"_id": "$metadata.fonema", "total": {"$sum": 1}}},
+                    {"$sort": {"total": 1}},
+                    {"$limit": 5},
+                    {"$project": {"_id": 0, "fonema": "$_id", "total": 1}}
+                ],
             }
         }
     ]
+    result = list(audio.aggregate(pipeline))[0]
+
+    # Como ya tenemos los totales de cada etiqueta, mediante Python me quedo con los 5 de arriba y los 5 de abajo
+    totales = result["totales_por_etiqueta"]  # ya ordenado de mayor a menor
+    # Recorremos ultimas_etiquetas y le añadimos el total
+    totales_map = {item["tag"]: item["total"] for item in totales}
+    for tag in result["ultimas_etiquetas"]:
+        tag["total"] = totales_map.get(tag["tag"], 0)
+
+    syllabus = Syllabus()
+    pipeline = [
+        { '$unwind': { 'path': '$tags' } },
+        { '$group': { '_id': '$tags', 'fecha': { '$last': '$fecha_creacion' }}},
+        { '$sample': { 'size': 1 }}
+    ]
     tags_suerte = syllabus.aggregate(pipeline)
 
-    # TODO - Es una chapuza ... rehacer en un futuro con una única consulta a MongoDB
-    todos_tags = syllabus.distinct("tags",{})
-    tags_audios_menos_grabadas = audio.distinct("texto.tag", {"texto.tipo": "syllabus"})
-    tags_menos_grabadas = list(set(todos_tags) - set(tags_audios_menos_grabadas))
+    return render_template(
+        'audios/client_tag.html',
 
-    if tags_menos_grabadas and len(tags_menos_grabadas) >= 5:
-        tags_menos_grabadas = sample(tags_menos_grabadas, 5)
-    else:
-        tags_menos_grabadas = sample(tags_audios_menos_grabadas, 5)
+        tags_suerte=tags_suerte,
 
-    tags_aleatorio = sample(list(set(todos_tags)),5)
-
-    return render_template('audios/client_tag.html', tags_suerte=tags_suerte, tags_menos=tags_menos_grabadas, tags3=tags_aleatorio)
+        total_audios=result.get("total_audios", [{}]),
+        ultimas_etiquetas=result.get("ultimas_etiquetas", []),
+        top_etiquetas=totales[:5], 
+        bottom_etiquetas=totales[-5:][::-1], 
+        total_fonemas=result.get("total_fonemas", [{}]),
+        ultimos_fonemas=result.get("ultimos_fonemas", []),
+        top_fonemas=result.get("top_fonemas", []),
+        bottom_fonemas=result.get("bottom_fonemas", []),
+    )
 
 @bp.route('/client-record/<string:tag_name>')
 @login_required
@@ -110,6 +169,7 @@ def client_record(tag_name):
         session.pop('next_syllabus_item_ent', None) 
         session['tag_name_ent'] = str(tag_name)
 
+
     # Recuperamos el id de la siguiente frase desde la sesión (si existe)
     current_item_id = session.get('next_syllabus_item_ent', None)
     next_syllabus_item = None
@@ -153,6 +213,8 @@ def client_record(tag_name):
         # Si no hay 'current_item_id', seleccionamos aleatoria
         next_syllabus_item = select_random_item(syllabus_items)
         session['next_syllabus_item_ent'] = str(next_syllabus_item['_id'])
+
+    
 
     # Pasamos el item seleccionado a la plantilla
     return render_template('audios/client_record.html', tag=tag_name, syllabus=next_syllabus_item)
@@ -198,9 +260,23 @@ def save_record():
     text_tag = request.form.get('text_tag')
     text_type = request.form.get('text_type')
 
+    metadataOb = {}
     if text_id:
         # es un texto que proviene de una etiqueta
-        print("Viene de una etiqueta")
+        regex = re.compile(r'^(\d{1,3})([a-zA-Z]+)([1-3])$')
+        match = regex.match(text_tag)
+        if match:
+            num1, fonema, pos = match.groups()
+
+            metadataOb = { # guardamos metadatos del tag para facilitar el entrenamiento
+                "tipo_frase": "corta" if int(num1) >= 100 else "larga",
+                "fonema": fonema.upper(),
+                "posicion_lengua": {
+                    "1": "baja",
+                    "2": "media",
+                    "3": "alta"
+                }[pos]
+            }
     else:
         # si no tiene text_id, es un texto grabado por el usuario
         # primero, guardamos el nuevo texto y obtenemos un id
@@ -236,6 +312,8 @@ def save_record():
         "usuario": usuarioOb,
         "fecha": datetime.now(),
         "texto": textoOb,
+        "metadata": metadataOb,
+        "schema_version": 2, # anyadimos los metadata en la v2
         "duracion": int(duration)
     }
     audio = Audios()
@@ -303,69 +381,171 @@ def tag_search():
 def client_report(id=None):
     total_audios = 0
     audios_por_categoria = {}
+    ultimas_tags_grabadas = []
+    mas_grabadas = []
+    menos_grabadas = []
+    ultimos_fonemas = []
+    fonemas_mas_grabados = []
+    fonemas_menos_grabados = []
+    total_fonemas_unicos = 0
     logged_rol = current_user.rol
     url = 'audios/client_report.html'
     cliente_nombre = "N/A"
 
+    PATRON_REGEX = r"^(\d+)([a-zA-ZñÑ]+)([1-3])$"
+
+    audios_model = Audios()
+    usuario_model = Usuario()
+
     if id or logged_rol == "cliente":
-        audios_model = Audios()
+        # Cliente: un solo usuario (el propio o el indicado por parámetro)
         user_id = ObjectId(id) if id else current_user.id
-        
-        usuario_model = Usuario()
+        match_filter = {"usuario.id": user_id}
+
         cliente = usuario_model.find_one({"_id": user_id})
         cliente_nombre = cliente.get("nombre", "Desconocido") if cliente else "Desconocido"
-        
-        pipeline = [
-            {"$match": {"usuario.id": user_id}},
-            {"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}}
-        ]
-        resultado = list(audios_model.aggregate(pipeline))
-
-        if resultado:
-            audios_por_categoria = {doc['_id']: doc['cantidad'] for doc in resultado}
-            total_audios = sum(audios_por_categoria.values())
-            
-    elif logged_rol == "admin":
-        audios_model = Audios()
-        pipeline = [{"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}}]
-        resultado = audios_model.aggregate(pipeline)
-        audios_por_categoria = {doc['_id']: doc['cantidad'] for doc in resultado}
-        total_audios = sum(audios_por_categoria.values())
-        cliente_nombre = "Todos los usuarios"
-        
     elif logged_rol == "tecnico":
-        usuario_model = Usuario()
-        pipeline = [
+        # Técnico: todos los clientes cuyo parent es el técnico de la sesión
+        tecnico_email = current_user.email          
+        clientes = usuario_model.find({"parent": tecnico_email})
+        cliente_ids = [c["_id"] for c in clientes]
+
+        match_filter = {"usuario.id": {"$in": cliente_ids}}
+        cliente_nombre = "los usuarios supervisados"
+    elif logged_rol == "admin":
+        # Admin: no filtro por usuario → ve todos los audios
+        match_filter = {}
+        cliente_nombre = "Todos los usuarios"
+
+    # ─────────────────────────────────────────────────────────────
+    # 2. Pipeline único con $facet (independiente del rol)
+    # ─────────────────────────────────────────────────────────────
+    # Extracción del fonema reutilizada en varios puntos del pipeline
+    _extract_fonema = {
+        "$arrayElemAt": [
             {
-                "$match": {
-                "parent": "tecnico@tecnico.com"
-                }
-            },
-            {
-                "$lookup": {
-                    "from": "audios",
-                    "localField": "_id",
-                    "foreignField": "usuario.id",
-                    "as": "audios"
-                }
-            },
-            {
-                "$unwind": "$audios"
-            },
-            {
-                "$group": {
-                    "_id": "$audios.texto.tag",
-                    "cantidad": {
-                        "$sum": 1
+                "$getField": {
+                    "field": "captures",
+                    "input": {
+                        "$regexFind": {
+                            "input": "$texto.tag",
+                            "regex": PATRON_REGEX
+                        }
                     }
                 }
-            }
+            },
+            1   # capture group 1 → la parte alfabética del tag
         ]
-        resultado = usuario_model.aggregate(pipeline)
-        audios_por_categoria = {doc['_id']: doc['cantidad'] for doc in resultado}
-        total_audios = sum(audios_por_categoria.values())
-        cliente_nombre = "los Usuarios supervisados"
-        
-    audios_por_categoria = dict(sorted(audios_por_categoria.items(), key=lambda x: x[1], reverse=True))
+    }
 
-    return render_template(url, total_audios=total_audios, audios_por_categoria=audios_por_categoria, usuario_id=id, cliente_nombre=cliente_nombre, rol=logged_rol)
+    pipeline = [
+        {
+            "$match": {
+                **match_filter, # desempaquetamos el diccionario
+                "texto.tag": {"$regex": PATRON_REGEX}
+            }
+        },
+        {
+            "$facet": {
+                # ── Estadísticas básicas ──────────────────────────
+                "tags": [
+                    {"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}}
+                ],
+                "total_temp": [
+                    {"$count": "valor"}
+                ],
+
+                # ── Últimas grabadas ──────────────────────────────
+                "ultimas_grabadas": [
+                    {"$sort": {"fecha": -1}},
+                    {"$limit": 5},
+                    {"$project": {"_id": 0, "tag": "$texto.tag"}}
+                ],
+                "ultimos_fonemas": [
+                    {"$sort": {"fecha": -1}},
+                    {"$limit": 5},
+                    {"$project": {"_id": 0, "fonema": _extract_fonema}}
+                ],
+
+                # ── Top 5 tags ────────────────────────────────────
+                "mas_grabadas": [
+                    {"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}},
+                    {"$sort": {"cantidad": -1}},
+                    {"$limit": 5}
+                ],
+                "menos_grabadas": [
+                    {"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}},
+                    {"$sort": {"cantidad": 1}},
+                    {"$limit": 5}
+                ],
+
+                # ── Top 5 fonemas ─────────────────────────────────
+                "fonemas_mas_grabados": [
+                    {"$group": {"_id": _extract_fonema, "cantidad": {"$sum": 1}}},
+                    {"$sort": {"cantidad": -1}},
+                    {"$limit": 5}
+                ],
+                "fonemas_menos_grabados": [
+                    {"$group": {"_id": _extract_fonema, "cantidad": {"$sum": 1}}},
+                    {"$sort": {"cantidad": 1}},
+                    {"$limit": 5}
+                ],
+
+                # ── Fonemas únicos ────────────────────────────────
+                "conteo_fonemas_unicos": [
+                    {"$group": {"_id": _extract_fonema}},
+                    {"$count": "total"}
+                ]
+            }
+        },
+        {
+            "$project": {
+                "tags": 1,
+                "ultimas_grabadas": 1,
+                "mas_grabadas": 1,
+                "menos_grabadas": 1,
+                "ultimos_fonemas": 1,
+                "fonemas_mas_grabados": 1,
+                "fonemas_menos_grabados": 1,
+                "total": {
+                    "$ifNull": [{"$arrayElemAt": ["$total_temp.valor", 0]}, 0]
+                },
+                "total_fonemas_unicos": {
+                    "$ifNull": [{"$arrayElemAt": ["$conteo_fonemas_unicos.total", 0]}, 0]
+                }
+            }
+        }
+    ]
+
+    resultado = list(audios_model.aggregate(pipeline))
+    datos = resultado[0] if resultado else {}
+
+    total_audios            = datos.get("total", 0)
+    audios_por_categoria    = datos.get("tags", [])
+    ultimas_tags_grabadas   = datos.get("ultimas_grabadas", [])
+    mas_grabadas            = datos.get("mas_grabadas", [])
+    menos_grabadas          = datos.get("menos_grabadas", [])
+    ultimos_fonemas         = datos.get("ultimos_fonemas", [])
+    fonemas_mas_grabados    = datos.get("fonemas_mas_grabados", [])
+    fonemas_menos_grabados  = datos.get("fonemas_menos_grabados", [])
+    total_fonemas_unicos    = datos.get("total_fonemas_unicos", 0)
+
+    # Ordenar categorías por cantidad descendente (para el template)
+    temp_dict = {item["_id"]: item["cantidad"] for item in audios_por_categoria}
+    audios_por_categoria = dict(sorted(temp_dict.items(), key=lambda x: x[1], reverse=True))
+
+    return render_template(
+        url,
+        total_audios=total_audios,
+        audios_por_categoria=audios_por_categoria,
+        usuario_id=id,
+        cliente_nombre=cliente_nombre,
+        rol=logged_rol,
+        ultimas_tags_grabadas=ultimas_tags_grabadas,
+        mas_grabadas=mas_grabadas,
+        menos_grabadas=menos_grabadas,
+        ultimos_fonemas=ultimos_fonemas,
+        fonemas_mas_grabados=fonemas_mas_grabados,
+        fonemas_menos_grabados=fonemas_menos_grabados,
+        total_fonemas_unicos=total_fonemas_unicos
+    )

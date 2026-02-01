@@ -50,7 +50,11 @@
         <!-- movil -->
         <div class="offcanvas offcanvas-start text-bg-secondary" id="demo">
           <br />
-          <a href="{{ url_for('auth.logout') }}" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+          {% if current_user.rol == "cliente" %}
+          <a href="{{ url_for('audios.client_tag') }}" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+          {% else %}
+          <a href="{{ url_for('users.index') }}" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+          {% endif %}
             <img src="{{ url_for('static',filename='img/logoLara.png') }}" class="img-fluid">
           </a>
           <br />
@@ -88,7 +92,11 @@
 
         <!--  web -->
         <div class="d-none d-sm-block flex-column align-items-center align-items-sm-start px-3 pt-2">
-          <a href="{{ url_for('auth.logout') }}" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+          {% if current_user.rol == "cliente" %}
+          <a href="{{ url_for('audios.client_tag') }}" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+          {% else %}
+          <a href="{{ url_for('users.index') }}" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+          {% endif %}
             <img src="{{ url_for('static',filename='img/logoLara.png') }}" class="img-fluid">
           </a>
           <br />

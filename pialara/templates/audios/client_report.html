@@ -11,35 +11,164 @@
    {% endif %}
         </header>
 
-<section class="container">
-    <!-- Total de audios -->
-    <div class="card mb-4">
-        <div class="card-body text-center">
-            <h2>Total de Audios Grabados</h2>
-            <p class="fs-3">{{ total_audios }}</p>
+<section class="container py-3 h-auto" style="height: auto !important; min-height: 0 !important;">
+
+    <div class="row g-3 mb-3 h-auto" style="height: auto !important;">
+        <div class="col-md-6">
+            <div class="card border-dark shadow-sm h-100">
+                <div class="card-body d-flex justify-content-between align-items-center p-3">
+                    <div>
+                        <h6 class="text-secondary text-uppercase mb-0">Total Audios</h6>
+                        <span class="fs-2 fw-bold text-dark lh-1">{{ total_audios }}</span>
+                    </div>
+                    <i class="bi bi-mic-fill fs-2 text-secondary opacity-25"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-secondary shadow-sm h-100">
+                <div class="card-body d-flex justify-content-between align-items-center p-3">
+                    <div>
+                        <h6 class="text-secondary text-uppercase mb-0">Fonemas Únicos</h6>
+                        <span class="fs-2 fw-bold text-dark lh-1">{{ total_fonemas_unicos }}</span>
+                    </div>
+                    <i class="bi bi-soundwave fs-2 text-secondary opacity-25"></i>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Audios por categoría -->
-    <div class="card">
-        <div class="card-body">
-            <h2 class="text-center">Audios por Categoría</h2>
-            <table class="table table-striped" id="categorias-tabla">
-                <thead>
-                    <tr>
-                        <th onclick="ordenarTabla(0)">Categoría <i class="bi bi-sort-down"></i></th>
-                        <th onclick="ordenarTabla(1)">Cantidad audios <i class="bi bi-sort-down"></i></th>
-                    </tr>
-                    <tbody>
+    <div class="row g-2 mb-3 h-auto" style="height: auto !important;">
+        <div class="col-12">
+            <h6 class="border-bottom pb-1 mb-2 text-dark fw-bold"><i class="bi bi-tags-fill me-2"></i>Etiquetas</h6>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 mb-2">
+            <div class="card border-0 bg-light shadow-sm h-100">
+                <div class="card-header bg-dark text-white text-center py-1">
+                    <small class="fw-bold text-uppercase">Últimas</small>
+                </div>
+                <ul class="list-group list-group-flush bg-transparent">
+                    {% for item in ultimas_tags_grabadas %}
+                    <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center py-1 px-2">
+                        <span class="fw-bold text-dark m-auto">{{ item.tag }}</span>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item bg-transparent text-center text-muted py-1"><small>Sin datos</small></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-2">
+            <div class="card border-secondary shadow-sm h-100">
+                <div class="card-header bg-white border-bottom border-dark text-center py-1">
+                    <small class="fw-bold text-uppercase text-dark" >Más Frecuentes</small>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for item in mas_grabadas %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-1 px-2">
+                        <span class="fw-bold text-dark">{{ item._id }}</span>
+                        <span class="badge bg-dark rounded-pill">{{ item.cantidad }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-2">
+            <div class="card border-secondary shadow-sm h-100">
+                <div class="card-header bg-white border-bottom border-secondary text-center py-1">
+                    <small class="fw-bold text-uppercase text-secondary">Menos Frecuentes</small>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for item in menos_grabadas %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-1 px-2">
+                        <span class="fw-bold text-dark" >{{ item._id }}</span>
+                        <span class="badge bg-secondary rounded-pill" >{{ item.cantidad }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-2 mb-3 h-auto" style="height: auto !important;">
+        <div class="col-12">
+            <h6 class="border-bottom pb-1 mb-2 text-dark fw-bold"><i class="bi bi-mic-fill me-2"></i>Fonemas</h6>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 mb-2">
+            <div class="card border-0 bg-light shadow-sm h-100">
+                <div class="card-header bg-secondary text-white text-center py-1">
+                    <small class="fw-bold text-uppercase">Últimos</small>
+                </div>
+                <ul class="list-group list-group-flush bg-transparent">
+                    {% for item in ultimos_fonemas %}
+                    <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center py-1 px-2">
+                        <span class="fw-bold text-dark text-uppercase m-auto">{{ item.fonema }}</span>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item bg-transparent text-center text-muted py-1"><small>Sin datos</small></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-2">
+            <div class="card border-secondary shadow-sm h-100">
+                <div class="card-header bg-white border-bottom border-dark text-center py-1">
+                    <small class="fw-bold text-uppercase text-dark">Más Practicados</small>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for item in fonemas_mas_grabados %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-1 px-2">
+                        <span class="text-uppercase fw-bold">{{ item._id }}</span>
+                        <span class="badge bg-dark rounded-pill" >{{ item.cantidad }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-2">
+            <div class="card border-secondary shadow-sm h-100">
+                <div class="card-header bg-white border-bottom border-secondary text-center py-1">
+                    <small class="fw-bold text-uppercase text-secondary">Menos Practicados</small>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for item in fonemas_menos_grabados %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-1 px-2">
+                        <span class="text-uppercase fw-bold text-dark" >{{ item._id }}</span>
+                        <span class="badge bg-secondary rounded-pill" >{{ item.cantidad }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-secondary shadow-sm h-auto" style="height: auto !important;">
+        <div class="card-body p-2">
+            <h6 class="text-center mb-2 fw-bold">Audios por Categoría</h6>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped table-hover mb-0" id="categorias-tabla">
+                    <thead class="table-dark text-center">
+                        <tr>
+                            <th onclick="ordenarTabla(0)" style="cursor:pointer;">Categoría <i class="bi bi-sort-down"></i></th>
+                            <th onclick="ordenarTabla(1)" style="cursor:pointer;">Cantidad <i class="bi bi-sort-down"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-center">
                         {% for category, count in audios_por_categoria.items() %}
                         <tr>
-                            <td>{{ category }}</td>
-                            <td>{{ count }}</td>
+                            <td class="py-1">{{ category }}</td>
+                            <td class="py-1">{{ count }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
-                </thead>
-            </table>
+                </table>
+            </div>
         </div>
     </div>
 </section>
