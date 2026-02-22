@@ -247,7 +247,7 @@ def save_record():
         aws_secret_access_key=current_app.config['AWS_SECRET_ACCESS_KEY'],
         # aws_session_token=current_app.config["AWS_SESSION_TOKEN"]
     )
-
+    
     s3c.upload_fileobj(file, current_app.config["BUCKET_NAME"], filename)
 
     text_id = request.form.get('text_id')
