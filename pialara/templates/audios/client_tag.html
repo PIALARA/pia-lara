@@ -58,6 +58,41 @@
     </button>
   </form>
 
+    <section>
+      {% if frase_sugerida and current_user.rol == 'cliente' %}
+    <div class="card my-4 mx-auto" style="max-width: 36rem;">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Frase sugerida</span>
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-info text-dark">
+            <i class="bi bi-clock"></i> <span id="momento-dia-badge">{{ momento_dia|capitalize }}</span>
+          </span>
+          <select id="location-select" class="form-select form-select-sm" style="width:auto"
+            onchange="cargarFraseAleatoria(this.value)">
+            <option value="general" {% if ubicacion=='general' or not ubicacion %}selected{% endif %}>General</option>
+            <option value="descanso" {% if ubicacion=='descanso' %}selected{% endif %}>Descanso</option>
+            <option value="deporte" {% if ubicacion=='deporte' %}selected{% endif %}>Deporte</option>
+            <option value="música" {% if ubicacion=='música' %}selected{% endif %}>Música</option>
+            <option value="futbol" {% if ubicacion=='futbol' %}selected{% endif %}>Fútbol</option>
+            <option value="viajes" {% if ubicacion=='viajes' %}selected{% endif %}>Viajes</option>
+          </select>
+        </div>
+      </div>
+      <div class="card-body">
+        <p id="frase-sugerida-text" class="card-text">{{ frase_sugerida.texto }}</p>
+        <footer class="blockquote-footer">
+          <cite id="frase-sugerida-tags" title="Tags">Etiquetas: {{ frase_sugerida.tags|join(', ') if frase_sugerida.tags
+            is iterable and frase_sugerida.tags is not string else frase_sugerida.tags }}</cite>
+        </footer>
+        <button id="frase-play-button" class="btn btn-warning btn-sm mt-2">
+          <span><i class="bi bi-ear me-2"></i></span>
+          <span>Escuchar</span>
+        </button>
+      </div>
+    </div>
+    {% endif %}
+  </section>
+  
   <!-- Botón suerte -->
   <div class="tags-container">
     {% for tag in tags_suerte %}
@@ -111,6 +146,7 @@
     </fieldset>
   </div>
 
+
   <!-- FONEMAS -->
   <!-- TODO: sobre un fonema, crear un método /client-fonema/ Wque recupere todas las etiquetas asociadas, y devuelva una aleatoria, y de ahí, un redirect a client-record
   <div class="tags-container">
@@ -122,6 +158,7 @@
         </span>
       {% endfor %}
     </fieldset>
+
   {% if tags_menos %}
   <div class="tags-container">
     <fieldset>
@@ -219,4 +256,6 @@
   {% endif %}
 
 </section>
+
+<script src="{{ url_for('static', filename='js/frases-momento.js') }}"></script>
 {% endblock %}
