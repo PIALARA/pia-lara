@@ -22,7 +22,7 @@ from pialara.models.Clicks import Clicks
 
 from pialara.decorators import rol_required
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import sample
 
 bp = Blueprint('audios', __name__, url_prefix='/audios')
@@ -110,6 +110,54 @@ def client_tag():
     ]
     tags_suerte = syllabus.aggregate(pipeline)
 
+
+    # Últimas etiquetas grabadas
+    pipeline_ultimas = [
+        {
+            "$match": {
+                "usuario.mail": current_user.email,
+                "texto.tipo": "syllabus"
+            }
+        },
+        {"$sort": {"fecha": -1}},
+        {
+            "$group": {
+                "_id": "$texto.tag",
+                "count": {"$sum": 1},
+                "last_time": {"$first": "$fecha"}
+            }
+        },
+        {"$sort": {"last_time": -1}},
+        {"$limit": 5}
+    ]
+
+    tags_ultimas_docs = list(audio.aggregate(pipeline_ultimas))
+
+    tags_ultimas = [
+        {"id": doc["_id"], "count": doc["count"]}
+        for doc in tags_ultimas_docs if doc["_id"]
+    ]
+
+    # objetivo diario
+    today = datetime.now()
+    start_of_day = datetime(today.year, today.month, today.day)
+    end_of_day = start_of_day + timedelta(days=1)
+
+    pipeline_today = [
+        {
+            "$match": {
+                "usuario.mail": current_user.email,
+                "fecha": {"$gte": start_of_day, "$lt": end_of_day}
+            }
+        },
+        {"$count": "total"}
+    ]
+
+    count_result = list(audio.aggregate(pipeline_today))
+    audios_today = count_result[0]['total'] if count_result else 0
+    daily_goal = 5
+
+
     return render_template(
         'audios/client_tag.html',
 
@@ -117,12 +165,16 @@ def client_tag():
 
         total_audios=result.get("total_audios", [{}]),
         ultimas_etiquetas=result.get("ultimas_etiquetas", []),
-        top_etiquetas=totales[:5], 
-        bottom_etiquetas=totales[-5:][::-1], 
+        top_etiquetas=totales[:5],
+        bottom_etiquetas=totales[-5:][::-1],
         total_fonemas=result.get("total_fonemas", [{}]),
         ultimos_fonemas=result.get("ultimos_fonemas", []),
         top_fonemas=result.get("top_fonemas", []),
         bottom_fonemas=result.get("bottom_fonemas", []),
+
+        tags_ultimas=tags_ultimas,
+        audios_today=audios_today,
+        daily_goal=daily_goal
     )
 
 @bp.route('/client-record/<string:tag_name>')
@@ -252,7 +304,7 @@ def save_record():
         aws_secret_access_key=current_app.config['AWS_SECRET_ACCESS_KEY'],
         # aws_session_token=current_app.config["AWS_SESSION_TOKEN"]
     )
-
+    
     s3c.upload_fileobj(file, current_app.config["BUCKET_NAME"], filename)
 
     text_id = request.form.get('text_id')
@@ -323,9 +375,33 @@ def save_record():
     usuario = Usuario()
     resultUsuario = usuario.update_one({"mail":current_user.email},{"$inc":{"cant_audios":1}})
 
+    # Comprobar objetivo diario
+    today = datetime.now()
+    start_of_day = datetime(today.year, today.month, today.day)
+    end_of_day = start_of_day + timedelta(days=1)
+    
+    pipeline_today = [
+        {
+            "$match": {
+                "usuario.mail": current_user.email,
+                "fecha": {"$gte": start_of_day, "$lt": end_of_day}
+            }
+        },
+        {
+            "$count": "total"
+        }
+    ]
+    
+    count_result = list(audio.aggregate(pipeline_today))
+    audios_today = count_result[0]['total'] if count_result else 0
+    daily_goal = 5
+    goal_reached = audios_today == daily_goal # Solo notificar cuando llega EXACTAMENTE al objetivo
+
     data = {
         "status": 'ok',
-        "message": "El audio ha sido almacenado correctamente."
+        "message": "El audio ha sido almacenado correctamente.",
+        "daily_goal_reached": goal_reached,
+        "daily_progress": f"{audios_today}/{daily_goal}"
     }
     return jsonify(data)
 
@@ -372,7 +448,29 @@ def tag_search():
     if not tags.alive:
         flash("No se han encontrado resultados de la etiqueta '" + tag_name + "'", "danger")
 
-    return render_template('audios/client_tag.html', tags=tags, tag_name=tag_name)
+    # Contar audios de hoy para el objetivo diario
+    audio = Audios()
+    today = datetime.now()
+    start_of_day = datetime(today.year, today.month, today.day)
+    end_of_day = start_of_day + timedelta(days=1)
+    
+    pipeline_today = [
+        {
+            "$match": {
+                "usuario.mail": current_user.email,
+                "fecha": {"$gte": start_of_day, "$lt": end_of_day}
+            }
+        },
+        {
+            "$count": "total"
+        }
+    ]
+    
+    count_result = list(audio.aggregate(pipeline_today))
+    audios_today = count_result[0]['total'] if count_result else 0
+    daily_goal = 5
+
+    return render_template('audios/client_tag.html', tags=tags, tag_name=tag_name, audios_today=audios_today, daily_goal=daily_goal)
 
 @bp.route('/client-report', methods=['GET'])
 @bp.route('/client-report/<id>', methods=['GET'])
