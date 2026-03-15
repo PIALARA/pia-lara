@@ -171,7 +171,98 @@
             </div>
         </div>
     </div>
+
+    <!-- Sección de Insignias y Progreso -->
+    {% if rol == 'cliente' %}
+    <div class="mt-4 pt-3 border-top">
+        <h6 class="text-center mb-3 fw-bold text-primary small text-uppercase" style="letter-spacing: 1px;"><i class="bi bi-award-fill me-2"></i>Mis Insignias</h6>
+        
+        <!-- Barra de progreso general -->
+        <div class="card shadow-sm mb-4 border-0 bg-light">
+            <div class="card-body">
+                {% if next_badge %}
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="small fw-bold">Siguiente nivel: {{ next_badge.name }}</span>
+                    <span class="small text-muted">{{ total_audios }} / {{ next_badge.limit }} audios</span>
+                </div>
+                <div class="progress" style="height: 20px; border-radius: 10px;">
+                    {% set progress_percentage = (total_audios / next_badge.limit * 100)|round|int %}
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                         role="progressbar" 
+                         style="width: {{ progress_percentage if progress_percentage <= 100 else 100 }}%" 
+                         aria-valuenow="{{ total_audios }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="{{ next_badge.limit }}">
+                         {{ progress_percentage }}%
+                    </div>
+                </div>
+                <p class="text-center mt-2 small text-muted">¡Te faltan {{ next_badge.limit - total_audios }} audios para tu próxima insignia!</p>
+                {% else %}
+                <div class="text-center py-2">
+                    <span class="badge bg-success fs-6"><i class="bi bi-star-fill me-1"></i>¡Has alcanzado el nivel máximo!</span>
+                    <p class="mt-2 mb-0 fw-bold">{{ total_audios }} audios grabados</p>
+                </div>
+                {% endif %}
+
+                <!-- Galería de insignias (ahora integrada dentro de la tarjeta) -->
+                <div class="d-flex justify-content-center align-items-stretch gap-1 flex-wrap flex-md-nowrap text-center mt-3 pt-3 border-top">
+                    {% for badge in badges_info %}
+                    <div class="badge-item-container p-1 rounded {% if badge.unlocked %}unlocked cursor-pointer{% else %}locked opacity-40{% endif %}"
+                        {% if badge.unlocked %}
+                            onclick="seleccionarInsignia('{{ badge.image }}')"
+                        {% endif %}
+                        style="flex: 1; min-width: 70px; max-width: 100px; transition: all 0.2s; position: relative; {% if badge.is_selected %}background: rgba(13, 110, 253, 0.1); border: 1px solid rgba(13, 110, 253, 0.3);{% endif %}"
+                        {% if badge.unlocked %}
+                            onmouseover="this.style.backgroundColor='rgba(0,0,0,0.05)'"
+                        {% endif %}
+                        onmouseout="this.style.backgroundColor='{% if badge.is_selected %}rgba(13, 110, 253, 0.1){% else %}transparent{% endif %}'">
+                        <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                            <img src="{{ url_for('static', filename='img/badges/' + badge.image) }}" 
+                                 alt="{{ badge.name }}" 
+                                 class="mb-1 {% if not badge.unlocked %}grayscale{% endif %}"
+                                 style="height: 30px; width: auto;">
+                            <div class="fw-bold mb-0 {% if badge.unlocked %}text-dark{% else %}text-muted{% endif %}" style="font-size: 0.6rem; line-height: 1;">{{ badge.name }}</div>
+                            <div class="text-muted" style="font-size: 0.5rem;">{{ badge.limit }}</div>
+                            {% if badge.is_selected %}
+                            <div class="bg-primary rounded-circle" style="width: 6px; height: 6px; position: absolute; top: 2px; right: 2px;"></div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+    </div>
+    {% endif %}
 </section>
+
+<style>
+    .grayscale { filter: grayscale(100%); }
+    .cursor-pointer { cursor: pointer; }
+    .ultra-small { line-height: 1; }
+</style>
+
+<script>
+    function seleccionarInsignia(badgeImage) {
+        fetch("{{ url_for('audios.select_badge') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ badge_image: badgeImage }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'ok') {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+
+</script>
 
 <script>
     function ordenarTabla(columnIndex) {

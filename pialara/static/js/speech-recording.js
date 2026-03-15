@@ -135,7 +135,11 @@ $sendButton.on('click', () => {
         let icon = data.status === 'ok' ? 'success' : 'error';
         let text = '';
 
-        if (data.daily_goal_reached) {
+        if (data.new_badge) {
+            title = "¡Nueva Insignia: " + data.new_badge.name + "! 🏅";
+            text = "¡Enhorabuena! Has alcanzado los " + data.new_badge.limit + " audios.";
+            icon = "success";
+        } else if (data.daily_goal_reached) {
             title = "¡Objetivo Diario Cumplido! 🎉";
             text = "¡Has completado tus " + data.daily_progress + " audios de hoy! Excelente trabajo.";
             icon = "success";
