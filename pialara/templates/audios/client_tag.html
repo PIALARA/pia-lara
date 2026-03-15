@@ -48,18 +48,15 @@
 
   <!-- Buscador -->
   <form class="tags-form" method="post" action="{{ url_for('audios.tag_search') }}">
-    <input class="tags-form__input"
-           type="search"
-           name="tagName"
-           placeholder="Buscar etiqueta..."
-           value="{{ tag_name }}" />
+    <input class="tags-form__input" type="search" name="tagName" placeholder="Buscar etiqueta..."
+      value="{{ tag_name }}" />
     <button class="tags-form__button btn btn-primary" type="submit">
       <i class="bi bi-search me-2"></i>
     </button>
   </form>
 
-    <section>
-      {% if frase_sugerida and current_user.rol == 'cliente' %}
+  <section>
+    {% if frase_sugerida and current_user.rol == 'cliente' %}
     <div class="card my-4 mx-auto" style="max-width: 36rem;">
       <div class="card-header d-flex justify-content-between align-items-center">
         <span class="fw-semibold">Frase sugerida</span>
@@ -70,7 +67,7 @@
           <select id="location-select" class="form-select form-select-sm" style="width:auto"
             onchange="cargarFraseAleatoria(this.value)">
             <option value="general" {% if ubicacion=='general' or not ubicacion %}selected{% endif %}>General</option>
-            <option value="descanso" {% if ubicacion=='descanso' %}selected{% endif %}>Descanso</option>
+            <option value="tecnología" {% if ubicacion=='tecnología' %}selected{% endif %}>Tecnología</option>
             <option value="deporte" {% if ubicacion=='deporte' %}selected{% endif %}>Deporte</option>
             <option value="música" {% if ubicacion=='música' %}selected{% endif %}>Música</option>
             <option value="futbol" {% if ubicacion=='futbol' %}selected{% endif %}>Fútbol</option>
@@ -81,7 +78,8 @@
       <div class="card-body">
         <p id="frase-sugerida-text" class="card-text">{{ frase_sugerida.texto }}</p>
         <footer class="blockquote-footer">
-          <cite id="frase-sugerida-tags" title="Tags">Etiquetas: {{ frase_sugerida.tags|join(', ') if frase_sugerida.tags
+          <cite id="frase-sugerida-tags" title="Tags">Etiquetas: {{ frase_sugerida.tags|join(', ') if
+            frase_sugerida.tags
             is iterable and frase_sugerida.tags is not string else frase_sugerida.tags }}</cite>
         </footer>
         <button id="frase-play-button" class="btn btn-warning btn-sm mt-2">
@@ -92,13 +90,13 @@
     </div>
     {% endif %}
   </section>
-  
+
   <!-- Botón suerte -->
   <div class="tags-container">
     {% for tag in tags_suerte %}
-      <a class="btn btn-info" href="/audios/client-record/{{ tag._id }}">
-        ¿Voy a tener suerte?
-      </a>
+    <a class="btn btn-info" href="/audios/client-record/{{ tag._id }}">
+      ¿Voy a tener suerte?
+    </a>
     {% endfor %}
   </div>
 
@@ -114,10 +112,9 @@
     <fieldset>
       <legend>Últimas 5 etiquetas grabadas</legend>
       {% for x in ultimas_etiquetas %}
-        <a class="tag button"
-           href="/audios/client-record/{{ x.tag }}" title="Total audios grabados: {{ x.total }}">
-          {{ x.tag.upper() }}
-        </a>
+      <a class="tag button" href="/audios/client-record/{{ x.tag }}" title="Total audios grabados: {{ x.total }}">
+        {{ x.tag.upper() }}
+      </a>
       {% endfor %}
     </fieldset>
   </div>
@@ -126,10 +123,9 @@
     <fieldset>
       <legend>5 etiquetas más grabadas</legend>
       {% for x in top_etiquetas %}
-        <a class="tag button"
-           href="/audios/client-record/{{ x.tag }}" title="Total audios grabados: {{ x.total }}">
-          {{ x.tag.upper() }}
-        </a>
+      <a class="tag button" href="/audios/client-record/{{ x.tag }}" title="Total audios grabados: {{ x.total }}">
+        {{ x.tag.upper() }}
+      </a>
       {% endfor %}
     </fieldset>
   </div>
@@ -138,10 +134,9 @@
     <fieldset>
       <legend>5 etiquetas menos grabadas</legend>
       {% for x in bottom_etiquetas %}
-        <a class="tag button"
-           href="/audios/client-record/{{ x.tag }}" title="Total audios grabados: {{ x.total }}">
-          {{ x.tag.upper() }}
-        </a>
+      <a class="tag button" href="/audios/client-record/{{ x.tag }}" title="Total audios grabados: {{ x.total }}">
+        {{ x.tag.upper() }}
+      </a>
       {% endfor %}
     </fieldset>
   </div>
@@ -212,13 +207,12 @@
     <fieldset>
       <legend>Etiquetas encontradas</legend>
       {% for tag in tags %}
-        <a class="tag button"
-           href="/audios/client-record/{{ tag._id }}">
-          {{ tag._id.upper() }}
-        </a>
+      <a class="tag button" href="/audios/client-record/{{ tag._id }}">
+        {{ tag._id.upper() }}
+      </a>
       {% endfor %}
     </fieldset>
-  {% endif %}
+    {% endif %}
   </div>
 
   {% if tags3 %}
