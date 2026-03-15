@@ -374,15 +374,6 @@ def save_record():
     filename = str(current_user.id) + '_' + str(timestamp) + '.wav'
 
     # # Guardado en S3
-    s3c = boto3.client(
-        's3',
-        region_name='eu-south-2',
-        aws_access_key_id=current_app.config["AWS_ACCESS_KEY_ID"],
-        aws_secret_access_key=current_app.config['AWS_SECRET_ACCESS_KEY'],
-        # aws_session_token=current_app.config["AWS_SESSION_TOKEN"]
-    )
-    
-    s3c.upload_fileobj(file, current_app.config["BUCKET_NAME"], filename)
 
     text_id = request.form.get('text_id')
     text_text = request.form.get('text_text')
@@ -664,59 +655,56 @@ def client_report(id=None):
 
     pipeline = [
         {
-            "$match": {
-                **match_filter, # desempaquetamos el diccionario
-                "texto.tag": {"$regex": PATRON_REGEX}
-            }
+            "$match": match_filter # Primero filtramos por usuario (TODA la actividad)
         },
         {
             "$facet": {
-                # ── Estadísticas básicas ──────────────────────────
+                # ── CONTEO TOTAL REAL (Para insignias) ────────────────
+                "total_temp": [{"$count": "valor"}],
+
+                # ── ESTADÍSTICAS BASADAS EN TAGS CIENTÍFICOS ──────────
                 "tags": [
+                    {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}}
                 ],
-                "total_temp": [
-                    {"$count": "valor"}
-                ],
-
-                # ── Últimas grabadas ──────────────────────────────
                 "ultimas_grabadas": [
+                    {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$sort": {"fecha": -1}},
                     {"$limit": 5},
                     {"$project": {"_id": 0, "tag": "$texto.tag"}}
                 ],
                 "ultimos_fonemas": [
+                    {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$sort": {"fecha": -1}},
                     {"$limit": 5},
                     {"$project": {"_id": 0, "fonema": _extract_fonema}}
                 ],
-
-                # ── Top 5 tags ────────────────────────────────────
                 "mas_grabadas": [
+                    {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}},
                     {"$sort": {"cantidad": -1}},
                     {"$limit": 5}
                 ],
                 "menos_grabadas": [
+                    {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}},
                     {"$sort": {"cantidad": 1}},
                     {"$limit": 5}
                 ],
-
-                # ── Top 5 fonemas ─────────────────────────────────
                 "fonemas_mas_grabados": [
+                    {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$group": {"_id": _extract_fonema, "cantidad": {"$sum": 1}}},
                     {"$sort": {"cantidad": -1}},
                     {"$limit": 5}
                 ],
                 "fonemas_menos_grabados": [
+                    {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$group": {"_id": _extract_fonema, "cantidad": {"$sum": 1}}},
                     {"$sort": {"cantidad": 1}},
                     {"$limit": 5}
                 ],
-
-                # ── Fonemas únicos ────────────────────────────────
                 "conteo_fonemas_unicos": [
+                    {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$group": {"_id": _extract_fonema}},
                     {"$count": "total"}
                 ]
