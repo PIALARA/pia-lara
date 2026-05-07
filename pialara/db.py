@@ -47,12 +47,8 @@ def get_user_by_id(id):
                            rol=usuario.get("rol"),
                            ultima_conexion=usuario.get("ultima_conexion"),
                            parent=usuario.get("parent"),
-						   activo=usuario.get("activo"))
-													   
-		  
-				
-		 
-	   
+                           activo=usuario.get("activo"),
+                           selected_badge=usuario.get("selected_badge"))
         return usuario_obj
     except Exception as e:
         return e
@@ -73,7 +69,8 @@ def get_user(email):
                            ultima_conexion=usuario.get("ultima_conexion"),
                            parent=usuario.get("parent"),
                            font_size=usuario.get("font_size"),
-						   activo=usuario.get("activo"))
+                           activo=usuario.get("activo"),
+                           selected_badge=usuario.get("selected_badge"))
 													   
 						 
 				
