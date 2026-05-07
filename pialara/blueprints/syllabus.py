@@ -1,5 +1,6 @@
 from datetime import datetime
 import math
+import random
 from bson.objectid import ObjectId
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
@@ -9,6 +10,47 @@ from pialara.models.Usuario import Usuario
 from pialara.models.Clicks import Clicks
 
 bp = Blueprint("syllabus", __name__, url_prefix="/syllabus")
+
+
+def _get_momento_dia():
+    hora = datetime.now().hour
+    if 6 <= hora < 12:
+        return "mañana"
+    elif 12 <= hora < 20:
+        return "tarde"
+    return "noche"
+
+
+def _get_frase_sugerida(syllabus, ubicacion):
+    """
+    Obtiene una frase sugerida optimizada usando $sample.
+    """
+    if ubicacion and ubicacion != "general":
+        match = {"tags": {"$regex": ubicacion, "$options": "i"}}
+    else:
+        dias_semana = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo']
+        dia_actual = dias_semana[datetime.now().weekday()]
+        match = {"tags": {"$regex": dia_actual, "$options": "i"}}
+
+    pipeline = [
+        {"$match": match},
+        {"$sample": {"size": 1}}
+    ]
+    
+    try:
+        resultado = list(syllabus.aggregate(pipeline))
+        if resultado:
+            return resultado[0]
+    except Exception:
+        pass
+
+    # Fallback si no hay coincidencias o error: cualquier frase aleatoria
+    try:
+        fallback_pipeline = [{"$sample": {"size": 1}}]
+        resultado_fallback = list(syllabus.aggregate(fallback_pipeline))
+        return resultado_fallback[0] if resultado_fallback else None
+    except Exception:
+        return None
 
 @bp.route("/", methods=["GET"])
 @login_required
@@ -104,6 +146,11 @@ def index():
     }
     clicks.insert_one(click_doc)
 
+    # Lógica para frase sugerida (solo para clientes)
+    ubicacion = request.args.get("location") or "general"
+    momento_dia = _get_momento_dia()
+    frase_sugerida = _get_frase_sugerida(syllabus, ubicacion)
+
     return render_template(
         "syllabus/index.html",
         syllabus=documentos,
@@ -114,8 +161,26 @@ def index():
         total_pages=total_pages,
         tag_date_since=tag_date_since,
         tag_date_to=tag_date_to,
+        frase_sugerida=frase_sugerida,
+        ubicacion=ubicacion,
+        momento_dia=momento_dia,
     )
 
+
+@bp.route("/frase-aleatoria", methods=["GET"])
+@login_required
+def frase_aleatoria():
+    from flask import jsonify
+    ubicacion = request.args.get("location") or "general"
+    syllabus = Syllabus()
+    frase = _get_frase_sugerida(syllabus, ubicacion)
+    if not frase:
+        return jsonify({"error": "No hay frases disponibles"}), 404
+    return jsonify({
+        "texto": frase.get("texto", ""),
+        "tags": frase.get("tags", []),
+        "momento_dia": _get_momento_dia(),
+    })
 
 
 @bp.route("/create")

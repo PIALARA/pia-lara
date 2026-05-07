@@ -21,11 +21,67 @@ from pialara.models.Syllabus import Syllabus
 from pialara.models.Clicks import Clicks
 
 from pialara.decorators import rol_required
+from pialara.blueprints.syllabus import _get_frase_sugerida, _get_momento_dia
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import sample
 
 bp = Blueprint('audios', __name__, url_prefix='/audios')
+
+def _parse_tag_metadata(tag):
+    """
+    Parsea una etiqueta (ej. 101FA1) y extrae sus metadatos.
+    Lógica extraída de los templates para mejorar el mantenimiento.
+    """
+    if not tag or not isinstance(tag, str):
+        return {"raw": tag, "valido": False, "descripcion": str(tag)}
+
+    patron = re.compile(r"^(\d{1,3})([A-Za-z]{1,2})(\d)$")
+    match = patron.match(tag)
+    
+    if not match:
+         return {"raw": tag, "valido": False, "descripcion": tag.upper()}
+
+    base_digits, fonema, last_char = match.groups()
+    tipo_frase = "frase larga" if int(base_digits) > 100 else "frase corta"
+    posiciones = {"1": "abajo", "2": "medio", "3": "arriba"}
+    posicion_lengua = posiciones.get(last_char, "desconocida")
+    
+    return {
+        "raw": tag,
+        "valido": True,
+        "descripcion": f"{tipo_frase}, fonema {fonema}, lengua {posicion_lengua}"
+    }
+
+def _get_next_syllabus_item(syllabus, syllabus_items, tag_name):
+    """
+    Gestiona la lógica de sesión e iteración para las frases del syllabus.
+    """
+    tag_name_ent = session.get('tag_name_ent')
+   
+    if tag_name_ent != tag_name:
+        session.pop('next_syllabus_item_ent', None)
+        session['tag_name_ent'] = tag_name
+
+    current_item_id = session.get('next_syllabus_item_ent')
+    next_item = None
+
+    if current_item_id:
+        current_item = syllabus.find_one({"_id": ObjectId(current_item_id)})
+        if current_item and current_item.get('iterable'):
+            iterable = current_item['iterable']
+            if iterable.get('num') == 1 or iterable.get('siguiente'):
+                next_item = syllabus.find_one({"_id": ObjectId(iterable.get('siguiente'))})
+    
+    if not next_item:
+        # Si no hay siguiente o no es iterable, seleccionamos aleatoria
+        valid_items = [item for item in syllabus_items if not item.get('iterable') or item['iterable'].get('num') == 1]
+        next_item = random.choice(valid_items) if valid_items else (random.choice(syllabus_items) if syllabus_items else None)
+
+    if next_item:
+        session['next_syllabus_item_ent'] = str(next_item['_id'])
+    
+    return next_item
 
 @bp.route('/cliente-tag')
 @login_required
@@ -110,6 +166,60 @@ def client_tag():
     ]
     tags_suerte = syllabus.aggregate(pipeline)
 
+
+    # Últimas etiquetas grabadas
+    pipeline_ultimas = [
+        {
+            "$match": {
+                "usuario.mail": current_user.email,
+                "texto.tipo": "syllabus"
+            }
+        },
+        {"$sort": {"fecha": -1}},
+        {
+            "$group": {
+                "_id": "$texto.tag",
+                "count": {"$sum": 1},
+                "last_time": {"$first": "$fecha"}
+            }
+        },
+        {"$sort": {"last_time": -1}},
+        {"$limit": 5}
+    ]
+
+    # Procesar las etiquetas para el template
+    tags_ultimas_docs = list(audio.aggregate(pipeline_ultimas))
+
+    tags_ultimas = [
+        {"id": doc["_id"], "count": doc["count"]}
+        for doc in tags_ultimas_docs if doc["_id"]
+    ]
+
+    # objetivo diario
+    today = datetime.now()
+    start_of_day = datetime(today.year, today.month, today.day)
+    end_of_day = start_of_day + timedelta(days=1)
+
+    pipeline_today = [
+        {
+            "$match": {
+                "usuario.mail": current_user.email,
+                "fecha": {"$gte": start_of_day, "$lt": end_of_day}
+            }
+        },
+        {"$count": "total"}
+    ]
+
+    count_result = list(audio.aggregate(pipeline_today))
+    audios_today = count_result[0]['total'] if count_result else 0
+    daily_goal = 5
+
+
+    # Frase sugerida para clientes
+    ubicacion = request.args.get("location") or "general"
+    frase_sugerida = _get_frase_sugerida(syllabus, ubicacion)
+    momento_dia = _get_momento_dia()
+    
     return render_template(
         'audios/client_tag.html',
 
@@ -117,12 +227,19 @@ def client_tag():
 
         total_audios=result.get("total_audios", [{}]),
         ultimas_etiquetas=result.get("ultimas_etiquetas", []),
-        top_etiquetas=totales[:5], 
-        bottom_etiquetas=totales[-5:][::-1], 
+        top_etiquetas=totales[:5],
+        bottom_etiquetas=totales[-5:][::-1],
         total_fonemas=result.get("total_fonemas", [{}]),
         ultimos_fonemas=result.get("ultimos_fonemas", []),
         top_fonemas=result.get("top_fonemas", []),
         bottom_fonemas=result.get("bottom_fonemas", []),
+
+        tags_ultimas=tags_ultimas,
+        audios_today=audios_today,
+        daily_goal=daily_goal,
+        frase_sugerida=frase_sugerida,
+        momento_dia=momento_dia,
+        ubicacion=ubicacion
     )
 
 @bp.route('/client-record/<string:tag_name>')
@@ -156,68 +273,18 @@ def client_record(tag_name):
     clicks.insert_one(click_doc)
 
     # Obtenemos las frases que coinciden con la etiqueta
-    syllabus_items = list(syllabus.aggregate(pipeline))  # Convertimos el cursor en lista
+    syllabus_items = list(syllabus.aggregate(pipeline))
     if not syllabus_items:
         flash(f"No se han encontrado frases con la etiqueta '{tag_name}'", "danger")
-        return redirect(url_for('audios.client_tag'))  # Redirige si no se encuentran frases
+        return redirect(url_for('audios.client_tag'))
     
-    tag_name_ent = session.get('tag_name_ent', None)
-   
-    if tag_name_ent==tag_name or tag_name_ent==None:
-        session['tag_name_ent'] = str(tag_name)
-    else:
-        session.pop('next_syllabus_item_ent', None) 
-        session['tag_name_ent'] = str(tag_name)
+    next_syllabus_item = _get_next_syllabus_item(syllabus, syllabus_items, tag_name)
 
-
-    # Recuperamos el id de la siguiente frase desde la sesión (si existe)
-    current_item_id = session.get('next_syllabus_item_ent', None)
-    next_syllabus_item = None
-
-    if current_item_id:
-        # Recuperamos la frase actual
-        current_item = syllabus.find_one({"_id": ObjectId(current_item_id)})
-        
-        if current_item:
-            # Comprobamos si tiene el campo 'iterable'
-            iterable = current_item.get('iterable', None)
-            
-            if iterable:
-                num = iterable.get('num')
-                siguiente_id = iterable.get('siguiente')
-
-                if  num == 1 or siguiente_id!=None:
-                    # Si tiene 'iterable.num == 1' y 'siguiente_id', pasamos a la siguiente frase
-                    next_syllabus_item = syllabus.find_one({"_id": ObjectId(siguiente_id)})
-                    
-                    if next_syllabus_item:
-                        session['next_syllabus_item_ent'] = str(next_syllabus_item['_id'])
-                        
-                    else:
-                        # Si no tiene 'siguiente_id', seleccionamos aleatoriamente
-                        next_syllabus_item = select_random_item(syllabus_items)
-                        session['next_syllabus_item_ent'] = str(next_syllabus_item['_id'])
-                else:
-                    # Si no tiene 'siguiente' o 'iterable.num' no es 1, seleccionamos aleatoria
-                    next_syllabus_item = select_random_item(syllabus_items)
-                    session['next_syllabus_item_ent'] = str(next_syllabus_item['_id'])
-            else:
-                # Si no tiene campo 'iterable', seleccionamos aleatoria
-                next_syllabus_item = select_random_item(syllabus_items)
-                session['next_syllabus_item_ent'] = str(next_syllabus_item['_id'])
-        else:
-            # Si no se encuentra el item actual, seleccionamos aleatoriamente una frase
-            next_syllabus_item = select_random_item(syllabus_items)
-            session['next_syllabus_item_ent'] = str(next_syllabus_item['_id'])
-    else:
-        # Si no hay 'current_item_id', seleccionamos aleatoria
-        next_syllabus_item = select_random_item(syllabus_items)
-        session['next_syllabus_item_ent'] = str(next_syllabus_item['_id'])
-
-    
-
-    # Pasamos el item seleccionado a la plantilla
-    return render_template('audios/client_record.html', tag=tag_name, syllabus=next_syllabus_item)
+    return render_template(
+        'audios/client_record.html',
+        tag=tag_name,
+        syllabus=next_syllabus_item
+    )
 
 # Función para seleccionar una frase aleatoria que no tenga 'iterable' o tenga 'iterable.num = 1'
 def select_random_item(syllabus_items):
@@ -252,7 +319,7 @@ def save_record():
         aws_secret_access_key=current_app.config['AWS_SECRET_ACCESS_KEY'],
         # aws_session_token=current_app.config["AWS_SESSION_TOKEN"]
     )
-
+    
     s3c.upload_fileobj(file, current_app.config["BUCKET_NAME"], filename)
 
     text_id = request.form.get('text_id')
@@ -323,9 +390,33 @@ def save_record():
     usuario = Usuario()
     resultUsuario = usuario.update_one({"mail":current_user.email},{"$inc":{"cant_audios":1}})
 
+    # Comprobar objetivo diario
+    today = datetime.now()
+    start_of_day = datetime(today.year, today.month, today.day)
+    end_of_day = start_of_day + timedelta(days=1)
+    
+    pipeline_today = [
+        {
+            "$match": {
+                "usuario.mail": current_user.email,
+                "fecha": {"$gte": start_of_day, "$lt": end_of_day}
+            }
+        },
+        {
+            "$count": "total"
+        }
+    ]
+    
+    count_result = list(audio.aggregate(pipeline_today))
+    audios_today = count_result[0]['total'] if count_result else 0
+    daily_goal = 5
+    goal_reached = audios_today == daily_goal # Solo notificar cuando llega EXACTAMENTE al objetivo
+
     data = {
         "status": 'ok',
-        "message": "El audio ha sido almacenado correctamente."
+        "message": "El audio ha sido almacenado correctamente.",
+        "daily_goal_reached": goal_reached,
+        "daily_progress": f"{audios_today}/{daily_goal}"
     }
     return jsonify(data)
 
@@ -372,7 +463,29 @@ def tag_search():
     if not tags.alive:
         flash("No se han encontrado resultados de la etiqueta '" + tag_name + "'", "danger")
 
-    return render_template('audios/client_tag.html', tags=tags, tag_name=tag_name)
+    # Contar audios de hoy para el objetivo diario
+    audio = Audios()
+    today = datetime.now()
+    start_of_day = datetime(today.year, today.month, today.day)
+    end_of_day = start_of_day + timedelta(days=1)
+    
+    pipeline_today = [
+        {
+            "$match": {
+                "usuario.mail": current_user.email,
+                "fecha": {"$gte": start_of_day, "$lt": end_of_day}
+            }
+        },
+        {
+            "$count": "total"
+        }
+    ]
+    
+    count_result = list(audio.aggregate(pipeline_today))
+    audios_today = count_result[0]['total'] if count_result else 0
+    daily_goal = 5
+
+    return render_template('audios/client_tag.html', tags=tags, tag_name=tag_name, audios_today=audios_today, daily_goal=daily_goal)
 
 @bp.route('/client-report', methods=['GET'])
 @bp.route('/client-report/<id>', methods=['GET'])

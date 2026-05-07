@@ -130,9 +130,21 @@ $sendButton.on('click', () => {
             .text('espere...');
 
         recordedAudio.controls = false;
+
+        let title = data.message || '';
+        let icon = data.status === 'ok' ? 'success' : 'error';
+        let text = '';
+
+        if (data.daily_goal_reached) {
+            title = "¡Objetivo Diario Cumplido! 🎉";
+            text = "¡Has completado tus " + data.daily_progress + " audios de hoy! Excelente trabajo.";
+            icon = "success";
+        }
+
         swal({
-            title: data.message || '',
-            icon: data.status === 'ok' ? 'success' : 'error',
+            title: title,
+            text: text,
+            icon: icon,
             buttons: {
                 audio: {
                     text: 'Grabar otro audio',
