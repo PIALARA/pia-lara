@@ -1,15 +1,15 @@
+from datetime import datetime
+
 import certifi as certifi
 from bson.objectid import ObjectId
 from flask import current_app, g
-from pymongo import ASCENDING
 from pymongo import MongoClient
 from werkzeug.local import LocalProxy
-
-from datetime import datetime
 
 from pialara.models.User import User
 
 # from project.models import User
+
 
 def get_db():
     """
@@ -21,17 +21,15 @@ def get_db():
     PIALARA_DB_DB_NAME = current_app.config["PIALARA_DB_NAME"]
 
     if db is None:
-        db = g._database = MongoClient(
-            PIALARA_DB_URI,
-            maxPoolSize=50,
-            timeoutMS=2500,
-            ssl=False
-        )[PIALARA_DB_DB_NAME]
+        db = g._database = MongoClient(PIALARA_DB_URI, maxPoolSize=50, timeoutMS=2500, ssl=False)[
+            PIALARA_DB_DB_NAME
+        ]
     return db
 
 
 # Utilizamos LocalProxy para leer la variable global usando sólo db
 db = LocalProxy(get_db)
+
 
 def get_user_by_id(id):
     """
@@ -40,18 +38,21 @@ def get_user_by_id(id):
     try:
         usuario = db.usuarios.find_one({"_id": ObjectId(id)})
 
-        usuario_obj = User(id=usuario["_id"],
-                           mail=usuario.get("mail"),
-                           nombre=usuario.get("nombre"),
-                           password=usuario.get("password"),
-                           rol=usuario.get("rol"),
-                           ultima_conexion=usuario.get("ultima_conexion"),
-                           parent=usuario.get("parent"),
-                           activo=usuario.get("activo"),
-                           selected_badge=usuario.get("selected_badge"))
+        usuario_obj = User(
+            id=usuario["_id"],
+            mail=usuario.get("mail"),
+            nombre=usuario.get("nombre"),
+            password=usuario.get("password"),
+            rol=usuario.get("rol"),
+            ultima_conexion=usuario.get("ultima_conexion"),
+            parent=usuario.get("parent"),
+            activo=usuario.get("activo"),
+            selected_badge=usuario.get("selected_badge"),
+        )
         return usuario_obj
     except Exception as e:
         return e
+
 
 def get_user(email):
     """
@@ -61,20 +62,18 @@ def get_user(email):
     try:
         usuario = db.usuarios.find_one({"mail": email})
 
-        usuario_obj = User(id=usuario["_id"],
-                           mail=usuario.get("mail"),
-                           nombre=usuario.get("nombre"),
-                           password=usuario.get("password"),
-                           rol=usuario.get("rol"),
-                           ultima_conexion=usuario.get("ultima_conexion"),
-                           parent=usuario.get("parent"),
-                           font_size=usuario.get("font_size"),
-                           activo=usuario.get("activo"),
-                           selected_badge=usuario.get("selected_badge"))
-													   
-						 
-				
-	   
+        usuario_obj = User(
+            id=usuario["_id"],
+            mail=usuario.get("mail"),
+            nombre=usuario.get("nombre"),
+            password=usuario.get("password"),
+            rol=usuario.get("rol"),
+            ultima_conexion=usuario.get("ultima_conexion"),
+            parent=usuario.get("parent"),
+            font_size=usuario.get("font_size"),
+            activo=usuario.get("activo"),
+            selected_badge=usuario.get("selected_badge"),
+        )
 
         print("Usuario objeto por email:", usuario_obj)
 
@@ -90,25 +89,25 @@ def update_ultima_conexion(email):
     Método a emplear en el login
     """
     try:
-        db.usuarios.update_one({"mail": email}, {"$set": {'ultima_conexion': datetime.now()}})
+        db.usuarios.update_one({"mail": email}, {"$set": {"ultima_conexion": datetime.now()}})
     except Exception as e:
         print("Se ha producido un error", e)
         return None
+
 
 def update_password(email, hashed_password):
     """
     Actualiza la contraseña de un usuario en MongoDB
     """
     try:
-        resultado = db.usuarios.update_one(
-            {"mail": email},
-            {"$set": {"password": hashed_password}}
-        )
+        resultado = db.usuarios.update_one({"mail": email}, {"$set": {"password": hashed_password}})
 
         if resultado.modified_count > 0:
             print(f"Contraseña actualizada para {email}")
         else:
-            print(f"No se encontró ningún usuario con el email {email} o la contraseña ya era la misma")
+            print(
+                f"No se encontró ningún usuario con el email {email} o la contraseña ya era la misma"  # noqa: E501
+            )
 
     except Exception as e:
         print("Error al actualizar la contraseña:", e)

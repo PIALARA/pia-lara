@@ -1,4 +1,5 @@
 from pialara.models.MongoModel import MongoModel
 
+
 class Survey(MongoModel):
-    collection_name = 'surveys'
+    collection_name = "surveys"

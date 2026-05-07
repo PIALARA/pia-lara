@@ -1,32 +1,29 @@
-import os.path
-import boto3
 import random
 import re
-from bson import ObjectId  # Asegúrate de importar ObjectId desde bson
-
-from bson.objectid import ObjectId
-import bson.objectid
-from flask import current_app
-from flask import Blueprint, render_template
-from flask import (
-    Blueprint, flash, redirect, render_template, request, url_for, jsonify, session
-)
-from flask_login import login_required, current_user
-from werkzeug.utils import secure_filename
-
-from pialara.models.Audios import Audios
-from pialara.models.Frases import Frases
-from pialara.models.Usuario import Usuario
-from pialara.models.Syllabus import Syllabus
-from pialara.models.Clicks import Clicks
-
-from pialara.decorators import rol_required
-from pialara.blueprints.syllabus import _get_frase_sugerida, _get_momento_dia
-
 from datetime import datetime, timedelta
-from random import sample
 
-bp = Blueprint('audios', __name__, url_prefix='/audios')
+from bson import ObjectId  # Asegúrate de importar ObjectId desde bson
+from flask import (
+    Blueprint,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
+from flask_login import current_user, login_required
+
+from pialara.blueprints.syllabus import _get_frase_sugerida, _get_momento_dia
+from pialara.decorators import rol_required
+from pialara.models.Audios import Audios
+from pialara.models.Clicks import Clicks
+from pialara.models.Frases import Frases
+from pialara.models.Syllabus import Syllabus
+from pialara.models.Usuario import Usuario
+
+bp = Blueprint("audios", __name__, url_prefix="/audios")
 BADGES_THRESHOLDS = [
     {"limit": 10, "name": "Principiante", "image": "badge_10.png"},
     {"limit": 25, "name": "Avanzado", "image": "badge_25.png"},
@@ -36,42 +33,40 @@ BADGES_THRESHOLDS = [
     {"limit": 500, "name": "Leyenda", "image": "badge_500.png"},
 ]
 
+
 @bp.app_context_processor
 def inject_badges():
-    if not current_user.is_authenticated or current_user.rol != 'cliente':
+    if not current_user.is_authenticated or current_user.rol != "cliente":
         return dict(current_badge=None, total_count=0)
 
     audio = Audios()
-    total_pipeline = [
-        {"$match": {"usuario.id": current_user.id}},
-        {"$count": "total"}
-    ]
+    total_pipeline = [{"$match": {"usuario.id": current_user.id}}, {"$count": "total"}]
     total_result = list(audio.aggregate(total_pipeline))
-    total_count = total_result[0]['total'] if total_result else 0
+    total_count = total_result[0]["total"] if total_result else 0
 
     current_badge = None
-    
+
     # Si el usuario tiene una insignia seleccionada, intentamos usar esa
-    selected_image = getattr(current_user, 'selected_badge', None)
-    
+    selected_image = getattr(current_user, "selected_badge", None)
+
     if selected_image:
         for b in BADGES_THRESHOLDS:
             if b["image"] == selected_image:
                 current_badge = b
                 break
 
-    # Si no hay seleccionada o la seleccionada no es válida (ej. nivel superior), 
+    # Si no hay seleccionada o la seleccionada no es válida (ej. nivel superior),
     # mostramos la mejor disponible
     if not current_badge:
         for b in reversed(BADGES_THRESHOLDS):
             if total_count >= b["limit"]:
                 current_badge = b
                 break
-    
+
     # Si sigue sin haber insignia (0 audios), o la cuenta es nueva, mostramos la por defecto
     if not current_badge:
         current_badge = {"limit": 0, "name": "Novato", "image": "default.png"}
-            
+
     return dict(current_badge=current_badge, total_count=total_count)
 
 
@@ -85,115 +80,123 @@ def _parse_tag_metadata(tag):
 
     patron = re.compile(r"^(\d{1,3})([A-Za-z]{1,2})(\d)$")
     match = patron.match(tag)
-    
+
     if not match:
-         return {"raw": tag, "valido": False, "descripcion": tag.upper()}
+        return {"raw": tag, "valido": False, "descripcion": tag.upper()}
 
     base_digits, fonema, last_char = match.groups()
     tipo_frase = "frase larga" if int(base_digits) > 100 else "frase corta"
     posiciones = {"1": "abajo", "2": "medio", "3": "arriba"}
     posicion_lengua = posiciones.get(last_char, "desconocida")
-    
+
     return {
         "raw": tag,
         "valido": True,
-        "descripcion": f"{tipo_frase}, fonema {fonema}, lengua {posicion_lengua}"
+        "descripcion": f"{tipo_frase}, fonema {fonema}, lengua {posicion_lengua}",
     }
+
+
 def _get_next_syllabus_item(syllabus, syllabus_items, tag_name):
     """
     Gestiona la lógica de sesión e iteración para las frases del syllabus.
     """
-    tag_name_ent = session.get('tag_name_ent')
-   
-    if tag_name_ent != tag_name:
-        session.pop('next_syllabus_item_ent', None)
-        session['tag_name_ent'] = tag_name
+    tag_name_ent = session.get("tag_name_ent")
 
-    current_item_id = session.get('next_syllabus_item_ent')
+    if tag_name_ent != tag_name:
+        session.pop("next_syllabus_item_ent", None)
+        session["tag_name_ent"] = tag_name
+
+    current_item_id = session.get("next_syllabus_item_ent")
     next_item = None
 
     if current_item_id:
         current_item = syllabus.find_one({"_id": ObjectId(current_item_id)})
-        if current_item and current_item.get('iterable'):
-            iterable = current_item['iterable']
-            if iterable.get('num') == 1 or iterable.get('siguiente'):
-                next_item = syllabus.find_one({"_id": ObjectId(iterable.get('siguiente'))})
-    
+        if current_item and current_item.get("iterable"):
+            iterable = current_item["iterable"]
+            if iterable.get("num") == 1 or iterable.get("siguiente"):
+                next_item = syllabus.find_one({"_id": ObjectId(iterable.get("siguiente"))})
+
     if not next_item:
         # Si no hay siguiente o no es iterable, seleccionamos aleatoria
-        valid_items = [item for item in syllabus_items if not item.get('iterable') or item['iterable'].get('num') == 1]
-        next_item = random.choice(valid_items) if valid_items else (random.choice(syllabus_items) if syllabus_items else None)
+        valid_items = [
+            item
+            for item in syllabus_items
+            if not item.get("iterable") or item["iterable"].get("num") == 1
+        ]
+        next_item = (
+            random.choice(valid_items)
+            if valid_items
+            else (random.choice(syllabus_items) if syllabus_items else None)
+        )
 
     if next_item:
-        session['next_syllabus_item_ent'] = str(next_item['_id'])
-    
+        session["next_syllabus_item_ent"] = str(next_item["_id"])
+
     return next_item
 
-@bp.route('/cliente-tag')
+
+@bp.route("/cliente-tag")
 @login_required
 def client_tag():
     audio = Audios()
-    
-    match_base = {
-        "texto.tipo": "syllabus",
-        "usuario.mail": current_user.email
-    }
+
+    match_base = {"texto.tipo": "syllabus", "usuario.mail": current_user.email}
 
     pipeline = [
         {"$match": match_base},
         {
             "$facet": {
                 # Cantidad total de audios
-                "total_audios": [
-                    {"$count": "total"}
-                ],
+                "total_audios": [{"$count": "total"}],
                 "totales_por_etiqueta": [
                     {"$group": {"_id": "$texto.tag", "total": {"$sum": 1}}},
                     {"$sort": {"total": -1}},
-                    {"$project": {"_id": 0, "tag": "$_id", "total": 1}}
+                    {"$project": {"_id": 0, "tag": "$_id", "total": 1}},
                 ],
                 # Últimas 5 etiquetas grabadas
                 "ultimas_etiquetas": [
                     {"$sort": {"fecha": -1}},
                     {"$limit": 5},
-                    {"$project": {"_id": 0, "tag": "$texto.tag", "fecha": 1}}
+                    {"$project": {"_id": 0, "tag": "$texto.tag", "fecha": 1}},
                 ],
                 # Cantidad total de fonemas distintos
                 "total_fonemas": [
                     {"$match": {"metadata.fonema": {"$exists": True}}},
                     {"$group": {"_id": "$metadata.fonema"}},
-                    {"$count": "total"}
+                    {"$count": "total"},
                 ],
-
                 # Últimos 5 fonemas grabados
                 "ultimos_fonemas": [
                     {"$match": {"metadata.fonema": {"$exists": True}}},
                     {"$sort": {"fecha": -1}},
-                    {"$group": {"_id": "$metadata.fonema", "last_time": {"$first": "$fecha"}}},
+                    {
+                        "$group": {
+                            "_id": "$metadata.fonema",
+                            "last_time": {"$first": "$fecha"},
+                        }
+                    },
                     {"$sort": {"last_time": -1}},
                     {"$limit": 5},
-                    {"$project": {"_id": 0, "fonema": "$_id", "fecha": "$last_time"}}
+                    {"$project": {"_id": 0, "fonema": "$_id", "fecha": "$last_time"}},
                 ],
-
                 # 5 fonemas más grabados
                 "top_fonemas": [
                     {"$match": {"metadata.fonema": {"$exists": True}}},
                     {"$group": {"_id": "$metadata.fonema", "total": {"$sum": 1}}},
                     {"$sort": {"total": -1}},
                     {"$limit": 5},
-                    {"$project": {"_id": 0, "fonema": "$_id", "total": 1}}
+                    {"$project": {"_id": 0, "fonema": "$_id", "total": 1}},
                 ],
-
                 # 5 fonemas menos grabados
                 "bottom_fonemas": [
                     {"$match": {"metadata.fonema": {"$exists": True}}},
                     {"$group": {"_id": "$metadata.fonema", "total": {"$sum": 1}}},
                     {"$sort": {"total": 1}},
                     {"$limit": 5},
-                    {"$project": {"_id": 0, "fonema": "$_id", "total": 1}}
+                    {"$project": {"_id": 0, "fonema": "$_id", "total": 1}},
                 ],
             }
-        }
+        },
     ]
     aggregation_result = list(audio.aggregate(pipeline))
     if not aggregation_result:
@@ -205,12 +208,13 @@ def client_tag():
             "total_fonemas": [],
             "ultimos_fonemas": [],
             "top_fonemas": [],
-            "bottom_fonemas": []
+            "bottom_fonemas": [],
         }
     else:
         result = aggregation_result[0]
 
-    # Como ya tenemos los totales de cada etiqueta, mediante Python me quedo con los 5 de arriba y los 5 de abajo
+    # Como ya tenemos los totales de cada etiqueta,
+    # mediante Python me quedo con los 5 de arriba y los 5 de abajo
     totales = result.get("totales_por_etiqueta", [])  # ya ordenado de mayor a menor
     # Recorremos ultimas_etiquetas y le añadimos el total
     totales_map = {item["tag"]: item["total"] for item in totales}
@@ -219,39 +223,32 @@ def client_tag():
 
     syllabus = Syllabus()
     pipeline = [
-        { '$unwind': { 'path': '$tags' } },
-        { '$group': { '_id': '$tags', 'fecha': { '$last': '$fecha_creacion' }}},
-        { '$sample': { 'size': 1 }}
+        {"$unwind": {"path": "$tags"}},
+        {"$group": {"_id": "$tags", "fecha": {"$last": "$fecha_creacion"}}},
+        {"$sample": {"size": 1}},
     ]
     tags_suerte = syllabus.aggregate(pipeline)
 
-
     # Últimas etiquetas grabadas
     pipeline_ultimas = [
-        {
-            "$match": {
-                "usuario.mail": current_user.email,
-                "texto.tipo": "syllabus"
-            }
-        },
+        {"$match": {"usuario.mail": current_user.email, "texto.tipo": "syllabus"}},
         {"$sort": {"fecha": -1}},
         {
             "$group": {
                 "_id": "$texto.tag",
                 "count": {"$sum": 1},
-                "last_time": {"$first": "$fecha"}
+                "last_time": {"$first": "$fecha"},
             }
         },
         {"$sort": {"last_time": -1}},
-        {"$limit": 5}
+        {"$limit": 5},
     ]
 
     # Procesar las etiquetas para el template
     tags_ultimas_docs = list(audio.aggregate(pipeline_ultimas))
 
     tags_ultimas = [
-        {"id": doc["_id"], "count": doc["count"]}
-        for doc in tags_ultimas_docs if doc["_id"]
+        {"id": doc["_id"], "count": doc["count"]} for doc in tags_ultimas_docs if doc["_id"]
     ]
 
     # objetivo diario
@@ -263,30 +260,27 @@ def client_tag():
         {
             "$match": {
                 "usuario.mail": current_user.email,
-                "fecha": {"$gte": start_of_day, "$lt": end_of_day}
+                "fecha": {"$gte": start_of_day, "$lt": end_of_day},
             }
         },
-        {"$count": "total"}
+        {"$count": "total"},
     ]
 
     count_result = list(audio.aggregate(pipeline_today))
-    audios_today = count_result[0]['total'] if count_result else 0
+    audios_today = count_result[0]["total"] if count_result else 0
     daily_goal = 5
-
 
     # Frase sugerida para clientes
     ubicacion = request.args.get("location") or "general"
     frase_sugerida = _get_frase_sugerida(syllabus, ubicacion)
     momento_dia = _get_momento_dia()
-    
+
     # Los datos de insignias ahora vienen vía app_context_processor
     # para estar disponibles en el sidebar de layout.html
 
     return render_template(
-        'audios/client_tag.html',
-
+        "audios/client_tag.html",
         tags_suerte=tags_suerte,
-
         total_audios=result.get("total_audios", [{}]),
         ultimas_etiquetas=result.get("ultimas_etiquetas", []),
         top_etiquetas=totales[:5],
@@ -295,32 +289,23 @@ def client_tag():
         ultimos_fonemas=result.get("ultimos_fonemas", []),
         top_fonemas=result.get("top_fonemas", []),
         bottom_fonemas=result.get("bottom_fonemas", []),
-
         tags_ultimas=tags_ultimas,
         audios_today=audios_today,
         daily_goal=daily_goal,
         frase_sugerida=frase_sugerida,
         momento_dia=momento_dia,
-        ubicacion=ubicacion
+        ubicacion=ubicacion,
     )
 
-@bp.route('/client-record/<string:tag_name>')
+
+@bp.route("/client-record/<string:tag_name>")
 @login_required
 def client_record(tag_name):
-    
-    
+
     syllabus = Syllabus()
     pipeline = [
-        {
-            '$unwind': {
-                'path': '$tags'
-            }
-        },
-        {
-            '$match': {
-                'tags': {'$regex': tag_name, '$options': 'i'}
-            }
-        }
+        {"$unwind": {"path": "$tags"}},
+        {"$match": {"tags": {"$regex": tag_name, "$options": "i"}}},
     ]
 
     # Guardamos el click
@@ -330,7 +315,7 @@ def client_record(tag_name):
         "method": "client_record",
         "tag": tag_name,
         "usuario": current_user.email,
-        "timestamp": datetime.now()
+        "timestamp": datetime.now(),
     }
     clicks.insert_one(click_doc)
 
@@ -338,64 +323,62 @@ def client_record(tag_name):
     syllabus_items = list(syllabus.aggregate(pipeline))
     if not syllabus_items:
         flash(f"No se han encontrado frases con la etiqueta '{tag_name}'", "danger")
-        return redirect(url_for('audios.client_tag'))
-    
+        return redirect(url_for("audios.client_tag"))
+
     next_syllabus_item = _get_next_syllabus_item(syllabus, syllabus_items, tag_name)
 
-    return render_template(
-        'audios/client_record.html',
-        tag=tag_name,
-        syllabus=next_syllabus_item
-    )
+    return render_template("audios/client_record.html", tag=tag_name, syllabus=next_syllabus_item)
+
 
 # Función para seleccionar una frase aleatoria que no tenga 'iterable' o tenga 'iterable.num = 1'
 def select_random_item(syllabus_items):
     # Filtramos las frases que no tienen 'iterable' o tienen 'iterable.num == 1'
-    valid_items = [item for item in syllabus_items if not item.get('iterable') or item['iterable'].get('num') == 1]
+    valid_items = [
+        item
+        for item in syllabus_items
+        if not item.get("iterable") or item["iterable"].get("num") == 1
+    ]
     if valid_items:
         return random.choice(valid_items)
 
 
-@bp.route('/client-text')
+@bp.route("/client-text")
 @login_required
 def client_text():
-    return render_template('audios/client_text.html')
+    return render_template("audios/client_text.html")
 
 
-@bp.route('/save-record', methods=['POST'])
+@bp.route("/save-record", methods=["POST"])
 @login_required
 def save_record():
-    file = request.files['file']
-    duration = request.form.get('duration')
+    # file = request.files["file"]
+    duration = request.form.get("duration")
 
     # print(duration)
-    # # Hemos pensado en guardar timestamp + id de usuario. Ver si se guarda en mp3 o wav
+    # # Hemos pensado en guardar timestamp + id de usuario.
+    # Ver si se guarda en mp3 o wav
     timestamp = int(round(datetime.now().timestamp()))
-    filename = str(current_user.id) + '_' + str(timestamp) + '.wav'
+    filename = str(current_user.id) + "_" + str(timestamp) + ".wav"
 
     # # Guardado en S3
 
-    text_id = request.form.get('text_id')
-    text_text = request.form.get('text_text')
-    text_tag = request.form.get('text_tag')
-    text_type = request.form.get('text_type')
+    text_id = request.form.get("text_id")
+    text_text = request.form.get("text_text")
+    text_tag = request.form.get("text_tag")
+    text_type = request.form.get("text_type")
 
     metadataOb = {}
     if text_id:
         # es un texto que proviene de una etiqueta
-        regex = re.compile(r'^(\d{1,3})([a-zA-Z]+)([1-3])$')
+        regex = re.compile(r"^(\d{1,3})([a-zA-Z]+)([1-3])$")
         match = regex.match(text_tag)
         if match:
             num1, fonema, pos = match.groups()
 
-            metadataOb = { # guardamos metadatos del tag para facilitar el entrenamiento
+            metadataOb = {  # guardamos metadatos del tag para facilitar entrenamiento
                 "tipo_frase": "frase larga" if int(num1) > 100 else "frase corta",
                 "fonema": fonema.upper(),
-                "posicion_lengua": {
-                    "1": "abajo",
-                    "2": "medio",
-                    "3": "arriba"
-                }[pos]
+                "posicion_lengua": {"1": "abajo", "2": "medio", "3": "arriba"}[pos],
             }
     else:
         # si no tiene text_id, es un texto grabado por el usuario
@@ -406,8 +389,8 @@ def save_record():
             "creador": {
                 "id": current_user.id,
                 "mail": current_user.email,
-                "nombre": current_user.nombre
-            }
+                "nombre": current_user.nombre,
+            },
         }
 
         frase = Frases()
@@ -416,16 +399,16 @@ def save_record():
         text_id = result.inserted_id
 
     textoOb = {
-        "id": bson.objectid.ObjectId(text_id),
+        "id": ObjectId(text_id),
         "texto": text_text,
         "tag": text_tag,
-        "tipo": text_type
+        "tipo": text_type,
     }
     usuarioOb = {
         "id": current_user.id,
-        "mail": current_user.email, 
+        "mail": current_user.email,
         "nombre": current_user.nombre,
-        "parent": current_user.parent 
+        "parent": current_user.parent,
     }
     newAudio = {
         "aws_object_id": filename,
@@ -433,165 +416,157 @@ def save_record():
         "fecha": datetime.now(),
         "texto": textoOb,
         "metadata": metadataOb,
-        "schema_version": 2, # anyadimos los metadata en la v2
-        "duracion": int(duration)
+        "schema_version": 2,  # anyadimos los metadata en la v2
+        "duracion": int(duration),
     }
     audio = Audios()
-    resultAudio = audio.insert_one(newAudio)
+    # resultAudio = audio.insert_one(newAudio)
+    audio.insert_one(newAudio)
 
     # Incrementamos en 1 la cantidad de audios grabados
     usuario = Usuario()
-    resultUsuario = usuario.update_one({"mail":current_user.email},{"$inc":{"cant_audios":1}})
+    # resultUsuario = usuario.update_one(
+    #     {"mail": current_user.email}, {"$inc": {"cant_audios": 1}}
+    # )
+    usuario.update_one({"mail": current_user.email}, {"$inc": {"cant_audios": 1}})
 
     # Comprobar objetivo diario
     today = datetime.now()
     start_of_day = datetime(today.year, today.month, today.day)
     end_of_day = start_of_day + timedelta(days=1)
-    
+
     pipeline_today = [
         {
             "$match": {
                 "usuario.id": current_user.id,
-                "fecha": {"$gte": start_of_day, "$lt": end_of_day}
+                "fecha": {"$gte": start_of_day, "$lt": end_of_day},
             }
         },
-        {
-            "$count": "total"
-        }
+        {"$count": "total"},
     ]
-    
+
     count_result = list(audio.aggregate(pipeline_today))
-    audios_today = count_result[0]['total'] if count_result else 0
+    audios_today = count_result[0]["total"] if count_result else 0
     daily_goal = 5
-    goal_reached = audios_today == daily_goal # Solo notificar cuando llega EXACTAMENTE al objetivo
+    goal_reached = audios_today == daily_goal  # Solo notificar cuando llega EXACTAMENTE al objetivo
 
     # Comprobar si ha ganado una nueva insignia
     new_badge = None
     # Usamos el total_audios_count de la base de datos para mayor precisión
-    total_pipeline = [
-        {"$match": {"usuario.id": current_user.id}},
-        {"$count": "total"}
-    ]
+    total_pipeline = [{"$match": {"usuario.id": current_user.id}}, {"$count": "total"}]
     total_result = list(audio.aggregate(total_pipeline))
-    total_audios_count = total_result[0]['total'] if total_result else 0
-    
+    total_audios_count = total_result[0]["total"] if total_result else 0
+
     for b in BADGES_THRESHOLDS:
         if total_audios_count == b["limit"]:
             new_badge = b
             break
 
     data = {
-        "status": 'ok',
+        "status": "ok",
         "message": "El audio ha sido almacenado correctamente.",
         "daily_goal_reached": goal_reached,
         "daily_progress": f"{audios_today}/{daily_goal}",
-        "new_badge": new_badge
+        "new_badge": new_badge,
     }
     return jsonify(data)
 
-@bp.route('/select-badge', methods=['POST'])
+
+@bp.route("/select-badge", methods=["POST"])
 @login_required
 def select_badge():
-    badge_image = request.json.get('badge_image')
+    badge_image = request.json.get("badge_image")
     if not badge_image:
         return jsonify({"status": "error", "message": "Falta la imagen de la insignia"}), 400
-    
+
     # Verificar que el usuario realmente tiene desbloqueada esa insignia
     audio = Audios()
     total_pipeline = [
         {"$match": {"usuario.mail": current_user.email}},
-        {"$count": "total"}
+        {"$count": "total"},
     ]
     total_result = list(audio.aggregate(total_pipeline))
-    total_count = total_result[0]['total'] if total_result else 0
-    
+    total_count = total_result[0]["total"] if total_result else 0
+
     is_unlocked = False
     for b in BADGES_THRESHOLDS:
         if b["image"] == badge_image and total_count >= b["limit"]:
             is_unlocked = True
             break
-            
+
     if not is_unlocked:
         return jsonify({"status": "error", "message": "Insignia no desbloqueada"}), 403
-        
+
     usuario_model = Usuario()
     usuario_model.update_one(
-        {"mail": current_user.email},
-        {"$set": {"selected_badge": badge_image}}
+        {"mail": current_user.email}, {"$set": {"selected_badge": badge_image}}
     )
-    
+
     return jsonify({"status": "ok", "message": "Insignia seleccionada con éxito"})
 
-@bp.route('/client-tag', methods=['POST'])
+
+@bp.route("/client-tag", methods=["POST"])
 @login_required
 def tag_search():
-    tag_name = request.form.get('tagName')
+    tag_name = request.form.get("tagName")
     syllabus = Syllabus()
 
     if tag_name == "":
-        return redirect(url_for('audios.client_tag'))
+        return redirect(url_for("audios.client_tag"))
 
     pipeline = [
+        {"$unwind": {"path": "$tags"}},
         {
-            '$unwind': {
-                'path': '$tags'
-            }
-        }, {
-            '$match': {
-                '$or': [
-                    {
-                        'tags': {
-                            '$regex': tag_name, 
-                            '$options': 'i'
-                        }
-                    }, {
-                        'texto': {
-                            '$regex': tag_name, 
-                            '$options': 'i'
-                        }
-                    }
+            "$match": {
+                "$or": [
+                    {"tags": {"$regex": tag_name, "$options": "i"}},
+                    {"texto": {"$regex": tag_name, "$options": "i"}},
                 ]
             }
         },
-        {
-            '$group': {
-                '_id': '$tags'
-            }
-        }        
+        {"$group": {"_id": "$tags"}},
     ]
 
     tags = syllabus.aggregate(pipeline)
 
     if not tags.alive:
-        flash("No se han encontrado resultados de la etiqueta '" + tag_name + "'", "danger")
+        flash(
+            "No se han encontrado resultados de la etiqueta '" + tag_name + "'",
+            "danger",
+        )
 
     # Contar audios de hoy para el objetivo diario
     audio = Audios()
     today = datetime.now()
     start_of_day = datetime(today.year, today.month, today.day)
     end_of_day = start_of_day + timedelta(days=1)
-    
+
     pipeline_today = [
         {
             "$match": {
                 "usuario.mail": current_user.email,
-                "fecha": {"$gte": start_of_day, "$lt": end_of_day}
+                "fecha": {"$gte": start_of_day, "$lt": end_of_day},
             }
         },
-        {
-            "$count": "total"
-        }
+        {"$count": "total"},
     ]
-    
+
     count_result = list(audio.aggregate(pipeline_today))
-    audios_today = count_result[0]['total'] if count_result else 0
+    audios_today = count_result[0]["total"] if count_result else 0
     daily_goal = 5
 
-    return render_template('audios/client_tag.html', tags=tags, tag_name=tag_name, audios_today=audios_today, daily_goal=daily_goal)
+    return render_template(
+        "audios/client_tag.html",
+        tags=tags,
+        tag_name=tag_name,
+        audios_today=audios_today,
+        daily_goal=daily_goal,
+    )
 
-@bp.route('/client-report', methods=['GET'])
-@bp.route('/client-report/<id>', methods=['GET'])
-@rol_required(['admin', 'tecnico', 'cliente'])
+
+@bp.route("/client-report", methods=["GET"])
+@bp.route("/client-report/<id>", methods=["GET"])
+@rol_required(["admin", "tecnico", "cliente"])
 @login_required
 def client_report(id=None):
     total_audios = 0
@@ -604,7 +579,7 @@ def client_report(id=None):
     fonemas_menos_grabados = []
     total_fonemas_unicos = 0
     logged_rol = current_user.rol
-    url = 'audios/client_report.html'
+    url = "audios/client_report.html"
     cliente_nombre = "N/A"
 
     PATRON_REGEX = r"^(\d+)([a-zA-ZñÑ]+)([1-3])$"
@@ -621,7 +596,7 @@ def client_report(id=None):
         cliente_nombre = cliente.get("nombre", "Desconocido") if cliente else "Desconocido"
     elif logged_rol == "tecnico":
         # Técnico: todos los clientes cuyo parent es el técnico de la sesión
-        tecnico_email = current_user.email          
+        tecnico_email = current_user.email
         clientes = usuario_model.find({"parent": tecnico_email})
         cliente_ids = [c["_id"] for c in clientes]
 
@@ -641,73 +616,67 @@ def client_report(id=None):
             {
                 "$getField": {
                     "field": "captures",
-                    "input": {
-                        "$regexFind": {
-                            "input": "$texto.tag",
-                            "regex": PATRON_REGEX
-                        }
-                    }
+                    "input": {"$regexFind": {"input": "$texto.tag", "regex": PATRON_REGEX}},
                 }
             },
-            1   # capture group 1 → la parte alfabética del tag
+            1,  # capture group 1 → la parte alfabética del tag
         ]
     }
 
     pipeline = [
         {
-            "$match": match_filter # Primero filtramos por usuario (TODA la actividad)
+            "$match": match_filter  # Primero filtramos por usuario (TODA la actividad)
         },
         {
             "$facet": {
                 # ── CONTEO TOTAL REAL (Para insignias) ────────────────
                 "total_temp": [{"$count": "valor"}],
-
                 # ── ESTADÍSTICAS BASADAS EN TAGS CIENTÍFICOS ──────────
                 "tags": [
                     {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
-                    {"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}}
+                    {"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}},
                 ],
                 "ultimas_grabadas": [
                     {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$sort": {"fecha": -1}},
                     {"$limit": 5},
-                    {"$project": {"_id": 0, "tag": "$texto.tag"}}
+                    {"$project": {"_id": 0, "tag": "$texto.tag"}},
                 ],
                 "ultimos_fonemas": [
                     {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$sort": {"fecha": -1}},
                     {"$limit": 5},
-                    {"$project": {"_id": 0, "fonema": _extract_fonema}}
+                    {"$project": {"_id": 0, "fonema": _extract_fonema}},
                 ],
                 "mas_grabadas": [
                     {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}},
                     {"$sort": {"cantidad": -1}},
-                    {"$limit": 5}
+                    {"$limit": 5},
                 ],
                 "menos_grabadas": [
                     {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}},
                     {"$sort": {"cantidad": 1}},
-                    {"$limit": 5}
+                    {"$limit": 5},
                 ],
                 "fonemas_mas_grabados": [
                     {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$group": {"_id": _extract_fonema, "cantidad": {"$sum": 1}}},
                     {"$sort": {"cantidad": -1}},
-                    {"$limit": 5}
+                    {"$limit": 5},
                 ],
                 "fonemas_menos_grabados": [
                     {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$group": {"_id": _extract_fonema, "cantidad": {"$sum": 1}}},
                     {"$sort": {"cantidad": 1}},
-                    {"$limit": 5}
+                    {"$limit": 5},
                 ],
                 "conteo_fonemas_unicos": [
                     {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$group": {"_id": _extract_fonema}},
-                    {"$count": "total"}
-                ]
+                    {"$count": "total"},
+                ],
             }
         },
         {
@@ -719,28 +688,29 @@ def client_report(id=None):
                 "ultimos_fonemas": 1,
                 "fonemas_mas_grabados": 1,
                 "fonemas_menos_grabados": 1,
-                "total": {
-                    "$ifNull": [{"$arrayElemAt": ["$total_temp.valor", 0]}, 0]
-                },
+                "total": {"$ifNull": [{"$arrayElemAt": ["$total_temp.valor", 0]}, 0]},
                 "total_fonemas_unicos": {
-                    "$ifNull": [{"$arrayElemAt": ["$conteo_fonemas_unicos.total", 0]}, 0]
-                }
+                    "$ifNull": [
+                        {"$arrayElemAt": ["$conteo_fonemas_unicos.total", 0]},
+                        0,
+                    ]
+                },
             }
-        }
+        },
     ]
 
     resultado = list(audios_model.aggregate(pipeline))
     datos = resultado[0] if resultado else {}
 
-    total_audios            = datos.get("total", 0)
-    audios_por_categoria    = datos.get("tags", [])
-    ultimas_tags_grabadas   = datos.get("ultimas_grabadas", [])
-    mas_grabadas            = datos.get("mas_grabadas", [])
-    menos_grabadas          = datos.get("menos_grabadas", [])
-    ultimos_fonemas         = datos.get("ultimos_fonemas", [])
-    fonemas_mas_grabados    = datos.get("fonemas_mas_grabados", [])
-    fonemas_menos_grabados  = datos.get("fonemas_menos_grabados", [])
-    total_fonemas_unicos    = datos.get("total_fonemas_unicos", 0)
+    total_audios = datos.get("total", 0)
+    audios_por_categoria = datos.get("tags", [])
+    ultimas_tags_grabadas = datos.get("ultimas_grabadas", [])
+    mas_grabadas = datos.get("mas_grabadas", [])
+    menos_grabadas = datos.get("menos_grabadas", [])
+    ultimos_fonemas = datos.get("ultimos_fonemas", [])
+    fonemas_mas_grabados = datos.get("fonemas_mas_grabados", [])
+    fonemas_menos_grabados = datos.get("fonemas_menos_grabados", [])
+    total_fonemas_unicos = datos.get("total_fonemas_unicos", 0)
 
     # Ordenar categorías por cantidad descendente (para el template)
     temp_dict = {item["_id"]: item["cantidad"] for item in audios_por_categoria}
@@ -751,13 +721,15 @@ def client_report(id=None):
     next_badge = None
     for b in BADGES_THRESHOLDS:
         unlocked = total_audios >= b["limit"]
-        badges_info.append({
-            "name": b["name"],
-            "limit": b["limit"],
-            "image": b["image"],
-            "unlocked": unlocked,
-            "is_selected": getattr(current_user, 'selected_badge', None) == b["image"]
-        })
+        badges_info.append(
+            {
+                "name": b["name"],
+                "limit": b["limit"],
+                "image": b["image"],
+                "unlocked": unlocked,
+                "is_selected": getattr(current_user, "selected_badge", None) == b["image"],
+            }
+        )
         if not unlocked and not next_badge:
             next_badge = b
 
@@ -776,5 +748,5 @@ def client_report(id=None):
         fonemas_menos_grabados=fonemas_menos_grabados,
         total_fonemas_unicos=total_fonemas_unicos,
         badges_info=badges_info,
-        next_badge=next_badge
+        next_badge=next_badge,
     )

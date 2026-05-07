@@ -1,13 +1,13 @@
-from datetime import datetime
 import math
-import random
+from datetime import datetime
+
 from bson.objectid import ObjectId
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
+from pialara.models.Clicks import Clicks
 from pialara.models.Syllabus import Syllabus
 from pialara.models.Usuario import Usuario
-from pialara.models.Clicks import Clicks
 
 bp = Blueprint("syllabus", __name__, url_prefix="/syllabus")
 
@@ -28,15 +28,20 @@ def _get_frase_sugerida(syllabus, ubicacion):
     if ubicacion and ubicacion != "general":
         match = {"tags": {"$regex": ubicacion, "$options": "i"}}
     else:
-        dias_semana = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo']
+        dias_semana = [
+            "lunes",
+            "martes",
+            "miércoles",
+            "jueves",
+            "viernes",
+            "sábado",
+            "domingo",
+        ]
         dia_actual = dias_semana[datetime.now().weekday()]
         match = {"tags": {"$regex": dia_actual, "$options": "i"}}
 
-    pipeline = [
-        {"$match": match},
-        {"$sample": {"size": 1}}
-    ]
-    
+    pipeline = [{"$match": match}, {"$sample": {"size": 1}}]
+
     try:
         resultado = list(syllabus.aggregate(pipeline))
         if resultado:
@@ -51,6 +56,7 @@ def _get_frase_sugerida(syllabus, ubicacion):
         return resultado_fallback[0] if resultado_fallback else None
     except Exception:
         return None
+
 
 @bp.route("/", methods=["GET"])
 @login_required
@@ -72,10 +78,10 @@ def index():
                 ]
             }
         )
-        
+
     # Agregamos un campo nuevo $expr para poder hacer un $and con los filtros de fecha
     match_filter.update({"$expr": {"$and": []}})
-    
+
     if tag_date_since != "":
         match_filter["$expr"]["$and"].append(
             {
@@ -171,24 +177,25 @@ def index():
 @login_required
 def frase_aleatoria():
     from flask import jsonify
+
     ubicacion = request.args.get("location") or "general"
     syllabus = Syllabus()
     frase = _get_frase_sugerida(syllabus, ubicacion)
     if not frase:
         return jsonify({"error": "No hay frases disponibles"}), 404
-    return jsonify({
-        "texto": frase.get("texto", ""),
-        "tags": frase.get("tags", []),
-        "momento_dia": _get_momento_dia(),
-    })
+    return jsonify(
+        {
+            "texto": frase.get("texto", ""),
+            "tags": frase.get("tags", []),
+            "momento_dia": _get_momento_dia(),
+        }
+    )
 
 
 @bp.route("/create")
 @login_required
 def create():
     return render_template("syllabus/create.html")
-
-
 
 
 @bp.route("/create", methods=["POST"])
@@ -228,21 +235,22 @@ def create_post():
         flash("La frase no se ha creado. Error genérico", "danger")
         return redirect(url_for("syllabus.create"))
 
+
 @bp.route("/create_iterable")
 @login_required
 def create_iterable():
     return render_template("syllabus/create_iterable.html")
 
+
 @bp.route("/create_iterable", methods=["POST"])
 @login_required
 def create_iterable_post():
     # Obtener los datos del formulario
-    tags = request.form.get('ftags')
+    tags = request.form.get("ftags")
     if not tags or tags.strip() == "":
-        flash('El campo de etiquetas no puede estar vacío.', 'danger')
-        return redirect(url_for('syllabus.create_iterable'))
+        flash("El campo de etiquetas no puede estar vacío.", "danger")
+        return redirect(url_for("syllabus.create_iterable"))
 
-    
     qtyPhrases = request.form.get("qtyPhrases")
 
     # Recogemos todas las frases del formulario
@@ -250,8 +258,7 @@ def create_iterable_post():
     for i in range(int(qtyPhrases)):
         lista_frases.append(request.form.get(f"ftext{i + 1}"))
 
-    if not any("" == frase for frase in lista_frases) and qtyPhrases != 'Seleccionar':
-
+    if not any("" == frase for frase in lista_frases) and qtyPhrases != "Seleccionar":
         # Obtener los datos del usuario
         usuario = Usuario()
         params = {"mail": current_user.email}
@@ -260,11 +267,11 @@ def create_iterable_post():
         # Convertir el array de los tags
         tagsArray = tags.split(", ")
         texto = Syllabus()
-        
+
         # Iteramos la lista de frases al reves
-        for index ,text in enumerate(reversed(lista_frases)):
+        for index, text in enumerate(reversed(lista_frases)):
             if index == 0:
-                print(f'Reversed lista {index}', text)
+                print(f"Reversed lista {index}", text)
                 # Crear el texto en la base de datos
                 aux = {
                     "texto": text,
@@ -277,11 +284,11 @@ def create_iterable_post():
                     "fecha_creacion": datetime.now(),
                     "iterable": {
                         "num": abs(index - len(lista_frases)),
-                        "total": len(lista_frases)
-                    }
+                        "total": len(lista_frases),
+                    },
                 }
                 result = texto.insert_one(aux)
-                id_insertado = result.inserted_id  
+                id_insertado = result.inserted_id
                 print("Frase ", text, "ID ", id_insertado)
             else:
                 aux = {
@@ -296,19 +303,19 @@ def create_iterable_post():
                     "iterable": {
                         "siguiente": id_insertado,
                         "num": abs(index - len(lista_frases)),
-                        "total": len(lista_frases)
-                    }
+                        "total": len(lista_frases),
+                    },
                 }
                 result = texto.insert_one(aux)
-                id_insertado = result.inserted_id           
+                id_insertado = result.inserted_id
                 print("Frase ", text, "ID ", id_insertado)
-    
+
         flash("Iterable creado correctamente", "success")
         return redirect(url_for("syllabus.index"))
     else:
         flash("Campos erroneos!", "danger")
         return render_template("syllabus/create_iterable.html")
-    
+
 
 @bp.route("/update/<string:id>")
 @login_required
@@ -336,9 +343,9 @@ def update_post(id):
     fraseID = id
 
     # Obtener los datos del usuario
-    usuario = Usuario()
-    params = {"email": current_user.email}
-    user = usuario.find_one(params)
+    # usuario = Usuario()
+    # params = {"email": current_user.email}
+    # user = usuario.find_one(params)
 
     # Convertir el array de los tags
     tagsArray = tags.split(", ")
