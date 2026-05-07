@@ -27,6 +27,53 @@ from datetime import datetime, timedelta
 from random import sample
 
 bp = Blueprint('audios', __name__, url_prefix='/audios')
+BADGES_THRESHOLDS = [
+    {"limit": 10, "name": "Principiante", "image": "badge_10.png"},
+    {"limit": 25, "name": "Avanzado", "image": "badge_25.png"},
+    {"limit": 50, "name": "Especialista", "image": "badge_50.png"},
+    {"limit": 100, "name": "Profesional", "image": "badge_100.png"},
+    {"limit": 200, "name": "Experto", "image": "badge_200.png"},
+    {"limit": 500, "name": "Leyenda", "image": "badge_500.png"},
+]
+
+@bp.app_context_processor
+def inject_badges():
+    if not current_user.is_authenticated or current_user.rol != 'cliente':
+        return dict(current_badge=None, total_count=0)
+
+    audio = Audios()
+    total_pipeline = [
+        {"$match": {"usuario.id": current_user.id}},
+        {"$count": "total"}
+    ]
+    total_result = list(audio.aggregate(total_pipeline))
+    total_count = total_result[0]['total'] if total_result else 0
+
+    current_badge = None
+    
+    # Si el usuario tiene una insignia seleccionada, intentamos usar esa
+    selected_image = getattr(current_user, 'selected_badge', None)
+    
+    if selected_image:
+        for b in BADGES_THRESHOLDS:
+            if b["image"] == selected_image:
+                current_badge = b
+                break
+
+    # Si no hay seleccionada o la seleccionada no es válida (ej. nivel superior), 
+    # mostramos la mejor disponible
+    if not current_badge:
+        for b in reversed(BADGES_THRESHOLDS):
+            if total_count >= b["limit"]:
+                current_badge = b
+                break
+    
+    # Si sigue sin haber insignia (0 audios), o la cuenta es nueva, mostramos la por defecto
+    if not current_badge:
+        current_badge = {"limit": 0, "name": "Novato", "image": "default.png"}
+            
+    return dict(current_badge=current_badge, total_count=total_count)
+
 
 def _parse_tag_metadata(tag):
     """
@@ -52,7 +99,6 @@ def _parse_tag_metadata(tag):
         "valido": True,
         "descripcion": f"{tipo_frase}, fonema {fonema}, lengua {posicion_lengua}"
     }
-
 def _get_next_syllabus_item(syllabus, syllabus_items, tag_name):
     """
     Gestiona la lógica de sesión e iteración para las frases del syllabus.
@@ -149,13 +195,26 @@ def client_tag():
             }
         }
     ]
-    result = list(audio.aggregate(pipeline))[0]
+    aggregation_result = list(audio.aggregate(pipeline))
+    if not aggregation_result:
+        # Fallback para usuarios sin audios
+        result = {
+            "total_audios": [],
+            "totales_por_etiqueta": [],
+            "ultimas_etiquetas": [],
+            "total_fonemas": [],
+            "ultimos_fonemas": [],
+            "top_fonemas": [],
+            "bottom_fonemas": []
+        }
+    else:
+        result = aggregation_result[0]
 
     # Como ya tenemos los totales de cada etiqueta, mediante Python me quedo con los 5 de arriba y los 5 de abajo
-    totales = result["totales_por_etiqueta"]  # ya ordenado de mayor a menor
+    totales = result.get("totales_por_etiqueta", [])  # ya ordenado de mayor a menor
     # Recorremos ultimas_etiquetas y le añadimos el total
     totales_map = {item["tag"]: item["total"] for item in totales}
-    for tag in result["ultimas_etiquetas"]:
+    for tag in result.get("ultimas_etiquetas", []):
         tag["total"] = totales_map.get(tag["tag"], 0)
 
     syllabus = Syllabus()
@@ -220,6 +279,9 @@ def client_tag():
     frase_sugerida = _get_frase_sugerida(syllabus, ubicacion)
     momento_dia = _get_momento_dia()
     
+    # Los datos de insignias ahora vienen vía app_context_processor
+    # para estar disponibles en el sidebar de layout.html
+
     return render_template(
         'audios/client_tag.html',
 
@@ -312,15 +374,6 @@ def save_record():
     filename = str(current_user.id) + '_' + str(timestamp) + '.wav'
 
     # # Guardado en S3
-    s3c = boto3.client(
-        's3',
-        region_name='eu-south-2',
-        aws_access_key_id=current_app.config["AWS_ACCESS_KEY_ID"],
-        aws_secret_access_key=current_app.config['AWS_SECRET_ACCESS_KEY'],
-        # aws_session_token=current_app.config["AWS_SESSION_TOKEN"]
-    )
-    
-    s3c.upload_fileobj(file, current_app.config["BUCKET_NAME"], filename)
 
     text_id = request.form.get('text_id')
     text_text = request.form.get('text_text')
@@ -336,12 +389,12 @@ def save_record():
             num1, fonema, pos = match.groups()
 
             metadataOb = { # guardamos metadatos del tag para facilitar el entrenamiento
-                "tipo_frase": "corta" if int(num1) >= 100 else "larga",
+                "tipo_frase": "frase larga" if int(num1) > 100 else "frase corta",
                 "fonema": fonema.upper(),
                 "posicion_lengua": {
-                    "1": "baja",
-                    "2": "media",
-                    "3": "alta"
+                    "1": "abajo",
+                    "2": "medio",
+                    "3": "arriba"
                 }[pos]
             }
     else:
@@ -349,9 +402,9 @@ def save_record():
         # primero, guardamos el nuevo texto y obtenemos un id
         fraseOb = {
             "texto": text_text,
-            "tag": current_user.email,
+            "tag": text_tag,
             "creador": {
-                "id": bson.objectid.ObjectId(text_id),
+                "id": current_user.id,
                 "mail": current_user.email,
                 "nombre": current_user.nombre
             }
@@ -398,7 +451,7 @@ def save_record():
     pipeline_today = [
         {
             "$match": {
-                "usuario.mail": current_user.email,
+                "usuario.id": current_user.id,
                 "fecha": {"$gte": start_of_day, "$lt": end_of_day}
             }
         },
@@ -412,13 +465,62 @@ def save_record():
     daily_goal = 5
     goal_reached = audios_today == daily_goal # Solo notificar cuando llega EXACTAMENTE al objetivo
 
+    # Comprobar si ha ganado una nueva insignia
+    new_badge = None
+    # Usamos el total_audios_count de la base de datos para mayor precisión
+    total_pipeline = [
+        {"$match": {"usuario.id": current_user.id}},
+        {"$count": "total"}
+    ]
+    total_result = list(audio.aggregate(total_pipeline))
+    total_audios_count = total_result[0]['total'] if total_result else 0
+    
+    for b in BADGES_THRESHOLDS:
+        if total_audios_count == b["limit"]:
+            new_badge = b
+            break
+
     data = {
         "status": 'ok',
         "message": "El audio ha sido almacenado correctamente.",
         "daily_goal_reached": goal_reached,
-        "daily_progress": f"{audios_today}/{daily_goal}"
+        "daily_progress": f"{audios_today}/{daily_goal}",
+        "new_badge": new_badge
     }
     return jsonify(data)
+
+@bp.route('/select-badge', methods=['POST'])
+@login_required
+def select_badge():
+    badge_image = request.json.get('badge_image')
+    if not badge_image:
+        return jsonify({"status": "error", "message": "Falta la imagen de la insignia"}), 400
+    
+    # Verificar que el usuario realmente tiene desbloqueada esa insignia
+    audio = Audios()
+    total_pipeline = [
+        {"$match": {"usuario.mail": current_user.email}},
+        {"$count": "total"}
+    ]
+    total_result = list(audio.aggregate(total_pipeline))
+    total_count = total_result[0]['total'] if total_result else 0
+    
+    is_unlocked = False
+    for b in BADGES_THRESHOLDS:
+        if b["image"] == badge_image and total_count >= b["limit"]:
+            is_unlocked = True
+            break
+            
+    if not is_unlocked:
+        return jsonify({"status": "error", "message": "Insignia no desbloqueada"}), 403
+        
+    usuario_model = Usuario()
+    usuario_model.update_one(
+        {"mail": current_user.email},
+        {"$set": {"selected_badge": badge_image}}
+    )
+    
+    return jsonify({"status": "ok", "message": "Insignia seleccionada con éxito"})
 
 @bp.route('/client-tag', methods=['POST'])
 @login_required
@@ -553,59 +655,56 @@ def client_report(id=None):
 
     pipeline = [
         {
-            "$match": {
-                **match_filter, # desempaquetamos el diccionario
-                "texto.tag": {"$regex": PATRON_REGEX}
-            }
+            "$match": match_filter # Primero filtramos por usuario (TODA la actividad)
         },
         {
             "$facet": {
-                # ── Estadísticas básicas ──────────────────────────
+                # ── CONTEO TOTAL REAL (Para insignias) ────────────────
+                "total_temp": [{"$count": "valor"}],
+
+                # ── ESTADÍSTICAS BASADAS EN TAGS CIENTÍFICOS ──────────
                 "tags": [
+                    {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}}
                 ],
-                "total_temp": [
-                    {"$count": "valor"}
-                ],
-
-                # ── Últimas grabadas ──────────────────────────────
                 "ultimas_grabadas": [
+                    {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$sort": {"fecha": -1}},
                     {"$limit": 5},
                     {"$project": {"_id": 0, "tag": "$texto.tag"}}
                 ],
                 "ultimos_fonemas": [
+                    {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$sort": {"fecha": -1}},
                     {"$limit": 5},
                     {"$project": {"_id": 0, "fonema": _extract_fonema}}
                 ],
-
-                # ── Top 5 tags ────────────────────────────────────
                 "mas_grabadas": [
+                    {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}},
                     {"$sort": {"cantidad": -1}},
                     {"$limit": 5}
                 ],
                 "menos_grabadas": [
+                    {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$group": {"_id": "$texto.tag", "cantidad": {"$sum": 1}}},
                     {"$sort": {"cantidad": 1}},
                     {"$limit": 5}
                 ],
-
-                # ── Top 5 fonemas ─────────────────────────────────
                 "fonemas_mas_grabados": [
+                    {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$group": {"_id": _extract_fonema, "cantidad": {"$sum": 1}}},
                     {"$sort": {"cantidad": -1}},
                     {"$limit": 5}
                 ],
                 "fonemas_menos_grabados": [
+                    {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$group": {"_id": _extract_fonema, "cantidad": {"$sum": 1}}},
                     {"$sort": {"cantidad": 1}},
                     {"$limit": 5}
                 ],
-
-                # ── Fonemas únicos ────────────────────────────────
                 "conteo_fonemas_unicos": [
+                    {"$match": {"texto.tag": {"$regex": PATRON_REGEX}}},
                     {"$group": {"_id": _extract_fonema}},
                     {"$count": "total"}
                 ]
@@ -647,6 +746,21 @@ def client_report(id=None):
     temp_dict = {item["_id"]: item["cantidad"] for item in audios_por_categoria}
     audios_por_categoria = dict(sorted(temp_dict.items(), key=lambda x: x[1], reverse=True))
 
+    # Insignias para el informe
+    badges_info = []
+    next_badge = None
+    for b in BADGES_THRESHOLDS:
+        unlocked = total_audios >= b["limit"]
+        badges_info.append({
+            "name": b["name"],
+            "limit": b["limit"],
+            "image": b["image"],
+            "unlocked": unlocked,
+            "is_selected": getattr(current_user, 'selected_badge', None) == b["image"]
+        })
+        if not unlocked and not next_badge:
+            next_badge = b
+
     return render_template(
         url,
         total_audios=total_audios,
@@ -660,5 +774,7 @@ def client_report(id=None):
         ultimos_fonemas=ultimos_fonemas,
         fonemas_mas_grabados=fonemas_mas_grabados,
         fonemas_menos_grabados=fonemas_menos_grabados,
-        total_fonemas_unicos=total_fonemas_unicos
+        total_fonemas_unicos=total_fonemas_unicos,
+        badges_info=badges_info,
+        next_badge=next_badge
     )

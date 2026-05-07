@@ -11,9 +11,11 @@ const speedButtonsContainer = document.querySelector('.speed-buttons');
 const speedButtons = document.querySelectorAll('.speed-button');
 //fin botones audio
 
+let mediaRecorder; // DECLARACIÓN EXPLICITAMENTE NECESARIA
+
 let audioChunks = [];
 let generalBlob = '';
-const canvasCtx = canvas.getContext('2d');
+const canvasCtx = canvas ? canvas.getContext('2d') : null;
 let audioCtx;
 let duration;
 
@@ -38,23 +40,25 @@ function handlerFunction(stream) {
             generalBlob = blob;
 
             //botones audio //Mostrar los botones una vez se grabe el audio y funcionen
-            speedButtonsContainer.style.display = 'flex';
-            speedButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const speedFactor = parseFloat(button.dataset.speed); // Obtener la velocidad desde el atributo 'data-speed'
-                    recordedAudio.playbackRate = speedFactor;
-                  });
-            })
+            if (speedButtonsContainer) { // SEGURIDAD: Solo si existe el contenedor
+                speedButtonsContainer.style.display = 'flex';
+                speedButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const speedFactor = parseFloat(button.dataset.speed); // Obtener la velocidad desde el atributo 'data-speed'
+                        recordedAudio.playbackRate = speedFactor;
+                    });
+                });
+            }
             //fin botones audio
         }
     });
 }
 
-recordButton.addEventListener('click', () => {
+const startRecording = () => {
     if (mediaRecorder.state === 'inactive') {
         // --- COMIENZO DEL PARCHE PARA SAFARI/iOS ---
         if (!audioCtx) {
-            audioCtx = new AudioContext();
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
         // REANUDAR: Si el contexto está suspendido (típico en iOS), lo reanudamos
         if (audioCtx.state === 'suspended' && audioCtx.resume) {
@@ -67,21 +71,44 @@ recordButton.addEventListener('click', () => {
         // --- FIN DEL PARCHE PARA SAFARI/iOS ---
 
         console.log('Recording started.');
-        $sendButton.hide();
+        if ($sendButton) $sendButton.hide();
         recordButton.classList.add('recording');
-        canvas.style.display = 'block';
+        if (canvas) canvas.style.display = 'block';
         recordedAudio.controls = false;
         audioChunks = [];
         mediaRecorder.start();
         duration = new Date();
     } else if (mediaRecorder.state === 'recording') {
-        canvas.style.display = 'none';
+        if (canvas) canvas.style.display = 'none';
         console.log('Recording stopped.');
         recordButton.classList.remove('recording');
-        $sendButton.show();
+        if ($sendButton) $sendButton.show();
         mediaRecorder.stop();
         duration = parseInt((new Date() - duration) / 1000);
     }
+};
+
+recordButton.addEventListener('click', () => {
+    if (!mediaRecorder) {
+        console.log("Intentando inicializar micrófono al hacer clic...");
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                handlerFunction(stream);
+                currentStream = stream;
+                // Una vez inicializado, empezamos a grabar
+                startRecording();
+            })
+            .catch(err => {
+                console.error("Error al acceder al micrófono:", err);
+                swal({
+                    title: "Error de Micrófono",
+                    text: "No se pudo acceder al micrófono. Por favor, asegúrate de dar permisos y de que tu navegador sea compatible.",
+                    icon: "error"
+                });
+            });
+        return;
+    }
+    startRecording();
 });
 
 $sendButton.on('click', () => {
@@ -135,7 +162,11 @@ $sendButton.on('click', () => {
         let icon = data.status === 'ok' ? 'success' : 'error';
         let text = '';
 
-        if (data.daily_goal_reached) {
+        if (data.new_badge) {
+            title = "¡Nueva Insignia: " + data.new_badge.name + "! 🏅";
+            text = "¡Enhorabuena! Has alcanzado los " + data.new_badge.limit + " audios.";
+            icon = "success";
+        } else if (data.daily_goal_reached) {
             title = "¡Objetivo Diario Cumplido! 🎉";
             text = "¡Has completado tus " + data.daily_progress + " audios de hoy! Excelente trabajo.";
             icon = "success";
@@ -185,6 +216,7 @@ function visualize(stream) {
     draw();
 
     function draw() {
+        if (!canvas || !canvasCtx) return;
         const WIDTH = canvas.width;
         const HEIGHT = canvas.height;
 

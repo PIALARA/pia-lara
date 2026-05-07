@@ -18,9 +18,9 @@
           {% set percentage = (audios_today / daily_goal * 100) if daily_goal > 0 else 100 %}
           <div
             class="progress-bar progress-bar-striped progress-bar-animated {% if audios_today >= daily_goal %}bg-success{% else %}bg-primary{% endif %}"
-            role="progressbar" style="width: {{ percentage }}%;" aria-valuenow="{{ audios_today }}" aria-valuemin="0"
-            aria-valuemax="{{ daily_goal }}">
-            {{ percentage | int }}%
+            role="progressbar" style="width: {{ percentage|default(0)|int }}%;" aria-valuenow="{{ audios_today|default(0) }}" aria-valuemin="0"
+            aria-valuemax="{{ daily_goal|default(0) }}">
+            {{ (percentage|default(0))|int }}%
           </div>
         </div>
         {% if audios_today >= daily_goal %}
@@ -33,6 +33,12 @@
   </div>
 </div>
 {% endif %}
+
+<style>
+  .grayscale { filter: grayscale(100%); }
+  .badge-item { border-radius: 12px; transition: background-color 0.2s; }
+  .badge-item:hover { background-color: rgba(0,0,0,0.02); }
+</style>
 
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}

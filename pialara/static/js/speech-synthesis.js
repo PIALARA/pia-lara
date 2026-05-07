@@ -47,6 +47,7 @@ window.speechSynthesis.onvoiceschanged = () => {
 
   // Recogemos elemento select
   const elemVoiceSelect = document.querySelector('.voice-select');
+  if (!elemVoiceSelect) return; // SEGURIDAD: Si no hay selector de voz, no hacemos nada
 
   elemVoiceSelect.innerHTML = html;
 
@@ -69,10 +70,12 @@ if (speechSynthesis.getVoices().length > 0) {
 
 
 audio.addEventListener('end', () => {
-  playButton.classList.replace('btn-danger', 'btn-warning');
-  playButton.innerHTML = `
-    <span><i class="bi bi-ear me-2"></i></span>
-    <span>Escuchar</span>`;
+  if (playButton) {
+    playButton.classList.replace('btn-danger', 'btn-warning');
+    playButton.innerHTML = `
+      <span><i class="bi bi-ear me-2"></i></span>
+      <span>Escuchar</span>`;
+  }
 });
 
 console.log('Entro sistesis1:',playButton);
@@ -100,13 +103,15 @@ if(playButton != null)
       
     }
     //botones audio //ajustes botones cuando le doy a escuchar
-    speedButtonsContainer.style.display = 'flex';
-    speedButtons.forEach(button => {
-      button.addEventListener('click', () => {
-          const speedFactor = parseFloat(button.dataset.speed); // Obtener la velocidad desde el atributo 'data-speed'
-          audio.rate = speedFactor;
+    if (speedButtonsContainer) { // SEGURIDAD
+        speedButtonsContainer.style.display = 'flex';
+        speedButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const speedFactor = parseFloat(button.dataset.speed); // Obtener la velocidad desde el atributo 'data-speed'
+                audio.rate = speedFactor;
+            });
         });
-    })
+    }
     //fin botones audio
   });
 }
