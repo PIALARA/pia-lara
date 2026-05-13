@@ -1,48 +1,102 @@
 # PIA LARA
 
-## Instalación
+## Instalación y Configuración del Entorno
 
-**Consideraciones**: Uso los comandos `python3` y `pip3` por que es como lo tengo configurado en mi sistema. Cada uno tendrá que saber cuál utilizar (`python` vs. `python3` / `pip` vs. `pip3`) según el entorno de cada uno.
+El proyecto ahora utiliza [uv](https://docs.astral.sh/uv/) como gestor de paquetes. La configuración del proyecto, junto con sus dependencias, está declarada de forma estandarizada en el archivo `pyproject.toml`. Además, usamos un archivo `.python-version` para fijar la versión de Python del proyecto (por ejemplo, `3.12`).
 
-Clonar el repositorio 
+### 1. Instalar uv
 
-```
+Si aún no tienes `uv` instalado en tu sistema, puedes hacerlo con los siguientes comandos:
+
+- **Linux y macOS**:
+  ```bash
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  ```
+
+- **Windows**:
+  ```powershell
+  powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+  ```
+
+### 2. Clonar el repositorio
+
+```bash
 git clone git@github.com:PIALARA/pia-lara.git
+cd pia-lara
 ```
 
-Dentro del directorio del repositorio, crear el entorno virtual:
+### 3. Gestión del entorno y dependencias
 
-```
-python3 -m venv venv
-```
+Existen dos formas de trabajar con el proyecto, dependiendo de tus necesidades:
 
-Y activar el entorno virtual (aquí ya cada uno según Windows, Linux o Mac tendrá que seguir el procedimiento que se explicó en clase), por ejemplo, para Linux/Mac haríamos:
+#### A. Enfoque moderno (Recomendado)
 
-``` bash
-source venv/bin/activate
-```
+Con `uv`, no necesitas crear ni activar el entorno virtual a mano. El siguiente comando creará automáticamente el entorno virtual (`.venv`), instalará o descargará la versión correcta de Python (basada en el archivo `.python-version`) e instalará todas las dependencias listadas en el `pyproject.toml`:
 
-**Nota**: El directorio `venv` está puesto en el `.gitignore` para que no se suba al repositorio. Si lo llamáis de otra forma, agregadlo al `.gitignore`
-
-Instalamos los requerimientos
-
-``` bash
-pip3 install -r requirements.txt
+```bash
+uv sync
 ```
 
-Nota: Si cuando actualicemos *master* tenemos actualizaciones en los requerimientos, hay que actualizarlos:
+Para gestionar dependencias en el futuro:
+- **Añadir una dependencia:** `uv add <nombre_paquete>`
+- **Eliminar una dependencia:** `uv remove <nombre_paquete>`
 
-``` bash
-pip3 install --upgrade --force-reinstall -r requirements.txt
+Para ejecutar Flask en este entorno:
+```bash
+uv run flask --app pialara --debug run
 ```
 
-Y finalmente ejecutamos Flask:
+#### B. Enfoque tradicional
 
-``` bash
+Si necesitas exportar las herramientas o usar el flujo más tradicional, puedes compilar el `pyproject.toml` en un `requirements.txt` usando `uv`:
+
+```bash
+uv pip compile pyproject.toml -o requirements.txt
+```
+
+Luego, puedes crear un entorno virtual e instalar las dependencias compuestas desde ese archivo:
+
+```bash
+uv venv
+source .venv/bin/activate  # En Linux/Mac
+# En Windows: .\.venv\Scripts\activate
+
+uv pip install -r requirements.txt
+```
+
+Y ejecutar Flask en el entorno virtual activo:
+```bash
 flask --app pialara --debug run
 ```
 
-### Migraciones
+## Herramientas de Desarrollo (Ruff)
+
+El proyecto incluye **Ruff**, un linter y formateador de código extremadamente rápido. La configuración reside en el `pyproject.toml`. 
+
+Comandos útiles para la calidad de código:
+
+- **Comprobar errores** en el código (Linter):
+  ```bash
+  uv run ruff check .
+  ```
+- **Corregir errores automáticamente** (siempre que sea posible):
+  ```bash
+  uv run ruff check --fix .
+  ```
+- **Formatear el código**:
+  ```bash
+  uv run ruff format .
+  ```
+
+### Integración Continua (CI) con GitHub Actions
+
+Se ha implementado un *workflow* de GitHub Actions (`.github/workflows/ruff.yml`) para asegurar la calidad del código. Cada vez que se realiza un *push* o se abre una *pull request* hacia las ramas `master` o `develop`, GitHub ejecutará automáticamente Ruff para comprobar:
+1. Que no haya errores de linting (`ruff check`).
+2. Que el código cumpla enteramente con el formato del proyecto (`ruff format --check`).
+
+Si tu código no está correctamente formateado antes de subirlo, los checks de GitHub Actions fallarán. ¡Recuerda pasar siempre los comandos locales antes de hacer tus *commits*!
+
+## Migraciones
 
 Para ejecutar las migraciones, una vez activado el entorno virtual, desde el raíz, ejecutaremos el script adecuado:
 
