@@ -18,7 +18,13 @@ def login():
 @bp.route("/login", methods=["POST"])
 def login_post():
     email = request.form.get("email")
+    if not email:
+        flash("El correo no puede estar vacío", "danger")
+        return redirect(url_for("auth.login"))
     password = request.form.get("password")
+    if not password:
+        flash("La contraseña no puede estar vacía", "danger")
+        return redirect(url_for("auth.login"))
     remember = True if request.form.get("remember") else False
 
     user = db.get_user(email)
@@ -53,7 +59,13 @@ def email_rec_password():
 def info_rec_password():
     if request.method == "POST":
         email = request.form.get("email")
+        if not email:
+            flash("El correo no puede estar vacío", "danger")
+            return redirect(url_for("auth.email_rec_password"))
         nombre = request.form.get("nombre")
+        if not nombre:
+            flash("El nombre no puede estar vacío", "danger")
+            return redirect(url_for("auth.email_rec_password"))
 
         user = db.get_user(email)
 
@@ -79,6 +91,9 @@ def rec_password():
     if request.method == "POST":
         new_password = request.form.get("new_password")
         confirm_password = request.form.get("confirm_password")
+        if not new_password or not confirm_password:
+            flash("Las contraseñas no pueden estar vacías", "danger")
+            return redirect(url_for("auth.info_rec_password"))
 
         # Validacion para las contraseñas, tienen que coincidir
         if new_password != confirm_password:

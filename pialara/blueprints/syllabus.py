@@ -112,7 +112,7 @@ def index():
             }
         )
 
-    pipeline = [{"$match": match_filter}]
+    pipeline: list[dict] = [{"$match": match_filter}]
 
     # Empieza modificacion
     PER_PAGE = 9
@@ -126,7 +126,7 @@ def index():
     total_pages = math.ceil(total / PER_PAGE)
     skip = (current_page - 1) * PER_PAGE
 
-    pipeline += [{"$skip": skip}, {"$limit": PER_PAGE}]
+    pipeline.extend([{"$skip": skip}, {"$limit": PER_PAGE}])
     print(pipeline)
     documentos = syllabus.aggregate(pipeline)
 
@@ -204,6 +204,12 @@ def create_post():
     # Obtener los datos del formulario
     text = request.form.get("ftext")
     tags = request.form.get("ftags")
+    if not text or text.strip() == "":
+        flash("El campo de texto no puede estar vacío.", "danger")
+        return redirect(url_for("syllabus.create"))
+    if not tags or tags.strip() == "":
+        flash("El campo de etiquetas no puede estar vacío.", "danger")
+        return redirect(url_for("syllabus.create"))
 
     # Obtener los datos del usuario
     usuario = Usuario()
@@ -252,6 +258,9 @@ def create_iterable_post():
         return redirect(url_for("syllabus.create_iterable"))
 
     qtyPhrases = request.form.get("qtyPhrases")
+    if not qtyPhrases or qtyPhrases.strip() == "" or not qtyPhrases.isdigit():
+        flash("El campo de cantidad de frases no puede estar vacío y debe ser un número.", "danger")
+        return redirect(url_for("syllabus.create_iterable"))
 
     # Recogemos todas las frases del formulario
     lista_frases = []
@@ -339,7 +348,13 @@ def update(id):
 def update_post(id):
     # Obtener los datos del formulario
     text = request.form.get("ftext")
+    if not text or text.strip() == "":
+        flash("El campo de texto no puede estar vacío.", "danger")
+        return redirect(url_for("syllabus.update", id=id))
     tags = request.form.get("ftags")
+    if not tags or tags.strip() == "":
+        flash("El campo de etiquetas no puede estar vacío.", "danger")
+        return redirect(url_for("syllabus.update", id=id))
     fraseID = id
 
     # Obtener los datos del usuario

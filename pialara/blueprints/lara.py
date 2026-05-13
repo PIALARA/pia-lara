@@ -2,7 +2,7 @@ import os
 import uuid
 from datetime import datetime
 
-from flask import Blueprint, current_app, render_template, request
+from flask import Blueprint, current_app, jsonify, render_template, request
 from gradio_client import Client, file
 
 from pialara.models.Survey import Survey
@@ -34,12 +34,14 @@ def save_record():
         audio=file(RUTA_AUDIO + "/" + name_audio), modelo=modelo, api_name="/predict"
     )
 
-    return {"status": "ok", "text": transcription}
+    return jsonify({"status": "ok", "text": transcription})
 
 
 @bp.route("/lara/send_survey", methods=["POST"])
 def send_survey():
     survey = Survey()
+    if request.json is None:
+        return jsonify({"status": "error", "message": "Cuerpo JSON inválido"}), 400
     data = request.json
     emotion = data.get("emotion")
 
@@ -47,4 +49,4 @@ def send_survey():
 
     survey.insert_one(newSurvey)
 
-    return {"status": "ok"}
+    return jsonify({"status": "ok"})

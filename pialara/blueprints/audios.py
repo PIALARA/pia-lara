@@ -59,6 +59,8 @@ def inject_badges():
     # mostramos la mejor disponible
     if not current_badge:
         for b in reversed(BADGES_THRESHOLDS):
+            if not isinstance(b["limit"], int):
+                continue  # Saltar si el límite no es un número válido
             if total_count >= b["limit"]:
                 current_badge = b
                 break
@@ -352,7 +354,7 @@ def client_text():
 @login_required
 def save_record():
     # file = request.files["file"]
-    duration = request.form.get("duration")
+    duration = request.form.get("duration") or "0"
 
     # print(duration)
     # # Hemos pensado en guardar timestamp + id de usuario.
@@ -371,15 +373,16 @@ def save_record():
     if text_id:
         # es un texto que proviene de una etiqueta
         regex = re.compile(r"^(\d{1,3})([a-zA-Z]+)([1-3])$")
-        match = regex.match(text_tag)
-        if match:
-            num1, fonema, pos = match.groups()
+        if text_tag:
+            match = regex.match(text_tag)
+            if match:
+                num1, fonema, pos = match.groups()
 
-            metadataOb = {  # guardamos metadatos del tag para facilitar entrenamiento
-                "tipo_frase": "frase larga" if int(num1) > 100 else "frase corta",
-                "fonema": fonema.upper(),
-                "posicion_lengua": {"1": "abajo", "2": "medio", "3": "arriba"}[pos],
-            }
+                metadataOb = {  # guardamos metadatos del tag para facilitar entrenamiento
+                    "tipo_frase": "frase larga" if int(num1) > 100 else "frase corta",
+                    "fonema": fonema.upper(),
+                    "posicion_lengua": {"1": "abajo", "2": "medio", "3": "arriba"}[pos],
+                }
     else:
         # si no tiene text_id, es un texto grabado por el usuario
         # primero, guardamos el nuevo texto y obtenemos un id
@@ -475,6 +478,8 @@ def save_record():
 @bp.route("/select-badge", methods=["POST"])
 @login_required
 def select_badge():
+    if request.json is None:
+        return jsonify({"status": "error", "message": "Cuerpo JSON inválido"}), 400
     badge_image = request.json.get("badge_image")
     if not badge_image:
         return jsonify({"status": "error", "message": "Falta la imagen de la insignia"}), 400
@@ -490,6 +495,8 @@ def select_badge():
 
     is_unlocked = False
     for b in BADGES_THRESHOLDS:
+        if not isinstance(b["limit"], int):
+            continue  # Saltar si el límite no es un número válido
         if b["image"] == badge_image and total_count >= b["limit"]:
             is_unlocked = True
             break
@@ -511,7 +518,7 @@ def tag_search():
     tag_name = request.form.get("tagName")
     syllabus = Syllabus()
 
-    if tag_name == "":
+    if tag_name == "" or tag_name is None:
         return redirect(url_for("audios.client_tag"))
 
     pipeline = [

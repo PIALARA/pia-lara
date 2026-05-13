@@ -153,7 +153,7 @@ def create_post():
 
     user = Usuario()
 
-    if pass1 != pass2:
+    if not pass1 or not pass2 or pass1 != pass2:
         flash("Las contraseñas no son iguales", "danger")
         return render_template("users/create.html")
 
@@ -312,7 +312,7 @@ def update_tech_post(id):
     usu = Usuario()
     tecnico = request.form.get("tecnico")
 
-    if len(tecnico) != 24:
+    if not tecnico or len(tecnico) != 24:
         flash("Error localizando al técnico. Id inexistente.", "danger")
         return redirect(url_for("users.index"))
 
@@ -609,12 +609,12 @@ def update_pass_post(id):
     repeat_pass = request.form.get("repeat-pass")
 
     # Comprobar Password usuario
-    if not check_password_hash(logged_user.password, user_logged_pass):
+    if not user_logged_pass or not check_password_hash(logged_user.password, user_logged_pass):
         flash("Su contraseña no es correcta", "danger")
         return redirect(url_for("users.update_pass_post", id=id))
 
     # Comprobar nueva Password
-    if new_pass != repeat_pass:
+    if not new_pass or not repeat_pass or new_pass != repeat_pass:
         flash("Las contraseñas no son iguales", "danger")
         return redirect(url_for("users.update_pass_post", id=id))
 
