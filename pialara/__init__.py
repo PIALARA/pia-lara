@@ -2,7 +2,10 @@ import configparser
 import os
 
 from flask import Flask
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from flask_login import LoginManager
+from flask_principal import Principal
 
 from pialara import db
 
@@ -30,6 +33,12 @@ def create_app():
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"
     login_manager.init_app(app)
+
+    limiter = Limiter(key_func=get_remote_address)
+    limiter.init_app(app)
+
+    principals = Principal()
+    principals.init_app(app)
 
     # Blueprints
     from pialara.blueprints import audios, auth, lara, main, syllabus, users
