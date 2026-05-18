@@ -31,7 +31,7 @@ def get_db():
 db = LocalProxy(get_db)
 
 
-def get_user_by_id(id):
+def get_user_by_id(id) -> User | None:
     """
     Devuelve un objeto User a partir de su id
     """
@@ -51,10 +51,11 @@ def get_user_by_id(id):
         )
         return usuario_obj
     except Exception as e:
-        return e
+        print("Se ha producido un error", e)
+        return None
 
 
-def get_user(email):
+def get_user(email) -> User | None:
     """
     Devuelve un objeto User
     Método a emplear en el login
@@ -92,7 +93,7 @@ def update_ultima_conexion(email):
         db.usuarios.update_one({"mail": email}, {"$set": {"ultima_conexion": datetime.now()}})
     except Exception as e:
         print("Se ha producido un error", e)
-        return None
+        raise e
 
 
 def update_password(email, hashed_password):
@@ -111,3 +112,4 @@ def update_password(email, hashed_password):
 
     except Exception as e:
         print("Error al actualizar la contraseña:", e)
+        raise e
