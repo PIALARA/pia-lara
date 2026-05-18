@@ -10,6 +10,7 @@ from flask import (
     session,
     url_for,
 )
+from flask_limiter.util import get_remote_address
 from flask_login import current_user as flask_current_user
 from flask_login import login_required, login_user, logout_user
 from flask_principal import (
@@ -22,7 +23,7 @@ from werkzeug.security import (
     generate_password_hash,  # Haseo de la contraseña
 )
 
-from pialara import db
+from pialara import db, limiter
 from pialara.models.User import User
 
 current_user: User = cast(User, flask_current_user)
@@ -37,7 +38,13 @@ def login():
     return render_template("auth/login.html")
 
 
+def limit_por_usuario():
+    return request.form.get("email") or get_remote_address()
+
+
 @bp.route("/login", methods=["POST"])
+@limiter.limit("5 per minute", key_func=limit_por_usuario)
+@limiter.limit("20 per minute")
 def login_post():
     if current_user.is_authenticated:
         return redirect(url_for("users.index"))

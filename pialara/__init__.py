@@ -2,17 +2,24 @@ import configparser
 import os
 from typing import cast
 
-from flask import Flask, redirect, url_for
+from flask import Flask, jsonify, redirect, url_for
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_login import LoginManager
 from flask_login import current_user as flask_current_user
 from flask_principal import Principal, RoleNeed, UserNeed, identity_loaded
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from pialara import db
 from pialara.models.User import User
 
 current_user = cast(User, flask_current_user)
+
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://",  # Para producción: "redis://localhost:6379" (necesario redis)
+)
 
 
 def create_app():
@@ -35,11 +42,16 @@ def create_app():
 
     app.config["GRADIO_URL"] = config["LOCAL"]["GRADIO_URL"]
 
+    # Aplicar Proxy Fix para que Flask reconozca correctamente la IP del cliente y el esquema
+    # (http/https) cuando se ejecuta detrás de un proxy inverso como Nginx o Cloudflare
+    # x_for=1 significa que confías en el ÚLTIMO proxy de la cadena
+    # (el Nginx o Cloudflare directamente delante de Flask)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)  # type: ignore
+
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"
     login_manager.init_app(app)
 
-    limiter = Limiter(key_func=get_remote_address)
     limiter.init_app(app)
 
     principals = Principal()
@@ -77,5 +89,11 @@ def create_app():
         if not current_user.is_authenticated:
             return redirect(url_for("auth.login"))
         return redirect(url_for("users.index"))
+
+    @app.errorhandler(429)
+    def ratelimit_handler(e):
+        return jsonify(
+            error="Demasiadas solicitudes. Por favor, inténtalo de nuevo más tarde."
+        ), 429
 
     return app
