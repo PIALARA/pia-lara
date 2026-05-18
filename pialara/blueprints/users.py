@@ -156,7 +156,15 @@ def create_post():
 
     user = Usuario()
 
-    if not pass1 or not pass2 or pass1 != pass2:
+    if not pass1 or not pass2:
+        flash("Las contraseñas no pueden estar vacías", "danger")
+        return render_template("users/create.html")
+
+    if len(pass1) < 8:
+        flash("La contraseña debe tener al menos 8 caracteres", "danger")
+        return render_template("users/create.html")
+
+    if pass1 != pass2:
         flash("Las contraseñas no son iguales", "danger")
         return render_template("users/create.html")
 
@@ -629,7 +637,15 @@ def update_pass_post(id):
         return redirect(url_for("users.update_pass_post", id=id))
 
     # Comprobar nueva Password
-    if not new_pass or not repeat_pass or new_pass != repeat_pass:
+    if not new_pass or not repeat_pass:
+        flash("Las contraseñas no pueden estar vacías", "danger")
+        return redirect(url_for("users.update_pass_post", id=id))
+
+    if len(new_pass) < 8:
+        flash("La nueva contraseña debe tener al menos 8 caracteres", "danger")
+        return redirect(url_for("users.update_pass_post", id=id))
+
+    if new_pass != repeat_pass:
         flash("Las contraseñas no son iguales", "danger")
         return redirect(url_for("users.update_pass_post", id=id))
 

@@ -130,6 +130,11 @@ def rec_password():
             flash("Las contraseñas no pueden estar vacías", "danger")
             return redirect(url_for("auth.info_rec_password"))
 
+        # Validacion de longitud
+        if len(new_password) < 8:
+            flash("La nueva contraseña debe tener al menos 8 caracteres", "danger")
+            return redirect(url_for("auth.info_rec_password"))
+
         # Validacion para las contraseñas, tienen que coincidir
         if new_password != confirm_password:
             flash("Las contraseñas no coinciden", "danger")
