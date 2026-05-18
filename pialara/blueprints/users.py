@@ -344,10 +344,18 @@ def update_tech_post(id):
     return redirect(url_for("users.index"))
 
 
+@bp.route("/update", defaults={"id": None}, methods=["GET"])
 @bp.route("/update/<id>", methods=["GET"])
 @login_required
-def update(id):
+def update(id: str | None):
+    if not id:
+        id = str(current_user.id)
+
     usu = Usuario()
+
+    if current_user.rol != "admin" and current_user.rol != "tecnico" and str(current_user.id) != id:
+        flash("No tienes permiso para editar este usuario", "danger")
+        return redirect(url_for("users.index"))
 
     # Usuario a actualizar
     usuario = usu.find_one({"_id": ObjectId(id)})
@@ -423,9 +431,13 @@ def update(id):
 
 
 # Actualiza datos de usuarios - POST
+@bp.route("/update", defaults={"id": None}, methods=["POST"])
 @bp.route("/update/<id>", methods=["POST"])
 @login_required
-def update_post(id):
+def update_post(id: str | None):
+    if not id:
+        id = str(current_user.id)
+
     usu = Usuario()
     usuario_db = usu.find_one({"_id": ObjectId(id)})
 
