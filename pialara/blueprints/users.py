@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import cast
 
 import pymongo
 from bson.objectid import ObjectId
@@ -11,29 +12,31 @@ from flask import (
     session,
     url_for,
 )
-from flask_login import current_user, login_required
+from flask_login import current_user as flask_current_user
+from flask_login import login_required
 from pymongo.errors import PyMongoError
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from pialara.decorators import rol_required
 from pialara.models.Disfonias import Disfonias
 from pialara.models.Enfermedades import Enfermedades
+from pialara.models.User import User
 from pialara.models.Usuario import Usuario
+from pialara.permissions import admin_o_tecnico
+
+current_user: User = cast(User, flask_current_user)
 
 bp = Blueprint("users", __name__, url_prefix="/users")
 
 
 @bp.route("/")
 @login_required
-@rol_required(["admin", "tecnico", "cliente"])
 def index():
-    # mostrar_inactivos=request.form.get("mostrar_inactivos")
-    mostrar_inactivos = request.args.get("mostrar_inactivos") == "true"
-    u = Usuario()
-
-    users = []
     logged_rol = current_user.rol
     url = "users/index.html"
+
+    users = []
+    mostrar_inactivos = request.args.get("mostrar_inactivos") == "true"
+    u = Usuario()
 
     if logged_rol == "admin":
         # users = u.find({"activo":True}).sort([("rol", pymongo.ASCENDING), ("nombre", pymongo.ASCENDING)])  # noqa: E501
@@ -73,7 +76,7 @@ def index():
 
 @bp.route("/", methods=["POST"])
 @login_required
-@rol_required(["admin", "tecnico"])
+@admin_o_tecnico.require(http_exception=403)
 def search_user():
     user_name = request.form.get("userName")
     u = Usuario()
@@ -97,7 +100,7 @@ def search_user():
 
 @bp.route("/create")
 @login_required
-@rol_required(["admin", "tecnico"])
+@admin_o_tecnico.require(http_exception=403)
 def create():
     # u = Usuario()
     logged_rol = current_user.rol
@@ -115,7 +118,7 @@ def create():
 
 @bp.route("/create", methods=["POST"])
 @login_required
-@rol_required(["admin", "tecnico"])
+@admin_o_tecnico.require(http_exception=403)
 def create_post():
     nombreAdmin = request.form.get("nombre_admin")
     emailAdmin = request.form.get("email_admin")
@@ -437,7 +440,7 @@ def update_post(id):
 
     activo = True if request.form.get("activo") else False
 
-    rol_editor = getattr(current_user, "rol", None)
+    rol_editor = current_user.rol
     puede_editar_restringido = rol_editor in ("admin", "tecnico")
 
     # ========== SCHEMA VERSION 2 ==========

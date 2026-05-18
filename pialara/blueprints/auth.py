@@ -1,22 +1,47 @@
-from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+from typing import cast
+
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
+from flask_login import current_user as flask_current_user
 from flask_login import login_required, login_user, logout_user
+from flask_principal import (
+    AnonymousIdentity,
+    Identity,
+    identity_changed,
+)
 from werkzeug.security import (
     check_password_hash,
     generate_password_hash,  # Haseo de la contraseña
 )
 
 from pialara import db
+from pialara.models.User import User
+
+current_user: User = cast(User, flask_current_user)
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
 @bp.route("/login")
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for("users.index"))
     return render_template("auth/login.html")
 
 
 @bp.route("/login", methods=["POST"])
 def login_post():
+    if current_user.is_authenticated:
+        return redirect(url_for("users.index"))
+
     email = request.form.get("email")
     if not email:
         flash("El correo no puede estar vacío", "danger")
@@ -37,6 +62,9 @@ def login_post():
 
     # marcamos al usuario como autenticado en flask_login
     login_user(user, remember=remember)
+
+    # actualizamos la identidad del usuario para flask_principal
+    identity_changed.send(current_app, identity=Identity(user.get_id()))
 
     # le cambiamos la fecha de la última conexión
     db.update_ultima_conexion(email)
@@ -127,5 +155,6 @@ def rec_password():
 def logout():
     session.pop("font_size", None)
     logout_user()
+    identity_changed.send(current_app, identity=AnonymousIdentity())
     flash("Sesión cerrada con éxito", "success")
     return redirect(url_for("auth.login"))

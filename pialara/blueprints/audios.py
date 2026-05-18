@@ -1,6 +1,7 @@
 import random
 import re
 from datetime import datetime, timedelta
+from typing import cast
 
 from bson import ObjectId  # Asegúrate de importar ObjectId desde bson
 from flask import (
@@ -13,15 +14,18 @@ from flask import (
     session,
     url_for,
 )
-from flask_login import current_user, login_required
+from flask_login import current_user as flask_current_user
+from flask_login import login_required
 
 from pialara.blueprints.syllabus import _get_frase_sugerida, _get_momento_dia
-from pialara.decorators import rol_required
 from pialara.models.Audios import Audios
 from pialara.models.Clicks import Clicks
 from pialara.models.Frases import Frases
 from pialara.models.Syllabus import Syllabus
+from pialara.models.User import User
 from pialara.models.Usuario import Usuario
+
+current_user: User = cast(User, flask_current_user)
 
 bp = Blueprint("audios", __name__, url_prefix="/audios")
 BADGES_THRESHOLDS = [
@@ -47,11 +51,11 @@ def inject_badges():
     current_badge = None
 
     # Si el usuario tiene una insignia seleccionada, intentamos usar esa
-    selected_image = getattr(current_user, "selected_badge", None)
+    selected_badge = current_user.selected_badge
 
-    if selected_image:
+    if selected_badge:
         for b in BADGES_THRESHOLDS:
-            if b["image"] == selected_image:
+            if b["image"] == selected_badge:
                 current_badge = b
                 break
 
@@ -573,7 +577,6 @@ def tag_search():
 
 @bp.route("/client-report", methods=["GET"])
 @bp.route("/client-report/<id>", methods=["GET"])
-@rol_required(["admin", "tecnico", "cliente"])
 @login_required
 def client_report(id=None):
     total_audios = 0

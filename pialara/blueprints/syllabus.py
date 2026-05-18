@@ -1,13 +1,18 @@
 import math
 from datetime import datetime
+from typing import cast
 
 from bson.objectid import ObjectId
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import current_user, login_required
+from flask_login import current_user as flask_current_user
+from flask_login import login_required
 
 from pialara.models.Clicks import Clicks
 from pialara.models.Syllabus import Syllabus
+from pialara.models.User import User
 from pialara.models.Usuario import Usuario
+
+current_user = cast(User, flask_current_user)
 
 bp = Blueprint("syllabus", __name__, url_prefix="/syllabus")
 
