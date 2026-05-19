@@ -18,6 +18,8 @@ let generalBlob = '';
 const canvasCtx = canvas ? canvas.getContext('2d') : null;
 let audioCtx;
 let duration;
+let recordingTimeout;
+const RECORDING_LIMIT_MS = 60000;
 
 let currentStream; // NUEVO: Variable para guardar el stream del micrófono
 
@@ -78,7 +80,19 @@ const startRecording = () => {
         audioChunks = [];
         mediaRecorder.start();
         duration = new Date();
+
+        recordingTimeout = setTimeout(() => {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                recordButton.click();
+                swal({
+                    title: "Límite alcanzado",
+                    text: "La grabación se ha detenido por alcanzar el límite de 1 minuto.",
+                    icon: "info"
+                });
+            }
+        }, RECORDING_LIMIT_MS);
     } else if (mediaRecorder.state === 'recording') {
+        if (recordingTimeout) clearTimeout(recordingTimeout);
         if (canvas) canvas.style.display = 'none';
         console.log('Recording stopped.');
         recordButton.classList.remove('recording');
