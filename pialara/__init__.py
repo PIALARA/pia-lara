@@ -77,10 +77,8 @@ def create_app():
     def on_identity_loaded(sender, identity):
         identity.user = current_user
 
-        if hasattr(current_user, "id"):
+        if current_user.is_authenticated:
             identity.provides.add(UserNeed(current_user.get_id()))
-
-        if hasattr(current_user, "rol"):
             identity.provides.add(RoleNeed(current_user.rol))
 
     # Redirigir a la página de inicio de sesión si el usuario no tiene acceso a una página protegida
