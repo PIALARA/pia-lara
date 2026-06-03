@@ -1,1 +1,1 @@
-from pialara import app
+from pialara import app  # noqa: F401

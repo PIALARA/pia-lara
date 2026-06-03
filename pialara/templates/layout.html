@@ -65,9 +65,20 @@
             <li><a href="{{ url_for('audios.client_report') }}" class="d-block text-light p-3 border-0"><i class="bi bi-info-circle m-2 lead"></i>Informes</a></li>
             {% endif %}
             {% if current_user.rol == "cliente" %}
-            <li><a href="{{ url_for('audios.client_tag') }}" class="d-block text-light p-3 border-0 fs-5"><i class="bi bi-book m-2 lead"></i>Ver etiquetas</a></li>
-            <li><a href="{{ url_for('audios.client_text') }}" class="d-block text-light p-3 border-0 fs-5"><i class="bi bi-file-earmark-music m-2 lead"></i>Grabar mi audio</a></li>
-            <li><a href="{{ url_for('audios.client_report') }}" class="d-block text-light p-3 border-0 fs-5"><i class="bi bi-info-circle m-2 lead"></i>Informes</a></li>
+            <li><a href="{{ url_for('audios.client_tag') }}" class="d-block text-light p-3 border-0"><i class="bi bi-book m-2 lead"></i>Ver etiquetas</a></li>
+            <li><a href="{{ url_for('audios.client_text') }}" class="d-block text-light p-3 border-0"><i class="bi bi-file-earmark-music m-2 lead"></i>Grabar mi audio</a></li>
+            <li><a href="{{ url_for('audios.client_report') }}" class="d-block text-light p-3 border-0"><i class="bi bi-info-circle m-2 lead"></i>Informes</a></li>
+              {% if current_badge %}
+              <li class="text-center mt-2 mb-3">
+                <div class="d-inline-block p-2 rounded shadow-sm" style="background: rgba(255,255,255,0.1);">
+                  <img src="{{ url_for('static', filename='img/badges/' + current_badge.image) }}" 
+                      alt="{{ current_badge.name }}" 
+                      title="{{ current_badge.name }}: {{ current_badge.limit }} audios"
+                      style="height: 50px; width: auto;">
+                  <div class="small fw-bold text-white mt-1" style="font-size: 0.75rem;">{{ current_badge.name }}</div>
+                </div>
+              </li>
+              {% endif %}
             {% endif %}
           </ul>
           <div class="pb-3 text-white text-decoration-none pt-5 text-center">
@@ -107,21 +118,21 @@
             <li><a href="{{ url_for('audios.client_report') }}" class="d-block text-light p-3 border-0"><i class="bi bi-info-circle m-2 lead"></i>Informes</a></li>
             {% endif %}
             {% if current_user.rol == "cliente" %}
-            <li>
-              <ul class="nav nav-pills">
-                <li><a href="{{ url_for('audios.client_tag') }}" class="d-block text-light border-0 d-flex align-items-center gap-1 fs-5">
-                  <i class="bi bi-book m-2 lead"></i>
-                  Ver etiquetas
-                  </a>
-                  <br />
-                </li>
-                <li><a href="{{ url_for('audios.client_text') }}" class="d-block text-light border-0 d-flex align-items-center gap-1 fs-5">
-                  <i class="bi bi-file-earmark-music m-2 lead"></i>
-                  Grabar mi audio
-                </a><br /></li>
-                <li><a href="{{ url_for('audios.client_report') }}" class="d-block text-light border-0 d-flex align-items-center gap-1 fs-5"><i class="bi bi-info-circle m-2 lead"></i>Informes</a></li>
-              </ul>
-            </li>
+            <li><a href="{{ url_for('audios.client_tag') }}" class="d-block text-light p-3 border-0"><i class="bi bi-book m-2 lead"></i>Ver etiquetas</a></li>
+            <li><a href="{{ url_for('audios.client_text') }}" class="d-block text-light p-3 border-0"><i class="bi bi-file-earmark-music m-2 lead"></i>Grabar mi audio</a></li>
+            <li><a href="{{ url_for('audios.client_report') }}" class="d-block text-light p-3 border-0"><i class="bi bi-info-circle m-2 lead"></i>Informes</a></li>
+
+              {% if current_badge %}
+              <li class="text-center mt-3 mb-4 w-100 d-flex flex-column align-items-center">
+                <div class="p-2 rounded shadow-sm" style="background: rgba(255,255,255,0.1);">
+                  <img src="{{ url_for('static', filename='img/badges/' + current_badge.image) }}" 
+                      alt="{{ current_badge.name }}" 
+                      title="{{ current_badge.name }}: {{ current_badge.limit }} audios"
+                      style="height: 65px; width: auto;">
+                  <div class="small fw-bold text-white mt-1" style="font-size: 0.8rem;">{{ current_badge.name }}</div>
+                </div>
+              </li>
+              {% endif %}
             {% endif %}
           </ul>
           <div class="pb-3 text-white text-decoration-none pt-5 text-center">
@@ -135,7 +146,7 @@
               <br /><br />
             </div>
 
-            <a href="{{ url_for('users.update',id=current_user.id) }}">
+            <a href="{{ url_for('users.update') }}">
               <h6 id="user" class="text-light">{{ current_user.nombre }} /<br /><i class="bi bi-person-fill"></i> <strong>{{ current_user.rol }}</strong> </h6>
             </a>
 

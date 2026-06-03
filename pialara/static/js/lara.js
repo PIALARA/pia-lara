@@ -15,6 +15,8 @@ let audioContext;
 let analyser;
 let dataArray;
 let bufferLength;
+let recordingTimeout;
+const RECORDING_LIMIT_MS = 60000;
 
 function showStatus(message, type = 'info') {
     statusDisplay.textContent = message;
@@ -88,6 +90,13 @@ recordButton.addEventListener('click', () => {
                 recordButton.classList.add('btn-danger');
                 isRecording = true;
 
+                recordingTimeout = setTimeout(() => {
+                    if (mediaRecorder && mediaRecorder.state === 'recording') {
+                        recordButton.click();
+                        showStatus("La grabación se ha detenido automáticamente tras 1 minuto.", 'info');
+                    }
+                }, RECORDING_LIMIT_MS);
+
                 drawVisualizer();
 
                 // Deshabilitar el botón "Enviar" al comenzar una nueva grabación
@@ -106,6 +115,7 @@ recordButton.addEventListener('click', () => {
                 });
             });
     } else {
+        if (recordingTimeout) clearTimeout(recordingTimeout);
         mediaRecorder.stop();
         recordButton.textContent = "Comenzar Grabación";
         recordButton.classList.remove('btn-danger');

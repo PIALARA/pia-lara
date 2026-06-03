@@ -1,0 +1,26 @@
+name: Ruff Code Quality
+
+on:
+  push:
+    branches: [ "master", "develop" ]
+  pull_request:
+    branches: [ "master", "develop" ]
+
+jobs:
+  lint-and-format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Ejecutar Ruff Linter (Comprobación de errores)
+        uses: astral-sh/ruff-action@v3
+        with:
+          # Ejecuta 'ruff check' basándose en las reglas de pyproject.toml
+          args: 'check --output-format=github .'
+
+      - name: Ejecutar Ruff Formatter (Comprobación de formato)
+        uses: astral-sh/ruff-action@v3
+        with:
+          # Verifica si alguien olvidó formatear el código
+          args: 'format --check .'

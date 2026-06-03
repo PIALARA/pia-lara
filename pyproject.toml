@@ -1,0 +1,43 @@
+[project]
+name = "pia-lara"
+version = "1.0"
+description = "Plataforma web PIA LARA basada en IA para mejorar la autonomía comunicativa de personas con trastornos del habla."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "boto3>=1.26.29",
+    "botocore>=1.29.29",
+    "certifi>=2022.9.24",
+    "click>=8.1.3",
+    "dnspython>=2.8.0",
+    "Flask>=2.2.2",
+    "Flask-Login>=0.6.2",
+    "itsdangerous>=2.1.2",
+    "Jinja2>=3.1.2",
+    "jmespath>=1.0.1",
+    "MarkupSafe>=2.1.1",
+    "pymongo>=4.17.0",
+    "python-dateutil>=2.8.2",
+    "s3transfer>=0.6.0",
+    "six>=1.16.0",
+    "urllib3>=1.26.13",
+    "Werkzeug==2.2.3",
+    "gradio>=6.14.0",
+    "gradio_client>=2.5.0",
+    "flask-principal>=0.4.0",
+    "flask-limiter>=4.1.1",
+]
+
+[tool.ruff]
+# Añadido solo lo que es distinto al comportamiento por defecto de Ruff (https://docs.astral.sh/ruff/configuration/)
+line-length = 100
+extend-exclude = ["__pycache__", "migrations"]
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E", # Errores de estilo (pycodestyle)
+    "F", # Pyflakes (ej. variables no usadas, imports no usados)
+    "I", # Isort (ordena las importaciones alfabéticamente)
+    "W", # Advertencias
+]

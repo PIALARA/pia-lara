@@ -1,14 +1,67 @@
-from datetime import datetime
 import math
+from datetime import datetime
+from typing import cast
+
 from bson.objectid import ObjectId
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import current_user, login_required
+from flask_login import current_user as flask_current_user
+from flask_login import login_required
 
-from pialara.models.Syllabus import Syllabus
-from pialara.models.Usuario import Usuario
 from pialara.models.Clicks import Clicks
+from pialara.models.Syllabus import Syllabus
+from pialara.models.User import User
+from pialara.models.Usuario import Usuario
+
+current_user = cast(User, flask_current_user)
 
 bp = Blueprint("syllabus", __name__, url_prefix="/syllabus")
+
+
+def _get_momento_dia():
+    hora = datetime.now().hour
+    if 6 <= hora < 12:
+        return "mañana"
+    elif 12 <= hora < 20:
+        return "tarde"
+    return "noche"
+
+
+def _get_frase_sugerida(syllabus, ubicacion):
+    """
+    Obtiene una frase sugerida optimizada usando $sample.
+    """
+    if ubicacion and ubicacion != "general":
+        match = {"tags": {"$regex": ubicacion, "$options": "i"}}
+    else:
+        dias_semana = [
+            "lunes",
+            "martes",
+            "miércoles",
+            "jueves",
+            "viernes",
+            "sábado",
+            "domingo",
+        ]
+        dia_actual = dias_semana[datetime.now().weekday()]
+        match = {"tags": {"$regex": dia_actual, "$options": "i"}}
+
+    pipeline = [{"$match": match}, {"$sample": {"size": 1}}]
+
+    try:
+        resultado = list(syllabus.aggregate(pipeline))
+        if resultado:
+            return resultado[0]
+    except Exception:
+        pass
+
+    # Fallback si no hay coincidencias o error: cualquier frase aleatoria
+    try:
+        fallback_pipeline = [{"$sample": {"size": 1}}]
+        resultado_fallback = list(syllabus.aggregate(fallback_pipeline))
+        return resultado_fallback[0] if resultado_fallback else None
+    except Exception:
+        return None
+
 
 @bp.route("/", methods=["GET"])
 @login_required
@@ -30,10 +83,10 @@ def index():
                 ]
             }
         )
-        
+
     # Agregamos un campo nuevo $expr para poder hacer un $and con los filtros de fecha
     match_filter.update({"$expr": {"$and": []}})
-    
+
     if tag_date_since != "":
         match_filter["$expr"]["$and"].append(
             {
@@ -64,7 +117,7 @@ def index():
             }
         )
 
-    pipeline = [{"$match": match_filter}]
+    pipeline: list[dict] = [{"$match": match_filter}]
 
     # Empieza modificacion
     PER_PAGE = 9
@@ -78,7 +131,7 @@ def index():
     total_pages = math.ceil(total / PER_PAGE)
     skip = (current_page - 1) * PER_PAGE
 
-    pipeline += [{"$skip": skip}, {"$limit": PER_PAGE}]
+    pipeline.extend([{"$skip": skip}, {"$limit": PER_PAGE}])
     print(pipeline)
     documentos = syllabus.aggregate(pipeline)
 
@@ -104,6 +157,11 @@ def index():
     }
     clicks.insert_one(click_doc)
 
+    # Lógica para frase sugerida (solo para clientes)
+    ubicacion = request.args.get("location") or "general"
+    momento_dia = _get_momento_dia()
+    frase_sugerida = _get_frase_sugerida(syllabus, ubicacion)
+
     return render_template(
         "syllabus/index.html",
         syllabus=documentos,
@@ -114,8 +172,29 @@ def index():
         total_pages=total_pages,
         tag_date_since=tag_date_since,
         tag_date_to=tag_date_to,
+        frase_sugerida=frase_sugerida,
+        ubicacion=ubicacion,
+        momento_dia=momento_dia,
     )
 
+
+@bp.route("/frase-aleatoria", methods=["GET"])
+@login_required
+def frase_aleatoria():
+    from flask import jsonify
+
+    ubicacion = request.args.get("location") or "general"
+    syllabus = Syllabus()
+    frase = _get_frase_sugerida(syllabus, ubicacion)
+    if not frase:
+        return jsonify({"error": "No hay frases disponibles"}), 404
+    return jsonify(
+        {
+            "texto": frase.get("texto", ""),
+            "tags": frase.get("tags", []),
+            "momento_dia": _get_momento_dia(),
+        }
+    )
 
 
 @bp.route("/create")
@@ -124,14 +203,18 @@ def create():
     return render_template("syllabus/create.html")
 
 
-
-
 @bp.route("/create", methods=["POST"])
 @login_required
 def create_post():
     # Obtener los datos del formulario
     text = request.form.get("ftext")
     tags = request.form.get("ftags")
+    if not text or text.strip() == "":
+        flash("El campo de texto no puede estar vacío.", "danger")
+        return redirect(url_for("syllabus.create"))
+    if not tags or tags.strip() == "":
+        flash("El campo de etiquetas no puede estar vacío.", "danger")
+        return redirect(url_for("syllabus.create"))
 
     # Obtener los datos del usuario
     usuario = Usuario()
@@ -163,30 +246,33 @@ def create_post():
         flash("La frase no se ha creado. Error genérico", "danger")
         return redirect(url_for("syllabus.create"))
 
+
 @bp.route("/create_iterable")
 @login_required
 def create_iterable():
     return render_template("syllabus/create_iterable.html")
 
+
 @bp.route("/create_iterable", methods=["POST"])
 @login_required
 def create_iterable_post():
     # Obtener los datos del formulario
-    tags = request.form.get('ftags')
+    tags = request.form.get("ftags")
     if not tags or tags.strip() == "":
-        flash('El campo de etiquetas no puede estar vacío.', 'danger')
-        return redirect(url_for('syllabus.create_iterable'))
+        flash("El campo de etiquetas no puede estar vacío.", "danger")
+        return redirect(url_for("syllabus.create_iterable"))
 
-    
     qtyPhrases = request.form.get("qtyPhrases")
+    if not qtyPhrases or qtyPhrases.strip() == "" or not qtyPhrases.isdigit():
+        flash("El campo de cantidad de frases no puede estar vacío y debe ser un número.", "danger")
+        return redirect(url_for("syllabus.create_iterable"))
 
     # Recogemos todas las frases del formulario
     lista_frases = []
     for i in range(int(qtyPhrases)):
         lista_frases.append(request.form.get(f"ftext{i + 1}"))
 
-    if not any("" == frase for frase in lista_frases) and qtyPhrases != 'Seleccionar':
-
+    if not any("" == frase for frase in lista_frases) and qtyPhrases != "Seleccionar":
         # Obtener los datos del usuario
         usuario = Usuario()
         params = {"mail": current_user.email}
@@ -195,11 +281,11 @@ def create_iterable_post():
         # Convertir el array de los tags
         tagsArray = tags.split(", ")
         texto = Syllabus()
-        
+
         # Iteramos la lista de frases al reves
-        for index ,text in enumerate(reversed(lista_frases)):
+        for index, text in enumerate(reversed(lista_frases)):
             if index == 0:
-                print(f'Reversed lista {index}', text)
+                print(f"Reversed lista {index}", text)
                 # Crear el texto en la base de datos
                 aux = {
                     "texto": text,
@@ -212,11 +298,11 @@ def create_iterable_post():
                     "fecha_creacion": datetime.now(),
                     "iterable": {
                         "num": abs(index - len(lista_frases)),
-                        "total": len(lista_frases)
-                    }
+                        "total": len(lista_frases),
+                    },
                 }
                 result = texto.insert_one(aux)
-                id_insertado = result.inserted_id  
+                id_insertado = result.inserted_id
                 print("Frase ", text, "ID ", id_insertado)
             else:
                 aux = {
@@ -231,19 +317,19 @@ def create_iterable_post():
                     "iterable": {
                         "siguiente": id_insertado,
                         "num": abs(index - len(lista_frases)),
-                        "total": len(lista_frases)
-                    }
+                        "total": len(lista_frases),
+                    },
                 }
                 result = texto.insert_one(aux)
-                id_insertado = result.inserted_id           
+                id_insertado = result.inserted_id
                 print("Frase ", text, "ID ", id_insertado)
-    
+
         flash("Iterable creado correctamente", "success")
         return redirect(url_for("syllabus.index"))
     else:
         flash("Campos erroneos!", "danger")
         return render_template("syllabus/create_iterable.html")
-    
+
 
 @bp.route("/update/<string:id>")
 @login_required
@@ -267,13 +353,19 @@ def update(id):
 def update_post(id):
     # Obtener los datos del formulario
     text = request.form.get("ftext")
+    if not text or text.strip() == "":
+        flash("El campo de texto no puede estar vacío.", "danger")
+        return redirect(url_for("syllabus.update", id=id))
     tags = request.form.get("ftags")
+    if not tags or tags.strip() == "":
+        flash("El campo de etiquetas no puede estar vacío.", "danger")
+        return redirect(url_for("syllabus.update", id=id))
     fraseID = id
 
     # Obtener los datos del usuario
-    usuario = Usuario()
-    params = {"email": current_user.email}
-    user = usuario.find_one(params)
+    # usuario = Usuario()
+    # params = {"email": current_user.email}
+    # user = usuario.find_one(params)
 
     # Convertir el array de los tags
     tagsArray = tags.split(", ")
